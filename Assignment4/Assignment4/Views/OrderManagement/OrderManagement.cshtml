@@ -1,0 +1,416 @@
+﻿<style>
+    .contentCenter {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+<div class="container-fluid mt-3">
+    <div>
+        @Html.Partial("~/Partialviews/_SearchBar.cshtml")
+    </div>
+    <button class="customBtn mb-2 mt-2" onclick="LoadOrderForm()">Add Order</button>
+
+    <table id="tblOrders" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer Name</th>
+                <th>Order Date</th>
+                <th>Total Amount</th>
+                <th>Preparation Status</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderModalLabel">Add Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Customer</label>
+                        <select class="form-select ClearOrderModalData requiredfield" id="ddlCustomer"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Order Date</label>
+                        <input type="date" class="form-control ClearOrderModalData requiredfield" id="txtOrderDate" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Preparation Status</label>
+                        <select class="form-select ClearOrderModalData requiredfield" id="ddlPreparationStatus">
+                            <option value="Not started">Not started</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Ready">Ready</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select ClearOrderModalData requiredfield" id="ddlOrderStatus">
+                            <option value="Pending">Pending</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <h5>Order Items</h5>
+                        <table id="tblOrderItems" class="table table-bordered table-responsive">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Unit</th>
+                                    <th>Price</th>
+                                    <th>Deliverstatus</th>
+                                    <th>DeliverdQuantity</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                        <button class="btn btn-sm btn-primary mt-2" onclick="AddOrderItemRow()">Add Item</button>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Final Price</label>
+                        <input type="number" class="form-control" id="txtFinalPrice" readonly />
+                    </div>
+                    <input type="hidden" class="ClearOrderModalData" id="txtOrderIdHidden">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="SaveOrder()" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function()
+    {
+        GetOrdersData();
+         $('#tblOrders').on('click', '.btn-edit', function() {
+
+                var fullData = JSON.parse($(this).attr('data-full-data'));
+
+                    
+                EditOrder(fullData)
+
+            });
+
+            $('#tblOrders').on('click', '.btn-delete', function() {
+
+                var ID = JSON.parse($(this).attr('data-id'));
+               
+
+                DeleteWarning(DeleteOrder, ID);
+
+
+            });
+        
+        
+    });
+
+    function LoadOrderForm() {
+        GetCustomers();
+        GetInventoryItems();
+        $('.ClearOrderModalData').val('');
+        $('#tblOrderItems tbody').empty();
+        $('#orderModal').modal('show');
+    }
+
+   
+    function  GetCustomers() {
+        $.ajax({
+            url: '/Configuration/GetCustomer',
+            type: 'POST',
+            success: function(response) {
+
+                const selectElement = $('#ddlCustomer');
+                selectElement.empty();
+
+                let options = `<option value="">Select Customer</option>`;
+
+                if (response && response.length > 0) {
+                    options += response.map(item => `<option value="${item.customerId}">${item.customerName}</option>`).join('');
+                }
+
+                selectElement.html(options);
+
+            },
+            error: function(xhr, status, error) {
+                alert('An error occurred: ' + error);
+            }
+        });
+
+    }
+
+    function GetInventoryItems() {
+        $.get('/Configuration/GetInventoryItems', function(response) {
+            window.inventoryItems = response;
+        });
+    }
+        function AddOrderItemRow() {
+        let tableBody = $('#tblOrderItems tbody');
+        let rowIndex = tableBody.children().length;
+      let newRow = `<tr>
+                   <td><select class="form-select item-dropdown" id="item_${rowIndex}" onchange="UpdatePriceAndUnit(${rowIndex})"></select></td>
+                   <td><input type="number" class="form-control" id="quantity_${rowIndex}" oninput="CalculatePrice(${rowIndex})"/></td>
+                   <td><input type="text" class="form-control unit-field" id="unit_${rowIndex}" readonly/></td>
+                   <td><input type="number" class="form-control item-price" id="price_${rowIndex}" /></td>
+                    <td><input type="text" class="form-control item-Deliverstatus" id="Deliverstatus_${rowIndex}" /></td> <!-- Fixed the syntax here -->
+                   <td><input type="Number" class="form-control item-DeliverdQuantity" id="DeliverdQuantity_${rowIndex}" /></td>
+                  
+                   <td><button class="btn btn-sm btn-danger" onclick="RemoveOrderItemRow(this)">Remove</button></td>
+               </tr>`;
+tableBody.append(newRow);
+
+        LoadOrderItems(rowIndex);
+    }
+        function RemoveOrderItemRow(button) {
+        // Find the row containing the clicked button
+        var row = $(button).closest('tr');
+
+        // Remove the row from the table
+        row.remove();
+    }
+   
+    function LoadOrderItems(index) {
+        let selectElement = $(`#item_${index}`);
+        selectElement.empty().append('<option value="">Select Item</option>');
+        window.inventoryItems.forEach(item => {
+            selectElement.append(`<option value="${item.itemId}" data-unit="${item.unit}" data-price="${item.pricePerUnit}">${item.itemName}</option>`);
+        });
+    }
+
+    function UpdatePriceAndUnit(index) {
+        let selectedOption = $(`#item_${index} option:selected`);
+        let unit = selectedOption.data('unit');
+        let pricePerUnit = selectedOption.data('price');
+        $(`#unit_${index}`).val(unit);
+        CalculatePrice(index);
+        UpdateFinalPrice();
+    }
+
+    function CalculatePrice(index) {
+        let quantity = parseFloat($(`#quantity_${index}`).val()) || 0;
+        let pricePerUnit = parseFloat($(`#item_${index} option:selected`).data('price')) || 0;
+        $(`#price_${index}`).val(quantity * pricePerUnit);
+        UpdateFinalPrice();
+    }
+
+    function UpdateFinalPrice() {
+        let total = 0;
+        $('.item-price').each(function() {
+            total += parseFloat($(this).val()) || 0;
+        });
+        $('#txtFinalPrice').val(total);
+    }
+
+        function GetOrdersData() {
+        // Get the selected start and end date values from the input fields
+        let startDate = $('#startDate').val();
+        let endDate = $('#endDate').val();
+
+        // Initialize DataTable
+        var table = $('#tblOrders').DataTable();
+        table.clear();  // Clear the existing data
+        table.draw();   // Redraw the table after clearing
+
+        // Send the AJAX request with the date range
+        $.ajax({
+            url: '/OrderManagement/GetAllOrders', // Your endpoint to fetch orders
+            type: 'GET', // Change this to POST if necessary
+            data: { sd: startDate, ed: endDate }, // Pass the start and end date as query parameters
+            success: function(response) {
+                debugger
+                // Add the orders data to the table
+                response.forEach(function(order) {
+                    table.row.add([
+                
+
+                        order.orderId,
+                        order.fkCustomer.customerName, // Assuming fkCustomer.customerName exists
+                        order.orderDate,
+                        order.totalAmount,
+                        order.orderPreparationStatus,
+                        order.status,
+                           '<div class="contentCenter">' +
+
+                    '<i class="fa fa-edit me-4 ml-2 btn-edit" style="color:green" data-full-data=\'' + JSON.stringify(order) + '\'></i>' +
+
+                    '<i class="fa fa-trash ml-2 btn-delete" style="color:red" data-id=\'' + JSON.stringify(order.orderId) + '\'></i>' +
+
+                    '</div>'
+                    ]).draw();
+                });
+            },
+            error: function(xhr, status, error) {
+                alert('An error occurred: ' + error); // Handle errors that occur during the request
+            }
+        });
+    }
+
+
+
+             function SaveOrder() {
+        debugger;
+        // Gather order details
+        let orderData = {
+            orderId: $('#txtOrderIdHidden').val(),
+            fkCustomerId: $('#ddlCustomer').val(),
+            orderDate: $('#txtOrderDate').val(),
+            orderPreparationStatus: $('#ddlPreparationStatus').val(),
+            status: $('#ddlOrderStatus').val(),
+            totalAmount: $('#txtFinalPrice').val(),
+        };
+
+        // Gather order items from the order items table
+        let orderItems = [];
+        $('#tblOrderItems tbody tr').each(function() {
+            let item = {
+                fkItemId: $(this).find('.item-dropdown').val(),
+                quantity: $(this).find('.form-control#quantity').val(),
+                unit: $(this).find('.form-control.unit-field').val(),
+                price: $(this).find('.form-control.item-price').val(),
+                deliveredQty: $(this).find('.form-control.item-DeliverdQuantity').val(),
+                deliveredStatus: $(this).find('.form-control.item-Deliverstatus').val()
+            };
+
+            // Debugging: check values for delivered quantity and status
+            console.log('Delivered Quantity:', $(this).find('.form-control.item-DeliverdQuantity').val());
+            console.log('Delivered Status:', $(this).find('.form-control.item-Deliverstatus').val());
+
+            orderItems.push(item);
+        });
+
+        // Send the data to the server as two separate parameters
+        $.ajax({
+            url: "/OrderManagement/AddOrEditOrder",
+            type: 'POST',
+            data: {
+                order: orderData,
+                billOrderItems: orderItems
+            },
+            success: function(response) {
+                if (response) {
+                    msgPopup('success', 'Data saved successfully');
+                    $('#orderModal').modal('hide');
+                } else {
+                    msgPopup('error', 'Failed to save data.');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', xhr.responseText);
+                msgPopup('error', 'An error occurred while saving the order.');
+            }
+        });
+    }
+
+
+        function EditOrder(order) {
+                 let customerId = order.fkCustomer.customerId;
+        // Set order details in modal fields
+              var cus=order.fkCustomerId.customerId;
+        $('#txtOrderIdHidden').val(order.orderId);
+            $('#ddlCustomer').val(customerId);  // Set the customer in the dropdown
+        $('#txtOrderDate').val(order.orderDate.split('T')[0]);  // Format date to YYYY-MM-DD
+        $('#ddlPreparationStatus').val(order.orderPreparationStatus);
+        $('#ddlOrderStatus').val(order.status);
+        $('#txtFinalPrice').val(order.totalAmount);
+
+        // Clear any existing order items in the table
+        $('#tblOrderItems tbody').empty();
+
+        // Check if orderItems is not undefined or null
+        if (order.orderItems && Array.isArray(order.orderItems)) {
+            // Populate the order items table
+            order.orderItems.forEach(function (item, index) {
+                let rowIndex = index;
+                let newRow = `<tr>
+                                <td><select class="form-select item-dropdown" id="item_${rowIndex}" onchange="UpdatePriceAndUnit(${rowIndex})"></select></td>
+                                <td><input type="number" class="form-control" id="quantity_${rowIndex}" value="${item.quantity}" oninput="CalculatePrice(${rowIndex})"/></td>
+                                <td><input type="text" class="form-control unit-field" id="unit_${rowIndex}" value="${item.unit}" readonly/></td>
+                                <td><input type="number" class="form-control item-price" id="price_${rowIndex}" value="${item.price}" readonly/></td>
+                                <td><input type="text" class="form-control item-DeliverdQuantity" id="DeliverdQuantity_${rowIndex}" value="${item.deliveredQty || ''}" /></td>
+                                <td><input type="text" class="form-control item-Deliverstatus" id="Deliverstatus_${rowIndex}" value="${item.deliveredStatus || ''}" /></td>
+                                <td><button class="btn btn-sm btn-danger" onclick="RemoveOrderItemRow(this)">Remove</button></td>
+                            </tr>`;
+
+                $('#tblOrderItems tbody').append(newRow);
+                LoadOrderItems(rowIndex, item.fkItemId); // Load inventory items for each row
+            });
+        } else {
+            console.error("orderItems is not defined or not an array");
+        }
+
+        // Show the modal
+        $('#orderModal').modal('show');
+    }
+
+
+    function LoadOrderItems(index, selectedItemId) {
+        let selectElement = $(`#item_${index}`);
+        selectElement.empty().append('<option value="">Select Item</option>');  // Clear existing options
+
+        // Ensure window.inventoryItems is populated
+        if (!window.inventoryItems || window.inventoryItems.length === 0) {
+            console.error('inventoryItems is not available or empty');
+            return;
+        }
+
+        // Loop through each item in inventory and populate the dropdown
+        window.inventoryItems.forEach(item => {
+            let selected = item.itemId == selectedItemId ? 'selected' : '';
+            selectElement.append(`<option value="${item.itemId}" data-unit="${item.unit}" data-price="${item.pricePerUnit}" ${selected}>${item.itemName}</option>`);
+        });
+    }
+
+
+              function LoadOrderItems(index, selectedItemId) {
+        // Ensure window.inventoryItems is populated
+        if (!window.inventoryItems || window.inventoryItems.length === 0) {
+            console.error('inventoryItems is not available or empty');
+            return;
+        }
+
+        // Get the select element for the item dropdown
+        let selectElement = $(`#item_${index}`);
+        selectElement.empty().append('<option value="">Select Item</option>');  // Clear existing options
+
+        // Check if selectedItemId is defined, and default to null if not
+        selectedItemId = selectedItemId || null;
+
+        // Loop through each item in inventory and populate the dropdown
+        window.inventoryItems.forEach(item => {
+            // Mark the option as selected if it matches selectedItemId
+            let selected = item.itemId == selectedItemId ? 'selected' : '';
+            selectElement.append(`<option value="${item.itemId}" data-unit="${item.unit}" data-price="${item.pricePerUnit}" ${selected}>${item.itemName}</option>`);
+        });
+    }
+
+
+
+    function DeleteOrder(orderId) {
+      
+            $.ajax({
+                url: `/OrderManagement/DeleteOrder/`,
+                data:{id:orderId},
+                type: 'POST',
+                success: function() {
+                    GetOrdersData();
+                }
+            });
+        
+    }
+</script>

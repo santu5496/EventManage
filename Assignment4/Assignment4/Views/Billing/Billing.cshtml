@@ -1,0 +1,251 @@
+﻿
+<style>
+    .billing-container {
+        display: flex;
+    }
+
+    .category-list, .items-list, .billing-section {
+        padding: 10px;
+    }
+
+    .billing-section {
+        border-left: 1px solid #ddd;
+    }
+
+    .category-list {
+        border-right: 1px solid #ddd;
+    }
+
+    .item-card {
+        cursor: pointer;
+        padding: 10px;
+        border: 1px solid #ddd;
+        margin-bottom: 5px;
+    }
+</style>
+
+<div class="container-fluid mt-4 mb-4">
+    <div class="row">
+        <div class="col-md-2">
+            Select Customer:
+        </div>
+        <div class="col-md-3">
+            <select id="ddlCustomer" class="form-control form-select"></select>
+        </div>
+        @* <div class="col-md-2">
+            Select Order:
+        </div>
+        <div class="col-md-3">
+            <select id="ddlOrders"></select>
+        </div> *@
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Category List -->
+        <div class="col-md-2 col-sm-12 category-list">
+            <h4>Categories</h4><hr>
+            <div id="categoryContainer"></div>
+        </div>
+
+        <!-- Items List -->
+        <div class="col-md-6 col-sm-12 items-list">
+            <h4>Items</h4><hr>
+            <div id="itemsContainer" class="row"></div>
+        </div>
+
+        <!-- Billing Section -->
+        <div class="col-md-4 col-sm-12 billing-section">
+            <h4>Bill Summary</h4><hr>
+
+            <table class="table table-bordered" style="height:350px;overflow:auto">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Unit</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="billItems"></tbody>
+            </table>
+            <h4>Total Amount: <span id="totalAmount">0</span> ₹</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Payment Status</label>
+                    <select id="ddlPaymentStatus" class="form-control form-select" onchange="ValidatePaymentMode(this.value)">
+                        <option value="UnPaid" selected>UnPaid</option>
+                        <option value="Paid">Paid</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label>Payment Mode</label>
+                    <select id="ddlPaymentMode" class="form-control form-select" disabled>
+                        <option value="NA">NA</option>
+                        <option value="Cash">Cash</option>
+                        <option value="PhonePay">Phone Pay</option>
+                        <option value="GooglePay">Google Pay</option>
+                        <option value="NetBanking">Net Banking</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn btn-success mt-3" onclick="generatePDF();SaveBillItems()">Generate Bill</button>
+
+        </div>
+    </div>
+</div>
+<script src="~/js/BillOperation.js"></script>
+<script>
+       
+    let scannedData = '';
+
+    window.addEventListener('keypress', function(e) {
+        if (e.key.length === 1) {
+            scannedData += e.key;  // Collect each character
+        } else if (e.key === 'Enter') {
+            if (scannedData.trim()) {
+                GetItemsDetailsById(scannedData.trim()); // Process data
+                scannedData = '';  // Reset for the next scan
+            }
+            e.preventDefault();  // Prevent unexpected behavior
+        }
+    });
+
+    $(document).ready(function() {
+        loadCategories();
+       
+
+        $(document).on("click", ".category-btn", function() {
+            let categoryId = $(this).data("id");
+            $.ajax({
+                url: '/Billing/GetBillingItemsByCategory',
+                type: 'POST',
+                data: {
+                    catId: categoryId
+                },
+                success: function(response) {
+
+                    let html = "";
+                    response.forEach(item => {
+                        html += `<div class="item-card col-md-3 m-2" data-id="${item.itemId}" data-unit="${item.unit}" data-name="${item.itemName}" data-maxval=${item.maxQuantity} data-price="${item.pricePerUnit}" data-priceqty="${item.priceQuantity}">
+                                    ${item.itemName}(${item.priceQuantity}${item.unit}) - ₹${item.pricePerUnit}
+                                    </div>`;
+                    });
+                    $("#itemsContainer").html(html);
+
+                },
+                error: function(xhr, status, error) {
+                    alert('An error occurred: ' + error);
+                }
+            });
+
+
+
+        });
+
+        $(document).on("click", ".item-card", function() {
+            let itemId = $(this).data("id");
+            let itemName = $(this).data("name");
+            let itemPrice = $(this).data("price");
+            let itemUnit = $(this).data("unit");
+            let unitforPrice = $(this).data("priceqty");
+            let maxValue = $(this).data("maxval");
+
+            addItemToBill(itemId, itemName, itemPrice, itemUnit, unitforPrice,maxValue);
+        });
+
+
+       
+
+    });
+    $(document).ready(function() {
+        $.ajax({
+            url: '/Configuration/GetCustomer',
+            type: 'GET',
+            success: function(response) {
+                let html = '<option value="">Select Customer</option>';
+                response.forEach(customer => {
+                    html += `<option value="${customer.customerId}">${customer.customerName}</option>`;
+                });
+                $('#ddlCustomer').html(html);
+            },
+            error: function(xhr, status, error) {
+                alert('An error occurred while fetching customer details: ' + error);
+            }
+        });
+    });
+
+ 
+    function loadCategories() {
+        $.ajax({
+            url: '/Configuration/GetCategory',
+            type: 'GET',
+            success: function(response) {
+                let html = "";
+                response.forEach(category => {
+                    html += `<button class="customBtn category-btn m-2 col-md-5" data-id="${category.id}">
+                                        ${category.categoryName}
+                                     </button>`;
+                });
+                $("#categoryContainer").html(html);
+            },
+            error: function(xhr, status, error) {
+                alert('An error occurred: ' + error);
+            }
+        });
+    }
+
+    // function updateTotal(row) {
+    //     let qty = row.find(".qty-input").val();
+    //     let price = row.find(".price").text();
+    //     row.find(".total").text(qty * price);
+    //     updateGrandTotal();
+    // }
+    
+
+
+    function SaveBillItems() {
+        let itemsList = [];
+        $("#billItems tr").each(function () {
+            let row = $(this);
+            let itemId = row.data('id');
+            let qty = parseFloat(row.find(".qty-input").val()) || 0;
+            let unit = row.find(".unit").text().trim();
+            let price = parseFloat(row.find(".total").text()) || 0;
+
+            // Add item details to the list
+            itemsList.push({
+                fkItemId: itemId,
+                quantity: qty,
+                unit: unit,
+                price: price
+            });
+        });
+        let billData = {};
+        billData.fkCustomerId  = $('#ddlCustomer').val();
+        billData.paymentMode   = $('#ddlPaymentMode').val();
+        billData.paymentStatus = $('#ddlPaymentStatus').val();
+        billData.finalAmount = $('#totalAmount').text();
+
+        $.ajax({
+            url: '/Billing/SaveBill',
+            type: 'POST',
+            data: {
+                billData: billData,
+                billItems: JSON.stringify(itemsList)
+                },
+            success: function (response) {
+                if(response){
+                msgPopup('success','BillData Saved successfully!');
+                }else{
+                    msgPopup('error','Bill Data Not Saved');
+                }
+            },
+            error: function (xhr, status, error) {
+            }
+        });
+    }
+
+</script>
