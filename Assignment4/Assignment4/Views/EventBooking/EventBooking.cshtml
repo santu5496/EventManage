@@ -190,18 +190,27 @@
                 },
 
                 // When a date is clicked in the calendar
-                dateClick: function(info) {
-                    // Update the date picker with the selected date
-                    var dateClicked = info.dateStr;
-                    $('#booking-date').datepicker('setDate', new Date(dateClicked));
-                    selectedDate = dateClicked;
+                        dateClick: function(info) {
+            // Get the clicked date
+            var dateClicked = info.dateStr;
 
-                    // Highlight the selected date cell
-                    $('.fc-day').removeClass('selected-day');
-                    $(info.dayEl).addClass('selected-day');
+            // Prompt the user to select a shift (morning/evening)
+            var shiftType = prompt("Enter shift (morning/evening):");
 
-                    console.log("Date selected:", dateClicked);
-                }
+            // Validate the shift type
+            if (shiftType === "morning" || shiftType === "evening") {
+                // Book the selected shift
+                bookShift(dateClicked, shiftType);
+            } else {
+                alert("Invalid shift. Please choose 'morning' or 'evening'.");
+            }
+
+            // Highlight the selected date cell
+            $('.fc-day').removeClass('selected-day');
+            $(info.dayEl).addClass('selected-day');
+
+            console.log("Date clicked:", dateClicked);
+        }
             });
 
             calendar.render();
