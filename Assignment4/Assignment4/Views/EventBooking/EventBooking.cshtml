@@ -1,0 +1,360 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lodge Booking Calendar</title>
+
+    <!-- FullCalendar CSS and JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- jQuery UI for Datepicker -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        #calendar {
+            width: 90%;
+            margin: 20px auto;
+        }
+
+        /* Buttons styling */
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+
+        /* Custom styling for day cells */
+        .fc-daygrid-day {
+            position: relative;
+        }
+
+        .day-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .morning-part {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+        }
+
+        .evening-part {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 50%;
+        }
+
+        .morning-booked {
+            background-color: #FF0000;
+        }
+
+        .evening-booked {
+            background-color: #00FF00;
+        }
+
+        /* Make sure day numbers remain visible */
+        .fc-daygrid-day-top {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Booking form styling */
+        #booking-form {
+            width: 350px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        #confirm-booking {
+            background-color: #28a745;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+            #confirm-booking:hover {
+                background-color: #218838;
+            }
+    </style>
+</head>
+<body>
+
+    <h1>Lodge Booking Calendar</h1>
+
+    <!-- Booking form with date picker and shift selector -->
+    <div id="booking-form">
+        <h3>Make a Booking</h3>
+        <div class="form-group">
+            <label for="booking-date">Select Date:</label>
+            <input type="text" id="booking-date" placeholder="Click to select date" readonly>
+        </div>
+        <div class="form-group">
+            <label for="booking-shift">Select Shift:</label>
+            <select id="booking-shift">
+                <option value="">-- Select Shift --</option>
+                <option value="morning">Morning</option>
+                <option value="evening">Evening</option>
+            </select>
+        </div>
+        <button id="confirm-booking">Confirm Booking</button>
+    </div>
+
+    <!-- Action buttons -->
+    <div>
+        <button id="get-bookings">Get Bookings</button>
+        <button id="test-button">Test Booking Connection</button>
+    </div>
+
+    <!-- Calendar container -->
+    <div id="calendar"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var bookingData = {}; // To store booking data
+            var selectedDate = null; // To store selected date
+
+            if (!calendarEl) {
+                console.error("Calendar element not found.");
+                return;
+            }
+
+            // Initialize FullCalendar
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                selectable: true,
+
+                // When calendar dates are set/changed
+                datesSet: function() {
+                    setTimeout(function() {
+                        setupDayCells();
+                        renderAllBookings();
+                    }, 100);
+                },
+
+                // When a date is clicked in the calendar
+                dateClick: function(info) {
+                    // Update the date picker with the selected date
+                    var dateClicked = info.dateStr;
+                    $('#booking-date').datepicker('setDate', new Date(dateClicked));
+                    selectedDate = dateClicked;
+
+                    // Highlight the selected date cell
+                    $('.fc-day').removeClass('selected-day');
+                    $(info.dayEl).addClass('selected-day');
+
+                    console.log("Date selected:", dateClicked);
+                }
+            });
+
+            calendar.render();
+
+            // Initialize jQuery UI Datepicker
+            $('#booking-date').datepicker({
+                dateFormat: 'yy-mm-dd',
+                minDate: 0, // Only allow future dates
+                onSelect: function(dateText) {
+                    selectedDate = dateText;
+                    console.log("Date picked:", selectedDate);
+
+                    // Highlight the selected date in the calendar
+                    $('.fc-day').removeClass('selected-day');
+                    $('.fc-day[data-date="' + selectedDate + '"]').addClass('selected-day');
+                }
+            });
+
+            // Add overlay divs to each date cell
+            function setupDayCells() {
+                // Find all day cells
+                var dayCells = document.querySelectorAll('.fc-daygrid-day');
+
+                // Process each day cell
+                dayCells.forEach(function(cell) {
+                    // Get the date from the cell's data attribute
+                    var dateStr = cell.getAttribute('data-date');
+
+                    // Only add overlays if not already present
+                    if (!cell.querySelector('.day-overlay')) {
+                        // Create overlay container
+                        var overlay = document.createElement('div');
+                        overlay.className = 'day-overlay';
+                        overlay.id = 'overlay-' + dateStr;
+
+                        // Create morning part
+                        var morningPart = document.createElement('div');
+                        morningPart.className = 'morning-part';
+                        morningPart.id = 'morning-' + dateStr;
+
+                        // Create evening part
+                        var eveningPart = document.createElement('div');
+                        eveningPart.className = 'evening-part';
+                        eveningPart.id = 'evening-' + dateStr;
+
+                        // Add parts to overlay
+                        overlay.appendChild(morningPart);
+                        overlay.appendChild(eveningPart);
+
+                        // Add overlay to cell
+                        cell.appendChild(overlay);
+                    }
+                });
+            }
+
+            // Event listeners for buttons
+            document.getElementById("test-button").addEventListener("click", testConnection);
+            document.getElementById("get-bookings").addEventListener("click", getBookings);
+            document.getElementById("confirm-booking").addEventListener("click", confirmBooking);
+
+            // Test connection function
+            function testConnection() {
+                console.log("Testing connection...");
+                alert("Connection tested!");
+            }
+
+            // Fetch bookings function
+            function getBookings() {
+                console.log("Fetching bookings data...");
+
+                // Sample booking data (simulate API response)
+                bookingData = {
+                    '2025-06-03': { morning: true, evening: false },
+                    '2025-06-05': { morning: false, evening: true }
+                };
+
+                // Render all bookings on the calendar
+                renderAllBookings();
+
+                alert("Bookings fetched and displayed!");
+            }
+
+            // Confirm booking function
+            function confirmBooking() {
+                var selectedShift = document.getElementById('booking-shift').value;
+
+                // Validate inputs
+                if (!selectedDate) {
+                    alert("Please select a date first.");
+                    return;
+                }
+
+                if (!selectedShift) {
+                    alert("Please select a shift (morning or evening).");
+                    return;
+                }
+
+                console.log("Confirming booking for " + selectedDate + ", " + selectedShift + " shift");
+
+                // Book the shift
+                bookShift(selectedDate, selectedShift);
+
+                // Reset form for next booking
+                document.getElementById('booking-shift').value = '';
+            }
+
+            // Book a shift for a date
+            function bookShift(date, shift) {
+                console.log("Booking " + shift + " shift for date " + date);
+
+                // Initialize booking data if needed
+                if (!bookingData[date]) {
+                    bookingData[date] = { morning: false, evening: false };
+                }
+
+                // Update booking data
+                bookingData[date][shift] = true;
+
+                // Render the booking on the calendar
+                renderBooking(date);
+
+                alert("Successfully booked " + shift + " shift for " + date);
+            }
+
+            // Render a single booking
+            function renderBooking(date) {
+                // Find the morning and evening elements for this date
+                var morningEl = document.getElementById('morning-' + date);
+                var eveningEl = document.getElementById('evening-' + date);
+
+                // Apply booking colors based on booking data
+                if (morningEl && bookingData[date] && bookingData[date].morning) {
+                    morningEl.classList.add('morning-booked');
+                }
+
+                if (eveningEl && bookingData[date] && bookingData[date].evening) {
+                    eveningEl.classList.add('evening-booked');
+                }
+
+                console.log("Rendered booking for date:", date);
+            }
+
+            // Render all bookings
+            function renderAllBookings() {
+                console.log("Rendering all bookings:", bookingData);
+
+                // Apply each booking
+                Object.keys(bookingData).forEach(function(date) {
+                    renderBooking(date);
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>

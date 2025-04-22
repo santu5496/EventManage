@@ -1,0 +1,204 @@
+﻿@{
+    ViewData["Title"] = "Events Management";
+}
+
+<style>
+    .customBtn {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+        .customBtn:hover {
+            background-color: #218838;
+        }
+
+    .modal-header, .modal-footer {
+        background-color: #f1f1f1;
+    }
+
+    .modal-title {
+        font-weight: bold;
+    }
+
+    #tblEvents {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        #tblEvents th, #tblEvents td {
+            padding: 8px 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        #tblEvents th {
+            background-color: #f8f9fa;
+        }
+
+    .btn-sm {
+        padding: 5px 10px;
+        font-size: 12px;
+        margin: 2px;
+        border-radius: 4px;
+    }
+
+    .form-label {
+        font-weight: bold;
+    }
+</style>
+
+<div class="container-fluid mt-3">
+    <button class="customBtn mb-2 mt-2" onclick="LoadEventForm()">Add Event</button>
+
+    <table id="tblEvents" class="table table-striped mb-3">
+        <thead>
+            <tr>
+                <th>Event Name</th>
+                <th>Description</th>
+                <th>Created Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <!-- Event Modal -->
+    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventModalLabel">Add / Update Event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Event Name</label>
+                        <input type="text" class="form-control ClearEventModalData" id="txtEventName" />
+                    </div>
+                    <div hidden class="mb-3">
+                        <label class="form-label">Event ID</label>
+                        <input type="number" class="form-control ClearEventModalData" id="EventID" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control ClearEventModalData" id="txtDescription"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" onclick="SaveEvent()" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function LoadEventForm()
+    {
+        $('.ClearEventModalData').val('');
+        $('#EventID').val('');
+        $('#eventModal').modal('show');
+    }
+
+    window.onload = function () {
+        GetEventsData();
+
+        $('#tblEvents').on('click', '.btn-edit', function () {
+            var event = JSON.parse($(this).attr('data-event'));
+            EditEvent(event);
+        });
+
+        $('#tblEvents').on('click', '.btn-delete', function () {
+            var eventID = $(this).attr('data-id');
+            DeleteEvent(eventID);
+        });
+    }
+
+       function GetEventsData() {
+        var table = $('#tblEvents').DataTable();
+        table.clear().draw();
+
+        $.ajax({
+            url: '/EventCrud/GetAllEvents',
+            type: 'GET',
+            success: function (response) {
+                console.log(response); // Debug the response structure
+                if (Array.isArray(response)) {
+                    response.forEach(function (event) {
+                        table.row.add([
+                            event.eventName,
+                            event.description,
+                            event.createdDate,
+                            '<div class="contentCenter">' +
+                                '<i class="fa fa-edit me-4 ml-2 btn-edit" style="color:green" data-event=\'' + JSON.stringify(event) + '\'></i>' +
+                                '<i class="fa fa-trash ml-2 btn-delete" style="color:red" data-id=\'' + event.eventId + '\'></i>' +
+                                '</div>'
+                        ]).draw();
+                    });
+                } else {
+                    alert('Unexpected response format. Please check the server response.');
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('Error: ' + error);
+            }
+        });
+    }
+
+    function EditEvent(event) {
+
+        $('#EventID').val(event.eventId);
+        $('#txtEventName').val(event.eventName);
+        $('#txtDescription').val(event.description);
+        $('#eventModal').modal('show');
+    }
+
+    function DeleteEvent(eventId) {
+        if (confirm('Are you sure you want to delete this event?')) {
+            $.ajax({
+                url: '/EventCrud/Delete',
+                data: { id: eventId },
+                type: 'DELETE',
+                success: function (response) {
+                    alert(response.message);
+                    GetEventsData();
+                },
+                error: function (xhr, status, error) {
+                    alert('Error: ' + error);
+                }
+            });
+        }
+    }
+
+    function SaveEvent() {
+        var eventData = {
+            eventId: $('#EventID').val(),
+            eventName: $('#txtEventName').val(),
+            description: $('#txtDescription').val()
+        };
+
+        $.ajax({
+            url: '/EventCrud/AddOrUpdateEvent',
+            type: 'POST',
+            data: { events: eventData },
+            success: function (response) {
+                if (response.success) {
+                    alert(response.message);
+                    $('#eventModal').modal('hide');
+                    GetEventsData();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('Error: ' + error);
+            }
+        });
+    }
+</script>
