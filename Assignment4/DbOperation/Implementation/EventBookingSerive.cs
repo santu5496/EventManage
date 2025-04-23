@@ -23,7 +23,7 @@ namespace DbOperation.Implementation
             {
                 using (var db = new EventContext(_context))
                 {
-                    bookings.BookingDate = DateTime.Now;
+                    bookings.createdDate = DateTime.Now;
                     db.Bookings.Add(bookings);
                     return db.SaveChanges() > 0;
                 }
@@ -67,15 +67,19 @@ namespace DbOperation.Implementation
         }
 
         // Implementing missing interface members
-        public bool AddEventBooking(Events eventBooking)
+        public bool AddEventBooking(Bookings eventBooking)
         {
             try
             {
                 using (var db = new EventContext(_context))
                 {
+                    eventBooking.eventId = 3;
+                    eventBooking.userId = 3;
+                    eventBooking.bookingDate = DateTime.Now;
                     eventBooking.createdDate = DateTime.Now;
-                    db.Events.Add(eventBooking);
-                    return db.SaveChanges() > 0;
+                    db.Bookings.Add(eventBooking);
+                    db.SaveChanges();
+                    return true;
                 }
             }
             catch (Exception ex)
@@ -93,11 +97,12 @@ namespace DbOperation.Implementation
             }
         }
 
-        public bool UpdateEventBooking(Events eventBooking)
+        public bool UpdateEventBooking(Bookings eventBooking)
         {
             using (var db = new EventContext(_context))
             {
-                db.Events.Update(eventBooking);
+                db.Bookings.Update(eventBooking);
+                
                 return db.SaveChanges() > 0;
             }
         }
@@ -115,6 +120,7 @@ namespace DbOperation.Implementation
                 return false;
             }
         }
+       
         
     }
 }

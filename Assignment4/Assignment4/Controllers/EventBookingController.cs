@@ -16,11 +16,11 @@ namespace EventManagement.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult AddOrUpdateEventBooking(Events eventBooking)
+        public IActionResult AddOrUpdateEventBooking(Bookings eventBooking)
         {
             if (eventBooking.eventId != 0)
             {
-                var result = _eventBookingSerive.UpdateEventBooking(eventBooking);
+                var result = _eventBookingSerive.UpdateBooking(eventBooking);
                 if (!result)
                 {
                     return Json(new { success = false, message = "Failed to update event booking." });
@@ -39,7 +39,7 @@ namespace EventManagement.Controllers
         }
         public IActionResult Delete(int id)
         {
-            var result = _eventBookingSerive.DeleteEventBooking(id);
+            var result = _eventBookingSerive.DeleteBooking(id);
             if (!result)
             {
                 return Json(new { success = false, message = "Failed to delete event booking." });
@@ -48,7 +48,7 @@ namespace EventManagement.Controllers
         }
         public IActionResult GetAllEventBookings()
         {
-            var result = _eventBookingSerive.GetAllEventBookings();
+            var result = _eventBookingSerive.GetAllBookings();
             if (result == null || result.Count == 0)
             {
                 return Json(result);
@@ -57,5 +57,6 @@ namespace EventManagement.Controllers
 
 
         }
+       
     }
 }

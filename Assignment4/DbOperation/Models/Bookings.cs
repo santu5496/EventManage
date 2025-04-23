@@ -7,33 +7,41 @@ namespace DbOperation.Models;
 
 public partial class Bookings
 {
-    public int BookingID { get; set; }
+    public int bookingId { get; set; }
 
-    public int? UserID { get; set; }
+    public int? userId { get; set; }
 
-    public int? EventID { get; set; }
+    public int? eventId { get; set; }
 
-    public DateTime? BookingDate { get; set; }
+    public DateTime? bookingDate { get; set; }
 
-    public DateTime? FromDate { get; set; }
+    public DateTime? fromDate { get; set; }
 
-    public DateTime? ToDate { get; set; }
+    public DateTime? toDate { get; set; }
 
-    public string ShiftType { get; set; }
+    public string shiftType { get; set; }
 
-    public string BookingStatus { get; set; }
+    public string bookingStatus { get; set; }
 
-    public decimal? TotalAmount { get; set; }
+    public decimal? totalAmount { get; set; }
 
-    public decimal? AdvancePayment { get; set; }
+    public decimal? advancePayment { get; set; }
 
-    public decimal? RemainingPayment { get; set; }
+    public decimal? remainingPayment { get; set; }
 
-    public string PaymentStatus { get; set; }
+    public string paymentStatus { get; set; }
 
-    public DateTime? CreatedDate { get; set; }
+    public DateTime? createdDate { get; set; }
 
-    public virtual Events Event { get; set; }
+    public string customerName { get; set; }
 
-    public virtual Users User { get; set; }
+    public string phoneNumber { get; set; }
+
+    public string alternativeNumber { get; set; }
+
+    public string address { get; set; }
+
+    public virtual Events _event { get; set; }
+
+    public virtual Users user { get; set; }
 }

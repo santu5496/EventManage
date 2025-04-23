@@ -23,36 +23,38 @@ public partial class EventContext : DbContext
     {
         modelBuilder.Entity<Bookings>(entity =>
         {
-            entity.HasKey(e => e.BookingID).HasName("PK__Bookings__73951ACD1702A52E");
+            entity.HasKey(e => e.bookingId).HasName("PK__Bookings__C6D03BCDC86B459A");
 
-            entity.Property(e => e.AdvancePayment).HasColumnType("decimal(10, 2)");
-            entity.Property(e => e.BookingDate)
+            entity.Property(e => e.address).HasMaxLength(255);
+            entity.Property(e => e.advancePayment).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.alternativeNumber).HasMaxLength(15);
+            entity.Property(e => e.bookingDate).HasColumnType("datetime");
+            entity.Property(e => e.bookingStatus)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.createdDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.BookingStatus)
+            entity.Property(e => e.customerName).HasMaxLength(255);
+            entity.Property(e => e.fromDate).HasColumnType("datetime");
+            entity.Property(e => e.paymentStatus)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.FromDate).HasColumnType("datetime");
-            entity.Property(e => e.PaymentStatus)
-                .HasMaxLength(50)
+            entity.Property(e => e.phoneNumber).HasMaxLength(15);
+            entity.Property(e => e.remainingPayment).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.shiftType)
+                .HasMaxLength(255)
                 .IsUnicode(false);
-            entity.Property(e => e.RemainingPayment).HasColumnType("decimal(10, 2)");
-            entity.Property(e => e.ShiftType)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-            entity.Property(e => e.ToDate).HasColumnType("datetime");
-            entity.Property(e => e.TotalAmount).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.toDate).HasColumnType("datetime");
+            entity.Property(e => e.totalAmount).HasColumnType("decimal(18, 2)");
 
-            entity.HasOne(d => d.Event).WithMany(p => p.Bookings)
-                .HasForeignKey(d => d.EventID)
-                .HasConstraintName("FK__Bookings__EventI__5165187F");
+            entity.HasOne(d => d._event).WithMany(p => p.Bookings)
+                .HasForeignKey(d => d.eventId)
+                .HasConstraintName("FK__Bookings__eventI__5629CD9C");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Bookings)
-                .HasForeignKey(d => d.UserID)
-                .HasConstraintName("FK__Bookings__UserID__5070F446");
+            entity.HasOne(d => d.user).WithMany(p => p.Bookings)
+                .HasForeignKey(d => d.userId)
+                .HasConstraintName("FK__Bookings__userId__5535A963");
         });
 
         modelBuilder.Entity<Events>(entity =>

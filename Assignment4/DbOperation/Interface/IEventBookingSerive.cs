@@ -9,10 +9,12 @@ namespace DbOperation.Interface
 {
     public interface IEventBookingSerive
     {
-        bool AddEventBooking(Events eventBooking);
-        List<Events> GetAllEventBookings();
-        bool UpdateEventBooking(Events eventBooking);
-        bool DeleteEventBooking(int id);
+        bool UpdateBooking(Bookings bookings);
+        bool DeleteBooking(int id);
+        bool AddEventBooking(Bookings eventBooking);
+        List<Bookings> GetAllBookings();
+
+
 
     }
 }
