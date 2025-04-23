@@ -432,9 +432,8 @@
     <div id="message" class="success-message"></div>
     <div id="calendar"></div>
 
-    <div id="booking-tooltip" class="booking-tooltip"></div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+   <script>
+               document.addEventListener('DOMContentLoaded', function() {
             // Global variables
             var calendarEl = document.getElementById('calendar');
             var bookingData = {};
@@ -442,6 +441,50 @@
             var calendar;
             var bookingModal = document.getElementById('bookingModal');
             var originalModalContent = $('#bookingModal .modal-body').html();
+            var eventsData = []; // Store events data for reference
+
+            // Add CSS styles for booking details
+            var css = `
+            .booking-info-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+
+            .booking-info-table td {
+                padding: 5px;
+                text-align: left;
+                border-bottom: 1px solid #eee;
+            }
+
+            .booking-info-table td:first-child {
+                width: 40%;
+                font-weight: 500;
+            }
+
+            .booking-item {
+                margin-bottom: 15px;
+                padding: 10px;
+                background-color: #f9f9f9;
+                border-radius: 5px;
+            }
+
+            .booking-item h4 {
+                margin-top: 0;
+                color: #007BFF;
+            }
+
+            .btn-info {
+                background-color: #17a2b8;
+                color: white;
+            }
+
+            .btn-info:hover {
+                background-color: #138496;
+            }
+            `;
+
+            $('<style>').text(css).appendTo('head');
 
             // Initialize FullCalendar
             calendar = new FullCalendar.Calendar(calendarEl, {
@@ -566,6 +609,11 @@
                 var eveningBooked = bookings.evening;
                 var content = `<div class="booking-options"><h3>${date}</h3>`;
 
+                // Add View Details button at the top if there are bookings
+                if (bookings.details.length > 0) {
+                    content += `<button class="btn btn-info view-details-btn">View Booking Details</button><hr>`;
+                }
+
                 if (morningBooked && eveningBooked) {
                     content += `
                         <p>Both shifts booked</p>
@@ -595,6 +643,10 @@
                 bookingModal.style.display = "block";
 
                 // Bind event handlers
+                $('.view-details-btn').click(function() {
+                    showBookingDetails(date, bookings);
+                });
+
                 $('.edit-btn').click(function() {
                     var shift = $(this).data('shift');
                     editBooking(date, shift);
@@ -607,6 +659,50 @@
 
                 $('.delete-btn').click(function() {
                     deleteBookingPrompt(date);
+                });
+            }
+
+            function showBookingDetails(date, bookings) {
+                var content = `<div class="booking-details">
+                                <h3>Booking Details for ${date}</h3>
+                                <div class="booking-list">`;
+
+                bookings.details.forEach(function(booking, index) {
+                    content += `
+                        <div class="booking-item">
+                            <h4>${booking.customerName} (${booking.shiftType})</h4>
+                            <table class="booking-info-table">
+                                <tr><td><strong>Booking ID:</strong></td><td>${booking.bookingId}</td></tr>
+                                <tr><td><strong>Event:</strong></td><td>${getEventName(booking.eventId)}</td></tr>
+                                <tr><td><strong>From Date:</strong></td><td>${booking.fromDate}</td></tr>
+                                <tr><td><strong>To Date:</strong></td><td>${booking.toDate}</td></tr>
+                                <tr><td><strong>Shift Type:</strong></td><td>${booking.shiftType}</td></tr>
+                                <tr><td><strong>Booking Status:</strong></td><td>${booking.bookingStatus}</td></tr>
+                                <tr><td><strong>Total Amount:</strong></td><td>$${booking.totalAmount}</td></tr>
+                                <tr><td><strong>Advance Payment:</strong></td><td>$${booking.advancePayment || 0}</td></tr>
+                                <tr><td><strong>Remaining Payment:</strong></td><td>$${booking.remainingPayment}</td></tr>
+                                <tr><td><strong>Payment Status:</strong></td><td>${booking.paymentStatus}</td></tr>
+                                <tr><td><strong>Phone:</strong></td><td>${booking.phoneNumber}</td></tr>
+                                <tr><td><strong>Alt. Phone:</strong></td><td>${booking.alternativeNumber || '-'}</td></tr>
+                                <tr><td><strong>Address:</strong></td><td>${booking.address || '-'}</td></tr>
+                            </table>
+                        </div>`;
+
+                    // Add a divider between bookings except after the last one
+                    if (index < bookings.details.length - 1) {
+                        content += `<hr>`;
+                    }
+                });
+
+                content += `</div>
+                            <button class="btn btn-secondary back-to-options-btn">Back</button>
+                            </div>`;
+
+                $('#bookingModal .modal-body').html(content);
+
+                // Add event handler for Back button
+                $('.back-to-options-btn').click(function() {
+                    showBookingOptions(date, bookings);
                 });
             }
 
@@ -662,7 +758,7 @@
             function deleteBooking(bookingId) {
                 showSpinner();
                 $.ajax({
-                    url: '/EventBooking/Delete',
+                    url: '/EventBooking/DeleteEventBooking',
                     type: 'POST',
                     data: { id: bookingId },
                     success: function(response) {
@@ -795,6 +891,7 @@
                     type: 'GET',
                     success: function(data) {
                         if (data && Array.isArray(data)) {
+                            eventsData = data; // Store events data globally
                             data.forEach(function(event) {
                                 eventDropdown.append(`<option value="${event.eventId}">${event.eventName}</option>`);
                             });
@@ -807,6 +904,11 @@
                         hideSpinner();
                     }
                 });
+            }
+
+            function getEventName(eventId) {
+                var event = eventsData.find(e => e.eventId == eventId);
+                return event ? event.eventName : 'Unknown Event';
             }
 
             function validateBookingForm() {
@@ -957,6 +1059,6 @@
             setupDayCells();
             fetchBookings();
         });
-    </script>
+   </script>
 </body>
 </html>
