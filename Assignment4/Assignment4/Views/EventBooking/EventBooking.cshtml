@@ -434,540 +434,529 @@
 
     <div id="booking-tooltip" class="booking-tooltip"></div>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Global variables
+            var calendarEl = document.getElementById('calendar');
+            var bookingData = {};
+            var selectedDate = null;
+            var calendar;
+            var bookingModal = document.getElementById('bookingModal');
+            var originalModalContent = $('#bookingModal .modal-body').html();
 
-   document.addEventListener('DOMContentLoaded', function () {
-    // Global variables
-    var calendarEl = document.getElementById('calendar');
-    var bookingData = {}; // Stores all booking data
-    var selectedDate = null; // Currently selected date
-    var calendar;
-    var bookingModal = document.getElementById('bookingModal');
-    var bookingModalCloseBtn = document.getElementsByClassName('close-button')[0];
-    var closeBookingModalBtn = document.getElementById('close-booking-modal');
-    var openBookingModalBtn = document.getElementById('open-booking-modal');
-    var saveBookingBtn = document.getElementById('save-booking');
-    var quickBookBtn = document.getElementById('quick-book');
-    var fetchBookingsBtn = document.getElementById('fetch-bookings');
-    var spinner = document.getElementById('spinner');
-    var messageEl = document.getElementById('message');
-    var modalMessageEl = document.getElementById('modal-message');
-    var tooltip = document.getElementById('booking-tooltip');
-
-    // Initialize FullCalendar
-    calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        selectable: true,
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,dayGridWeek'
-        },
-        datesSet: function() {
-            setTimeout(function() {
-                setupDayCells();
-                fetchBookings(); // Fetch bookings when month changes
-            }, 100);
-        },
-        dateClick: function(info) {
-            var dateClicked = info.dateStr;
-            selectedDate = dateClicked;
-            
-            // Set dates in form
-            $('#bookingDate').val(dateClicked);
-            $('#fromDate').val(dateClicked);
-            $('#toDate').val(dateClicked);
-            
-            // Highlight selected cell
-            $('.fc-day').removeClass('selected-day');
-            $(info.dayEl).addClass('selected-day');
-            
-            // Check booking status for this date
-            var bookingsForDate = bookingData[dateClicked];
-            
-            if (!bookingsForDate || bookingsForDate.details.length === 0) {
-                // No bookings - open new booking modal
-                openBookingModal(dateClicked);
-            } else {
-                // Check what's booked
-                var morningBooked = bookingsForDate.morning;
-                var eveningBooked = bookingsForDate.evening;
-                
-                if (!morningBooked && !eveningBooked) {
-                    openBookingModal(dateClicked);
-                } else if (morningBooked && eveningBooked) {
-                    // Both shifts booked - show edit/delete options
-                    showBookingOptions(dateClicked, 'both');
-                } else {
-                    // Partially booked - ask which shift to book/edit
-                    showBookingOptions(dateClicked, morningBooked ? 'evening' : 'morning');
-                }
-            }
-        }
-    });
-
-    // Initialize the calendar
-    calendar.render();
-
-    // Initialize jQuery UI Datepicker
-    $('#booking-date').datepicker({
-        dateFormat: 'yy-mm-dd',
-        minDate: 0,
-        onSelect: function(dateText) {
-            selectedDate = dateText;
-            $('.fc-day').removeClass('selected-day');
-            $('.fc-day[data-date="' + selectedDate + '"]').addClass('selected-day');
-        }
-    });
-
-    // Event listeners
-    saveBookingBtn.addEventListener('click', saveBooking);
-    quickBookBtn.addEventListener('click', quickBook);
-    fetchBookingsBtn.addEventListener('click', fetchBookings);
-    openBookingModalBtn.addEventListener('click', function() {
-        openBookingModal();
-    });
-    closeBookingModalBtn.addEventListener('click', closeBookingModal);
-    bookingModalCloseBtn.addEventListener('click', closeBookingModal);
-    window.addEventListener('click', function(event) {
-        if (event.target === bookingModal) {
-            closeBookingModal();
-        }
-    });
-
-    // Payment calculation
-    $('#totalAmount, #advancePayment').on('input', calculateRemainingPayment);
-
-    // ========== CORE FUNCTIONS ========== //
-
-    function setupDayCells() {
-        var dayCells = document.querySelectorAll('.fc-daygrid-day');
-        dayCells.forEach(function(cell) {
-            var dateStr = cell.getAttribute('data-date');
-            if (!cell.querySelector('.day-overlay')) {
-                var overlay = document.createElement('div');
-                overlay.className = 'day-overlay';
-                overlay.id = 'overlay-' + dateStr;
-
-                var morningPart = document.createElement('div');
-                morningPart.className = 'morning-part';
-                morningPart.id = 'morning-' + dateStr;
-
-                var eveningPart = document.createElement('div');
-                eveningPart.className = 'evening-part';
-                eveningPart.id = 'evening-' + dateStr;
-
-                overlay.appendChild(morningPart);
-                overlay.appendChild(eveningPart);
-                cell.appendChild(overlay);
-            }
-        });
-    }
-
-    function fetchBookings() {
-        showSpinner();
-        showMessage("Fetching bookings...");
-
-        $.ajax({
-            url: '/EventBooking/GetAllEventBookings',
-            type: 'GET',
-            dataType: 'json',
-            success: function(data) {
-                hideSpinner();
-                if (data && Array.isArray(data)) {
-                    bookingData = {};
-                    data.forEach(function(booking) {
-                        var fromDate = new Date(booking.fromDate);
-                        var toDate = new Date(booking.toDate);
-                        var currentDate = new Date(fromDate);
-
-                        while (currentDate <= toDate) {
-                            var dateStr = formatDate(currentDate);
-
-                            if (!bookingData[dateStr]) {
-                                bookingData[dateStr] = {
-                                    morning: false,
-                                    evening: false,
-                                    details: []
-                                };
-                            }
-
-                            if (booking.shiftType === 'morning' || booking.shiftType === 'fullday') {
-                                bookingData[dateStr].morning = true;
-                            }
-
-                            if (booking.shiftType === 'evening' || booking.shiftType === 'fullday') {
-                                bookingData[dateStr].evening = true;
-                            }
-
-                            bookingData[dateStr].details.push(booking);
-                            currentDate.setDate(currentDate.getDate() + 1);
-                        }
-                    });
-                    renderAllBookings();
-                    showMessage("Bookings loaded successfully!", "success");
-                } else {
-                    showMessage("No bookings found.", "error");
-                }
-            },
-            error: function(error) {
-                hideSpinner();
-                console.error('Error fetching bookings:', error);
-                showMessage("Failed to fetch bookings.", "error");
-            }
-        });
-    }
-
-    function populateEventDropdown() {
-        $.ajax({
-            url: '/EventCrud/GetAllEvents',
-            type: 'GET',
-            dataType: 'json',
-            success: function(data) {
-                if (data && data.length > 0) {
-                    var eventDropdown = $('#eventId');
-                    eventDropdown.empty().append($('<option>', {
-                        value: '',
-                        text: '-- Select Event --'
-                    }));
-                    $.each(data, function(i, event) {
-                        eventDropdown.append($('<option>', {
-                            value: event.eventId,
-                            text: event.eventName
-                        }));
-                    });
-                } else {
-                    showModalMessage("No events found.", "error");
-                }
-            },
-            error: function(error) {
-                console.error('Error fetching events:', error);
-                showModalMessage("Failed to load events.", "error");
-            }
-        });
-    }
-
-    function openBookingModal(date = null) {
-        clearBookingModalData();
-        $('#createdDate').val(formatDate(new Date()));
-        
-        if (date) {
-            $('#bookingDate').val(date);
-            $('#fromDate').val(date);
-            $('#toDate').val(date);
-        }
-        
-        populateEventDropdown();
-        bookingModal.style.display = "block";
-    }
-
-    function closeBookingModal() {
-        bookingModal.style.display = "none";
-        clearBookingModalData();
-        hideModalMessage();
-    }
-
-    function clearBookingModalData() {
-        $('.ClearBookingModalData').val('');
-        hideModalMessage();
-    }
-
-    function saveBooking() {
-        if (!validateBookingForm()) return;
-        
-        showModalMessage("Saving booking...");
-
-        var bookingData = {
-            bookingId: $('#bookingId').val() || 0,
-            userId: $('#userId').val(),
-            eventId: $('#eventId').val(),
-            bookingDate: $('#bookingDate').val(),
-            fromDate: $('#fromDate').val(),
-            toDate: $('#toDate').val(),
-            shiftType: $('#shiftType').val(),
-            bookingStatus: $('#bookingStatus').val(),
-            totalAmount: $('#totalAmount').val(),
-            advancePayment: $('#advancePayment').val() || 0,
-            remainingPayment: $('#remainingPayment').val(),
-            paymentStatus: $('#paymentStatus').val(),
-            createdDate: $('#createdDate').val() || formatDate(new Date()),
-            customerName: $('#customerName').val(),
-            phoneNumber: $('#phoneNumber').val(),
-            alternativeNumber: $('#alternativeNumber').val() || "",
-            address: $('#address').val() || ""
-        };
-
-        $.ajax({
-            url: '/EventBooking/AddOrUpdateEventBooking',
-            type: 'POST',
-            data: { eventBooking: bookingData },
-            dataType: 'json',
-            success: function(response) {
-                if (response && response.success) {
-                    showModalMessage("Booking saved!", "success");
-                    setTimeout(function() {
-                        closeBookingModal();
-                        fetchBookings();
-                    }, 1500);
-                } else {
-                    showModalMessage(response.message || "Failed to save.", "error");
-                }
-            },
-            error: function(error) {
-                console.error('Error saving booking:', error);
-                showModalMessage("Failed to save.", "error");
-            }
-        });
-    }
-
-    function quickBook() {
-        var selectedShift = $('#booking-shift').val();
-        var date = $('#booking-date').val();
-
-        if (!date) {
-            alert("Please select a date.");
-            return;
-        }
-
-        if (!selectedShift) {
-            alert("Please select a shift.");
-            return;
-        }
-
-        openBookingModal(date);
-        $('#shiftType').val(selectedShift);
-        setTimeout(function() {
-            $('#customerName').focus();
-        }, 300);
-    }
-
-    // ========== NEW SMART BOOKING FUNCTIONS ========== //
-
-    function showBookingOptions(date, availability) {
-        var modalContent = `
-            <div style="padding: 20px; text-align: center;">
-                <h3>Booking Options for ${date}</h3>`;
-        
-        if (availability === 'both') {
-            modalContent += `
-                <p>Both shifts are booked</p>
-                <button onclick="editExistingBooking('${date}')" class="btn btn-primary" style="margin: 10px;">
-                    Edit Booking
-                </button>
-                <button onclick="deleteExistingBooking('${date}')" class="btn btn-danger" style="margin: 10px;">
-                    Delete Booking
-                </button>`;
-        } else {
-            var availableShift = availability === 'morning' ? 'Morning' : 'Evening';
-            modalContent += `
-                <p>${availableShift} shift is available</p>
-                <button onclick="bookNewShift('${date}', '${availability}')" class="btn btn-success" style="margin: 10px;">
-                    Book ${availableShift} Shift
-                </button>`;
-            
-            if (availability === 'evening') {
-                modalContent += `
-                    <button onclick="editMorningBooking('${date}')" class="btn btn-primary" style="margin: 10px;">
-                        Edit Morning Booking
-                    </button>`;
-            } else {
-                modalContent += `
-                    <button onclick="editEveningBooking('${date}')" class="btn btn-primary" style="margin: 10px;">
-                        Edit Evening Booking
-                    </button>`;
-            }
-        }
-        
-        modalContent += `</div>`;
-        
-        $('#bookingModal .modal-body').html(modalContent);
-        bookingModal.style.display = "block";
-    }
-
-    window.editExistingBooking = function(date) {
-        var booking = bookingData[date].details[0];
-        populateBookingForm(booking);
-    };
-
-    window.deleteExistingBooking = function(date) {
-        var booking = bookingData[date].details[0];
-        if (confirm(`Delete booking for ${booking.customerName}?`)) {
-            deleteBooking(booking.bookingId);
-        }
-    };
-
-    window.bookNewShift = function(date, shift) {
-        openBookingModal(date);
-        $('#shiftType').val(shift);
-    };
-
-    window.editMorningBooking = function(date) {
-        var booking = bookingData[date].details.find(b => 
-            b.shiftType === 'morning' || b.shiftType === 'fullday');
-        if (booking) populateBookingForm(booking);
-    };
-
-    window.editEveningBooking = function(date) {
-        var booking = bookingData[date].details.find(b => 
-            b.shiftType === 'evening' || b.shiftType === 'fullday');
-        if (booking) populateBookingForm(booking);
-    };
-
-    function populateBookingForm(booking) {
-        clearBookingModalData();
-        
-        $('#bookingId').val(booking.bookingId);
-        $('#userId').val(booking.userId);
-        $('#eventId').val(booking.eventId);
-        $('#bookingDate').val(formatDate(new Date(booking.bookingDate)));
-        $('#fromDate').val(formatDate(new Date(booking.fromDate)));
-        $('#toDate').val(formatDate(new Date(booking.toDate)));
-        $('#shiftType').val(booking.shiftType);
-        $('#bookingStatus').val(booking.bookingStatus);
-        $('#totalAmount').val(booking.totalAmount);
-        $('#advancePayment').val(booking.advancePayment);
-        $('#remainingPayment').val(booking.remainingPayment);
-        $('#paymentStatus').val(booking.paymentStatus);
-        $('#createdDate').val(formatDate(new Date(booking.createdDate)));
-        $('#customerName').val(booking.customerName);
-        $('#phoneNumber').val(booking.phoneNumber);
-        $('#alternativeNumber').val(booking.alternativeNumber);
-        $('#address').val(booking.address);
-        
-        // Show the form
-        $('#bookingModal .modal-body').html(document.getElementById('bookingModal').querySelector('.modal-body').innerHTML);
-        
-        // Re-populate values
-        Object.keys(booking).forEach(key => {
-            if ($('#' + key).length) {
-                $('#' + key).val(booking[key]);
-            }
-        });
-        
-        calculateRemainingPayment();
-    }
-
-    window.deleteBooking = function(bookingId) {
-        if (confirm("Are you sure you want to delete this booking?")) {
-            showSpinner();
-            $.ajax({
-                url: '/EventBooking/DeleteEventBooking',
-                type: 'POST',
-                data: { id: bookingId },
-                dataType: 'json',
-                success: function(response) {
-                    hideSpinner();
-                    if (response && response.success) {
-                        showMessage("Booking deleted!", "success");
-                        fetchBookings();
-                    } else {
-                        showMessage(response.message || "Failed to delete.", "error");
-                    }
+            // Initialize FullCalendar
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                selectable: true,
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,dayGridWeek'
                 },
-                error: function(error) {
-                    hideSpinner();
-                    console.error('Error deleting booking:', error);
-                    showMessage("Failed to delete.", "error");
+                datesSet: function() {
+                    setTimeout(function() {
+                        setupDayCells();
+                        fetchBookings();
+                    }, 100);
+                },
+                dateClick: function(info) {
+                    handleDateClick(info);
                 }
             });
-        }
-    };
+            calendar.render();
 
-    // ========== HELPER FUNCTIONS ========== //
+            // Initialize datepicker
+            $('#booking-date').datepicker({
+                dateFormat: 'yy-mm-dd',
+                minDate: 0,
+                onSelect: function(dateText) {
+                    selectedDate = dateText;
+                    $('.fc-day').removeClass('selected-day');
+                    $('.fc-day[data-date="' + selectedDate + '"]').addClass('selected-day');
+                }
+            });
 
-    function renderAllBookings() {
-        Object.keys(bookingData).forEach(function(date) {
-            renderBooking(date);
+            // Event listeners
+            $('#save-booking').click(saveBooking);
+            $('#quick-book').click(quickBook);
+            $('#fetch-bookings').click(fetchBookings);
+            $('#open-booking-modal').click(function() { openBookingModal(); });
+            $('#close-booking-modal, .close-button').click(closeBookingModal);
+            $('#totalAmount, #advancePayment').on('input', calculateRemainingPayment);
+
+            // ========== CORE FUNCTIONS ========== //
+
+            function setupDayCells() {
+                $('.fc-daygrid-day').each(function() {
+                    var dateStr = $(this).attr('data-date');
+                    if (!$(this).find('.day-overlay').length) {
+                        $(this).append(`
+                            <div class="day-overlay" id="overlay-${dateStr}">
+                                <div class="morning-part" id="morning-${dateStr}"></div>
+                                <div class="evening-part" id="evening-${dateStr}"></div>
+                            </div>
+                        `);
+                    }
+                });
+            }
+
+            function fetchBookings() {
+                showSpinner();
+                $.ajax({
+                    url: '/EventBooking/GetAllEventBookings',
+                    type: 'GET',
+                    success: function(data) {
+                        if (data && Array.isArray(data)) {
+                            bookingData = {};
+                            data.forEach(function(booking) {
+                                processBooking(booking);
+                            });
+                            renderAllBookings();
+                            showMessage("Bookings loaded successfully!", "success");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        showMessage("Error loading bookings: " + error, "error");
+                    },
+                    complete: function() {
+                        hideSpinner();
+                    }
+                });
+            }
+
+            function processBooking(booking) {
+                var fromDate = new Date(booking.fromDate);
+                var toDate = new Date(booking.toDate);
+                var currentDate = new Date(fromDate);
+
+                while (currentDate <= toDate) {
+                    var dateStr = formatDate(currentDate);
+                    if (!bookingData[dateStr]) {
+                        bookingData[dateStr] = { morning: false, evening: false, details: [] };
+                    }
+
+                    if (booking.shiftType === 'morning' || booking.shiftType === 'fullday') {
+                        bookingData[dateStr].morning = true;
+                    }
+                    if (booking.shiftType === 'evening' || booking.shiftType === 'fullday') {
+                        bookingData[dateStr].evening = true;
+                    }
+
+                    bookingData[dateStr].details.push(booking);
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+            }
+
+            function handleDateClick(info) {
+                selectedDate = info.dateStr;
+                $('.fc-day').removeClass('selected-day');
+                $(info.dayEl).addClass('selected-day');
+
+                $('#booking-date').datepicker('setDate', new Date(selectedDate));
+
+                var bookings = bookingData[selectedDate];
+                if (!bookings || bookings.details.length === 0) {
+                    openBookingModal(selectedDate);
+                } else {
+                    showBookingOptions(selectedDate, bookings);
+                }
+            }
+
+            function showBookingOptions(date, bookings) {
+                var morningBooked = bookings.morning;
+                var eveningBooked = bookings.evening;
+                var content = `<div class="booking-options"><h3>${date}</h3>`;
+
+                if (morningBooked && eveningBooked) {
+                    content += `
+                        <p>Both shifts booked</p>
+                        <button class="btn btn-primary edit-btn" data-shift="morning">Edit Morning</button>
+                        <button class="btn btn-primary edit-btn" data-shift="evening">Edit Evening</button>
+                        <button class="btn btn-danger delete-btn">Delete Booking</button>`;
+                } else if (morningBooked) {
+                    content += `
+                        <p>Morning booked</p>
+                        <button class="btn btn-primary edit-btn" data-shift="morning">Edit Morning</button>
+                        <button class="btn btn-success book-btn" data-shift="evening">Book Evening</button>`;
+                } else if (eveningBooked) {
+                    content += `
+                        <p>Evening booked</p>
+                        <button class="btn btn-primary edit-btn" data-shift="evening">Edit Evening</button>
+                        <button class="btn btn-success book-btn" data-shift="morning">Book Morning</button>`;
+                } else {
+                    content += `
+                        <p>No bookings for this date.</p>
+                        <button class="btn btn-success book-btn" data-shift="morning">Book Morning</button>
+                        <button class="btn btn-success book-btn" data-shift="evening">Book Evening</button>
+                        <button class="btn btn-success book-btn" data-shift="fullday">Book Full Day</button>`;
+                }
+
+                content += `</div>`;
+                $('#bookingModal .modal-body').html(content);
+                bookingModal.style.display = "block";
+
+                // Bind event handlers
+                $('.edit-btn').click(function() {
+                    var shift = $(this).data('shift');
+                    editBooking(date, shift);
+                });
+
+                $('.book-btn').click(function() {
+                    var shift = $(this).data('shift');
+                    openBookingModal(date, shift);
+                });
+
+                $('.delete-btn').click(function() {
+                    deleteBookingPrompt(date);
+                });
+            }
+
+            function editBooking(date, shift) {
+                var booking = bookingData[date].details.find(b =>
+                    b.shiftType === shift || b.shiftType === 'fullday');
+                if (booking) {
+                    openBookingModal(date);
+                    populateBookingForm(booking);
+                }
+            }
+
+            function deleteBookingPrompt(date) {
+                var bookings = bookingData[date].details;
+                if (bookings.length === 1) {
+                    if (confirm(`Delete booking for ${bookings[0].customerName}?`)) {
+                        deleteBooking(bookings[0].bookingId);
+                    }
+                } else {
+                    var content = `<div class="delete-options"><h3>Which shift to delete?</h3>`;
+
+                    if (bookingData[date].morning) {
+                        var morningBooking = bookings.find(b =>
+                            b.shiftType === 'morning' || b.shiftType === 'fullday');
+                        content += `
+                            <button class="btn btn-danger delete-shift-btn"
+                                    data-id="${morningBooking.bookingId}">
+                                Delete Morning (${morningBooking.customerName})
+                            </button>`;
+                    }
+
+                    if (bookingData[date].evening) {
+                        var eveningBooking = bookings.find(b =>
+                            b.shiftType === 'evening' || b.shiftType === 'fullday');
+                        content += `
+                            <button class="btn btn-danger delete-shift-btn"
+                                    data-id="${eveningBooking.bookingId}">
+                                Delete Evening (${eveningBooking.customerName})
+                            </button>`;
+                    }
+
+                    content += `</div>`;
+                    $('#bookingModal .modal-body').html(content);
+
+                    $('.delete-shift-btn').click(function() {
+                        if (confirm("Are you sure you want to delete this booking?")) {
+                            deleteBooking($(this).data('id'));
+                        }
+                    });
+                }
+            }
+
+            function deleteBooking(bookingId) {
+                showSpinner();
+                $.ajax({
+                    url: '/EventBooking/Delete',
+                    type: 'POST',
+                    data: { id: bookingId },
+                    success: function(response) {
+                        fetchBookings();
+                        closeBookingModal();
+                        showMessage("Booking deleted successfully!", "success");
+                    },
+                    error: function(xhr, status, error) {
+                        showMessage("Error deleting booking: " + error, "error");
+                    },
+                    complete: function() {
+                        hideSpinner();
+                    }
+                });
+            }
+
+            function openBookingModal(date = null, shift = null) {
+                $('#bookingModal .modal-body').html(originalModalContent);
+                if (date) {
+                    $('#bookingDate, #fromDate, #toDate').val(date);
+                } else {
+                    var today = new Date();
+                    $('#bookingDate, #fromDate, #toDate').val(formatDate(today));
+                }
+
+                if (shift) {
+                    $('#shiftType').val(shift);
+                }
+
+                // Set default values
+                if (!$('#bookingId').val()) {
+                    $('#bookingStatus').val('Pending');
+                    $('#paymentStatus').val('Pending');
+                    $('#createdDate').val(formatDate(new Date()));
+                }
+
+                populateEventDropdown();
+                bookingModal.style.display = "block";
+            }
+
+            function closeBookingModal() {
+                bookingModal.style.display = "none";
+                $('.ClearBookingModalData').val('');
+            }
+
+            function saveBooking() {
+                if (!validateBookingForm()) {
+                    return;
+                }
+
+                var bookingData = {
+                    bookingId: $('#bookingId').val() || 0,
+                    userId: $('#userId').val(),
+                    eventId: $('#eventId').val(),
+                    bookingDate: $('#bookingDate').val(),
+                    fromDate: $('#fromDate').val(),
+                    toDate: $('#toDate').val(),
+                    shiftType: $('#shiftType').val(),
+                    bookingStatus: $('#bookingStatus').val(),
+                    totalAmount: $('#totalAmount').val(),
+                    advancePayment: $('#advancePayment').val() || 0,
+                    remainingPayment: $('#remainingPayment').val(),
+                    paymentStatus: $('#paymentStatus').val(),
+                    createdDate: $('#createdDate').val() || formatDate(new Date()),
+                    customerName: $('#customerName').val(),
+                    phoneNumber: $('#phoneNumber').val(),
+                    alternativeNumber: $('#alternativeNumber').val() || '',
+                    address: $('#address').val() || ''
+                };
+
+                showSpinner();
+                $.ajax({
+                    url: '/EventBooking/AddOrUpdateEventBooking',
+                    type: 'POST',
+                    data: bookingData,
+                    success: function(response) {
+                        if (response && response.success) {
+                            fetchBookings();
+                            closeBookingModal();
+                            showMessage("Booking saved successfully!", "success");
+                        } else {
+                            showMessage("Error saving booking: " + (response.message || "Unknown error"), "error");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        showMessage("Error saving booking: " + error, "error");
+                    },
+                    complete: function() {
+                        hideSpinner();
+                    }
+                });
+            }
+
+            function quickBook() {
+                if (!selectedDate) {
+                    showMessage("Please select a date first.", "error");
+                    return;
+                }
+
+                var shift = $('#booking-shift').val();
+                if (!shift) {
+                    showMessage("Please select a shift.", "error");
+                    return;
+                }
+
+                // Check if date is already booked for the selected shift
+                if (bookingData[selectedDate]) {
+                    if ((shift === 'morning' || shift === 'fullday') && bookingData[selectedDate].morning) {
+                        showMessage("Morning shift is already booked for this date.", "error");
+                        return;
+                    }
+                    if ((shift === 'evening' || shift === 'fullday') && bookingData[selectedDate].evening) {
+                        showMessage("Evening shift is already booked for this date.", "error");
+                        return;
+                    }
+                }
+
+                openBookingModal(selectedDate, shift);
+            }
+
+            // ========== HELPER FUNCTIONS ========== //
+
+            function populateEventDropdown() {
+                var eventDropdown = $('#eventId');
+                eventDropdown.empty().append('<option value="">-- Select Event --</option>');
+
+                showSpinner();
+                $.ajax({
+                    url: '/EventCrud/GetAllEvents',
+                    type: 'GET',
+                    success: function(data) {
+                        if (data && Array.isArray(data)) {
+                            data.forEach(function(event) {
+                                eventDropdown.append(`<option value="${event.eventId}">${event.eventName}</option>`);
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        showMessage("Error loading events: " + error, "error");
+                    },
+                    complete: function() {
+                        hideSpinner();
+                    }
+                });
+            }
+
+            function validateBookingForm() {
+                // Required fields
+                var requiredFields = [
+                    { id: 'userId', name: 'User ID' },
+                    { id: 'eventId', name: 'Event' },
+                    { id: 'fromDate', name: 'From Date' },
+                    { id: 'toDate', name: 'To Date' },
+                    { id: 'shiftType', name: 'Shift Type' },
+                    { id: 'bookingStatus', name: 'Booking Status' },
+                    { id: 'totalAmount', name: 'Total Amount' },
+                    { id: 'paymentStatus', name: 'Payment Status' },
+                    { id: 'customerName', name: 'Customer Name' },
+                    { id: 'phoneNumber', name: 'Phone Number' }
+                ];
+
+                var isValid = true;
+                $('#modal-message').text('').removeClass('error-message success-message');
+
+                requiredFields.forEach(function(field) {
+                    var value = $('#' + field.id).val();
+                    if (!value) {
+                        $('#modal-message').text(field.name + ' is required.').addClass('error-message');
+                        isValid = false;
+                        return false;
+                    }
+                });
+
+                // Check if toDate is after fromDate
+                if (isValid) {
+                    var fromDate = new Date($('#fromDate').val());
+                    var toDate = new Date($('#toDate').val());
+                    if (toDate < fromDate) {
+                        $('#modal-message').text('To Date must be after From Date.').addClass('error-message');
+                        isValid = false;
+                    }
+                }
+
+                return isValid;
+            }
+
+            function renderAllBookings() {
+                // First clear all existing bookings visual indicators
+                $('.morning-part, .evening-part').removeClass('morning-booked evening-booked');
+
+                // Then add indicators for current bookings
+                Object.keys(bookingData).forEach(function(date) {
+                    $('#morning-' + date).toggleClass('morning-booked', bookingData[date].morning);
+                    $('#evening-' + date).toggleClass('evening-booked', bookingData[date].evening);
+                });
+
+                // Add tooltips to show booking info on hover
+                setupBookingTooltips();
+            }
+
+            function setupBookingTooltips() {
+                $('.day-overlay').off('mouseenter mouseleave');
+
+                $('.day-overlay').hover(
+                    function() {
+                        var dateStr = $(this).attr('id').replace('overlay-', '');
+                        if (bookingData[dateStr] && bookingData[dateStr].details.length > 0) {
+                            showBookingTooltip(dateStr, $(this));
+                        }
+                    },
+                    function() {
+                        $('#booking-tooltip').hide();
+                    }
+                );
+            }
+
+            function showBookingTooltip(date, element) {
+                var bookings = bookingData[date].details;
+                var content = `<strong>Bookings for ${date}</strong><br>`;
+
+                bookings.forEach(function(booking) {
+                    content += `${booking.customerName} (${booking.shiftType})<br>`;
+                });
+
+                $('#booking-tooltip').html(content);
+
+                var pos = element.offset();
+                $('#booking-tooltip').css({
+                    top: pos.top + 10,
+                    left: pos.left + 10
+                }).show();
+            }
+
+            function populateBookingForm(booking) {
+                // Clear form first
+                $('.ClearBookingModalData').val('');
+
+                // Then populate with booking data
+                Object.keys(booking).forEach(key => {
+                    if ($('#' + key).length) {
+                        $('#' + key).val(booking[key]);
+                    }
+                });
+
+                calculateRemainingPayment();
+            }
+
+            function calculateRemainingPayment() {
+                var total = parseFloat($('#totalAmount').val()) || 0;
+                var advance = parseFloat($('#advancePayment').val()) || 0;
+                var remaining = total - advance;
+                $('#remainingPayment').val(remaining >= 0 ? remaining : 0);
+
+                // Auto-select payment status based on payments
+                if (advance === 0) {
+                    $('#paymentStatus').val('Pending');
+                } else if (advance < total) {
+                    $('#paymentStatus').val('Partially Paid');
+                } else {
+                    $('#paymentStatus').val('Paid');
+                }
+            }
+
+            function formatDate(date) {
+                var d = new Date(date),
+                    month = '' + (d.getMonth() + 1),
+                    day = '' + d.getDate(),
+                    year = d.getFullYear();
+
+                if (month.length < 2) month = '0' + month;
+                if (day.length < 2) day = '0' + day;
+
+                return [year, month, day].join('-');
+            }
+
+            function showSpinner() {
+                $('#spinner').show();
+            }
+
+            function hideSpinner() {
+                $('#spinner').hide();
+            }
+
+            function showMessage(text, type) {
+                $('#message').text(text)
+                    .removeClass('error-message success-message')
+                    .addClass(type === 'error' ? 'error-message' : 'success-message')
+                    .show().delay(5000).fadeOut();
+            }
+
+            // Initial setup
+            setupDayCells();
+            fetchBookings();
         });
-    }
-
-    function renderBooking(date) {
-        $('#morning-' + date).removeClass('morning-booked');
-        $('#evening-' + date).removeClass('evening-booked');
-
-        if (bookingData[date]) {
-            if (bookingData[date].morning) {
-                $('#morning-' + date).addClass('morning-booked');
-            }
-            if (bookingData[date].evening) {
-                $('#evening-' + date).addClass('evening-booked');
-            }
-        }
-    }
-
-    function validateBookingForm() {
-        var required = ['userId', 'eventId', 'bookingDate', 'fromDate', 'toDate',
-                       'shiftType', 'bookingStatus', 'totalAmount', 'paymentStatus',
-                       'customerName', 'phoneNumber'];
-        var valid = true;
-        
-        required.forEach(function(field) {
-            var value = $('#' + field).val();
-            if (!value) {
-                $('#' + field).css('border-color', 'red');
-                valid = false;
-            } else {
-                $('#' + field).css('border-color', '');
-            }
-        });
-
-        if (!valid) {
-            showModalMessage("Please fill all required fields.", "error");
-        }
-        return valid;
-    }
-
-    function calculateRemainingPayment() {
-        var total = parseFloat($('#totalAmount').val()) || 0;
-        var advance = parseFloat($('#advancePayment').val()) || 0;
-        var remaining = total - advance;
-
-        $('#remainingPayment').val(remaining >= 0 ? remaining : 0);
-
-        if (remaining <= 0 && total > 0) {
-            $('#paymentStatus').val('Paid');
-        } else if (advance > 0 && advance < total) {
-            $('#paymentStatus').val('Partially Paid');
-        } else {
-            $('#paymentStatus').val('Pending');
-        }
-    }
-
-    function showSpinner() {
-        spinner.style.display = 'block';
-    }
-
-    function hideSpinner() {
-        spinner.style.display = 'none';
-    }
-
-    function showMessage(text, type = "") {
-        messageEl.textContent = text;
-        messageEl.className = type === "error" ? "error-message" : "success-message";
-        setTimeout(function() {
-            messageEl.textContent = "";
-        }, 5000);
-    }
-
-    function showModalMessage(text, type = "") {
-        modalMessageEl.textContent = text;
-        modalMessageEl.className = type === "error" ? "error-message" : "success-message";
-    }
-
-    function hideModalMessage() {
-        modalMessageEl.textContent = "";
-    }
-
-    function formatDate(date) {
-        var year = date.getFullYear();
-        var month = String(date.getMonth() + 1).padStart(2, '0');
-        var day = String(date.getDate()).padStart(2, '0');
-        return year + '-' + month + '-' + day;
-    }
-
-    // Initial setup
-    setupDayCells();
-    fetchBookings();
-});
     </script>
 </body>
 </html>
