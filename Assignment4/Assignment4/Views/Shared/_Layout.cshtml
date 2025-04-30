@@ -244,7 +244,7 @@
 </head>
 <body style="background-color:white">
 
-    <header class="mainContainer" id="mainContainerHeader">
+    <header hidden class="mainContainer" id="mainContainerHeader">
 
         <div class="header-start">
             @* <span class="stylish-text">Codemind Software</span> *@
@@ -271,31 +271,29 @@
                 </a>
             </li>
             <li>
-                <a asp-area="" asp-controller="Home" hidden asp-action="index">
-                    <span class="icon"><i class="fa-solid fa-house"></i></span>
+                <a asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="icon"><i class="fas fa-home"></i></span>
                     <span class="title">Dashboard</span>
                 </a>
             </li>
             <li>
                 <a asp-area="" asp-controller="EventBooking" asp-action="EventBooking">
-                    <span class="icon"><i class="fa-solid fa-cogs"></i></span>
+                    <span class="icon"><i class="fas fa-calendar-check"></i></span>
                     <span class="title">BookEvent</span>
                 </a>
             </li>
             <li>
                 <a asp-area="" asp-controller="User" asp-action="User">
-                    <span class="icon"><i class="fa-solid fa-user"></i></span>
+                    <span class="icon"><i class="fas fa-user-plus"></i></span>
                     <span class="title">AddUser</span>
                 </a>
             </li>
             <li>
-                <a asp-area="" asp-controller="EventCrud"  asp-action="EventCrud">
-                    <span class="icon"><i class="fa-solid fa-Event"></i></span>
+                <a asp-area="" asp-controller="EventCrud" asp-action="EventCrud">
+                    <span class="icon"><i class="fas fa-calendar-plus"></i></span>
                     <span class="title">AddEvent</span>
                 </a>
             </li>
-          
-           
             <li>
                 <a href="#">
                     <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
@@ -304,6 +302,7 @@
             </li>
         </ul>
     </nav>
+
 
 
     <div class="mainContainer" id="mainContent">

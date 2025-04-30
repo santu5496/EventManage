@@ -2,6 +2,7 @@
 using DbOperation.Models;
 using iText.Layout.Tagging;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Crypto.Generators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,6 +49,36 @@ namespace DbOperation.Implementation
                 return db.Users.ToList();
             }
         }
+        public Users? ValidateUser(string phoneNumber, string password)
+        {
+            try
+            {
+                using (var db = new EventContext(_context))
+                {
+                    // Retrieve the user by phone number
+                    var user = db.Users.FirstOrDefault(u => u.phoneNumber == phoneNumber);
+
+                    if (user == null)
+                    {
+                        // User not found
+                        return null;
+                    }
+
+                    // Password matches, return the user
+                        return user;
+                    
+
+                    // Password does not match
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error validating user: {ex.Message}");
+                return null;
+            }
+        }
+
 
         public bool UpdateUser(Users user)
         {
@@ -72,4 +103,4 @@ namespace DbOperation.Implementation
             }
         }
     }
-}
+    }

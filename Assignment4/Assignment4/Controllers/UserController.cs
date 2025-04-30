@@ -61,5 +61,6 @@ namespace EventManagement.Controllers
             }
             return Json(result);
         }
+      
     }
 }
