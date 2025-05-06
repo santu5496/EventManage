@@ -94,6 +94,9 @@ public partial class EventContext : DbContext
             entity.Property(e => e.userRole)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.Property(e => e.username)
+                .IsRequired()
+                .HasMaxLength(100);
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -262,16 +262,13 @@
         }
 
         @@keyframes spin {
-            0%
+            0% {
+                transform: rotate(0deg);
+            }
 
-        {
-            transform: rotate(0deg);
-        }
-
-        100% {
-            transform: rotate(360deg);
-        }
-
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Tooltip styling */
@@ -316,8 +313,8 @@
                     <input type="number" id="bookingId" class="ClearBookingModalData" />
                 </div>
                 <div class="form-group">
-                    <label>User ID</label>
-                    <input type="number" id="userId" class="ClearBookingModalData" required />
+
+                    <input type="number" hidden id="userId" class="ClearBookingModalData" required />
                 </div>
                 <div class="form-group">
                     <label>Event</label>
@@ -432,7 +429,7 @@
     <div id="message" class="success-message"></div>
     <div id="calendar"></div>
 
-   <script>
+    <script>
                document.addEventListener('DOMContentLoaded', function() {
             // Global variables
             var calendarEl = document.getElementById('calendar');
@@ -604,63 +601,128 @@
                 }
             }
 
-            function showBookingOptions(date, bookings) {
-                var morningBooked = bookings.morning;
-                var eveningBooked = bookings.evening;
-                var content = `<div class="booking-options"><h3>${date}</h3>`;
+            // function showBookingOptions(date, bookings) {
+            //     var morningBooked = bookings.morning;
+            //     var eveningBooked = bookings.evening;
+            //     var content = `<div class="booking-options"><h3>${date}</h3>`;
 
-                // Add View Details button at the top if there are bookings
-                if (bookings.details.length > 0) {
-                    content += `<button class="btn btn-info view-details-btn">View Booking Details</button><hr>`;
-                }
+            //     // Add View Details button at the top if there are bookings
+            //     if (bookings.details.length > 0) {
+            //         content += `<button class="btn btn-info view-details-btn">View Booking Details</button><hr>`;
+            //     }
 
-                if (morningBooked && eveningBooked) {
-                    content += `
-                        <p>Both shifts booked</p>
-                        <button class="btn btn-primary edit-btn" data-shift="morning">Edit Morning</button>
-                        <button class="btn btn-primary edit-btn" data-shift="evening">Edit Evening</button>
-                        <button class="btn btn-danger delete-btn">Delete Booking</button>`;
-                } else if (morningBooked) {
-                    content += `
-                        <p>Morning booked</p>
-                        <button class="btn btn-primary edit-btn" data-shift="morning">Edit Morning</button>
-                        <button class="btn btn-success book-btn" data-shift="evening">Book Evening</button>`;
-                } else if (eveningBooked) {
-                    content += `
-                        <p>Evening booked</p>
-                        <button class="btn btn-primary edit-btn" data-shift="evening">Edit Evening</button>
-                        <button class="btn btn-success book-btn" data-shift="morning">Book Morning</button>`;
-                } else {
-                    content += `
-                        <p>No bookings for this date.</p>
-                        <button class="btn btn-success book-btn" data-shift="morning">Book Morning</button>
-                        <button class="btn btn-success book-btn" data-shift="evening">Book Evening</button>
-                        <button class="btn btn-success book-btn" data-shift="fullday">Book Full Day</button>`;
-                }
+            //     if (morningBooked && eveningBooked) {
+            //         content += `
+            //             <p>Both shifts booked</p>
+            //             <button class="btn btn-primary edit-btn" data-shift="morning">Edit Morning</button>
+            //             <button class="btn btn-primary edit-btn" data-shift="evening">Edit Evening</button>
+            //             <button class="btn btn-danger delete-btn">Delete Booking</button>`;
+            //     } else if (morningBooked) {
+            //         content += `
+            //             <p>Morning booked</p>
+            //             <button class="btn btn-primary edit-btn" data-shift="morning">Edit Morning</button>
+            //             <button class="btn btn-success book-btn" data-shift="evening">Book Evening</button>`;
+            //     } else if (eveningBooked) {
+            //         content += `
+            //             <p>Evening booked</p>
+            //             <button class="btn btn-primary edit-btn" data-shift="evening">Edit Evening</button>
+            //             <button class="btn btn-success book-btn" data-shift="morning">Book Morning</button>`;
+            //     } else {
+            //         content += `
+            //             <p>No bookings for this date.</p>
+            //             <button class="btn btn-success book-btn" data-shift="morning">Book Morning</button>
+            //             <button class="btn btn-success book-btn" data-shift="evening">Book Evening</button>
+            //             <button class="btn btn-success book-btn" data-shift="fullday">Book Full Day</button>`;
+            //     }
 
-                content += `</div>`;
-                $('#bookingModal .modal-body').html(content);
-                bookingModal.style.display = "block";
+            //     content += `</div>`;
+            //     $('#bookingModal .modal-body').html(content);
+            //     bookingModal.style.display = "block";
 
-                // Bind event handlers
-                $('.view-details-btn').click(function() {
-                    showBookingDetails(date, bookings);
-                });
+            //     // Bind event handlers
+            //     $('.view-details-btn').click(function() {
+            //         showBookingDetails(date, bookings);
+            //     });
 
-                $('.edit-btn').click(function() {
-                    var shift = $(this).data('shift');
-                    editBooking(date, shift);
-                });
+            //     $('.edit-btn').click(function() {
+            //         var shift = $(this).data('shift');
+            //         editBooking(date, shift);
+            //     });
 
-                $('.book-btn').click(function() {
-                    var shift = $(this).data('shift');
-                    openBookingModal(date, shift);
-                });
+            //     $('.book-btn').click(function() {
+            //         var shift = $(this).data('shift');
+            //         openBookingModal(date, shift);
+            //     });
 
-                $('.delete-btn').click(function() {
-                    deleteBookingPrompt(date);
-                });
+            //     $('.delete-btn').click(function() {
+            //         deleteBookingPrompt(date);
+            //     });
+            // }
+
+
+
+                    function showBookingOptions(date, bookings) {
+            var morningBooked = bookings.morning;
+            var eveningBooked = bookings.evening;
+            var content = `<div class="booking-options"><h3>${date}</h3>`;
+
+            // Add View Details button at the top if there are bookings
+            if (bookings.details.length > 0) {
+                content += `<button class="btn btn-info view-details-btn">View Booking Details</button><hr>`;
             }
+
+            // Always show delete option if there are any bookings
+            if (bookings.details.length > 0) {
+                content += `<button class="btn btn-danger delete-btn">Delete Booking</button><hr>`;
+            }
+
+            if (morningBooked && eveningBooked) {
+                content += `
+                    <p>Both shifts booked</p>
+                    <button class="btn btn-primary edit-btn" data-shift="morning">Edit Morning</button>
+                    <button class="btn btn-primary edit-btn" data-shift="evening">Edit Evening</button>`;
+            } else if (morningBooked) {
+                content += `
+                    <p>Morning booked</p>
+                    <button class="btn btn-primary edit-btn" data-shift="morning">Edit Morning</button>
+                    <button class="btn btn-success book-btn" data-shift="evening">Book Evening</button>`;
+            } else if (eveningBooked) {
+                content += `
+                    <p>Evening booked</p>
+                    <button class="btn btn-primary edit-btn" data-shift="evening">Edit Evening</button>
+                    <button class="btn btn-success book-btn" data-shift="morning">Book Morning</button>`;
+            } else {
+                content += `
+                    <p>No bookings for this date.</p>
+                    <button class="btn btn-success book-btn" data-shift="morning">Book Morning</button>
+                    <button class="btn btn-success book-btn" data-shift="evening">Book Evening</button>
+                    <button class="btn btn-success book-btn" data-shift="fullday">Book Full Day</button>`;
+            }
+
+            content += `</div>`;
+            $('#bookingModal .modal-body').html(content);
+            bookingModal.style.display = "block";
+
+            // Bind event handlers
+            $('.view-details-btn').click(function() {
+                showBookingDetails(date, bookings);
+            });
+
+            $('.edit-btn').click(function() {
+                var shift = $(this).data('shift');
+                editBooking(date, shift);
+            });
+
+            $('.book-btn').click(function() {
+                var shift = $(this).data('shift');
+                openBookingModal(date, shift);
+            });
+
+            $('.delete-btn').click(function() {
+                deleteBookingPrompt(date);
+            });
+        }
+
 
             function showBookingDetails(date, bookings) {
                 var content = `<div class="booking-details">
@@ -755,10 +817,11 @@
                 }
             }
 
-            function deleteBooking(bookingId) {
+            function deleteBooking(bookingId)
+            {
                 showSpinner();
                 $.ajax({
-                    url: '/EventBooking/DeleteEventBooking',
+                    url: '/EventBooking/Delete',
                     type: 'POST',
                     data: { id: bookingId },
                     success: function(response) {
@@ -914,7 +977,7 @@
             function validateBookingForm() {
                 // Required fields
                 var requiredFields = [
-                    { id: 'userId', name: 'User ID' },
+
                     { id: 'eventId', name: 'Event' },
                     { id: 'fromDate', name: 'From Date' },
                     { id: 'toDate', name: 'To Date' },
@@ -1044,7 +1107,8 @@
                 $('#spinner').show();
             }
 
-            function hideSpinner() {
+            function hideSpinner()
+            {
                 $('#spinner').hide();
             }
 
@@ -1059,6 +1123,6 @@
             setupDayCells();
             fetchBookings();
         });
-   </script>
+    </script>
 </body>
 </html>

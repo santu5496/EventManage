@@ -10,7 +10,7 @@ namespace DbOperation.Interface
         bool UpdateUser(Users user);
         bool DeleteUser(int userId);
        
-        Users? ValidateUser(string phoneNumber, string password); // Add this line
+        Users? ValidateUser(string UserName, string password); // Add this line
     }
 
 }

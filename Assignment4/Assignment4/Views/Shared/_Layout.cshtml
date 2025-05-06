@@ -33,7 +33,7 @@
 
     <!-- jQuery Confirm JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.4/jquery-confirm.min.js"></script>
-
+    
     <!-- Moment.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
@@ -271,9 +271,9 @@
                 </a>
             </li>
             <li>
-                <a asp-area="" asp-controller="Home" asp-action="Index">
+                <a asp-area="" asp-controller="DashBoard" asp-action="DashBoard">
                     <span class="icon"><i class="fas fa-home"></i></span>
-                    <span class="title">Dashboard</span>
+                    <span class="title">DashBoard</span>
                 </a>
             </li>
             <li>
@@ -294,12 +294,15 @@
                     <span class="title">AddEvent</span>
                 </a>
             </li>
+         
             <li>
-                <a href="#">
+                <a asp-area="" asp-controller="Home" asp-action="Login">
                     <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
                     <span class="title">Sign Out</span>
                 </a>
             </li>
+
+          
         </ul>
     </nav>
 

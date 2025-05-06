@@ -24,7 +24,9 @@ namespace DbOperation.Implementation
                 using (var db = new EventContext(_context))
                 {
                     bookings.createdDate = DateTime.Now;
+                    bookings.userId = 4;
                     db.Bookings.Add(bookings);
+                  
                     return db.SaveChanges() > 0;
                 }
             }

@@ -31,6 +31,16 @@ builder.Services.AddSingleton<IEventBookingSerive, EventBookingSerive>(provider 
         throw new InvalidOperationException("Connection string 'Assignment4' is not configured or is empty.");
     }
     return new EventBookingSerive(connectionString);
+
+});
+builder.Services.AddSingleton<IDashBoard, DashBoardSerivice>(provider =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("Assignment4");
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+        throw new InvalidOperationException("Connection string 'Assignment4' is not configured or is empty.");
+    }
+    return new DashBoardSerivice(connectionString);
 });
 
 var app = builder.Build();
@@ -51,6 +61,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=home}/{action=login}/{id?}");
+    pattern: "{controller=Home}/{action=login}/{id?}");
 
 app.Run();

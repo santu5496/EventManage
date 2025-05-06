@@ -1,0 +1,1361 @@
+﻿
+    <!-- Custom Styles -->
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --success-color: #4ade80;
+            --warning-color: #fcd34d;
+            --danger-color: #f87171;
+            --info-color: #60a5fa;
+            --light-bg: #f8f9fa;
+            --dark-bg: #1e1e2c;
+            --text-light: #f8fafc;
+            --text-dark: #1e293b;
+            --text-muted: #94a3b8;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+
+        
+        /* Main Content Styling */
+        .main-content {
+            margin-left: 250px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Header Section */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            background: white;
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+
+            .dashboard-header h4 {
+                margin: 0;
+                font-weight: 600;
+                color: var(--primary-color);
+            }
+
+        .dashboard-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .date-filter {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            border: 1px solid #e2e8f0;
+        }
+
+            .date-filter i {
+                color: var(--primary-color);
+                margin-right: 0.5rem;
+            }
+
+            .date-filter select {
+                border: none;
+                background: transparent;
+                font-size: 0.875rem;
+                color: var(--text-dark);
+                outline: none;
+            }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                background-color: var(--secondary-color);
+                border-color: var(--secondary-color);
+            }
+
+        /* Dashboard Stats Cards */
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+            .stats-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .stats-card h4 {
+                color: var(--text-dark);
+                font-size: 1rem;
+                font-weight: 600;
+                margin-bottom: 1.5rem;
+            }
+
+            .stats-card .value {
+                font-size: 2rem;
+                font-weight: 700;
+                color: var(--primary-color);
+                margin-bottom: 0.75rem;
+            }
+
+            .stats-card .trend {
+                display: flex;
+                align-items: center;
+                font-size: 0.875rem;
+            }
+
+                .stats-card .trend.up {
+                    color: var(--success-color);
+                }
+
+                .stats-card .trend.down {
+                    color: var(--danger-color);
+                }
+
+                .stats-card .trend i {
+                    margin-right: 0.5rem;
+                }
+
+            .stats-card .icon {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+                margin-bottom: 1rem;
+            }
+
+        .bookings-icon {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+        }
+
+        .revenue-icon {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--accent-color);
+        }
+
+        .pending-icon {
+            background-color: rgba(252, 211, 77, 0.1);
+            color: var(--warning-color);
+        }
+
+        .payment-icon {
+            background-color: rgba(74, 222, 128, 0.1);
+            color: var(--success-color);
+        }
+
+        /* Chart Containers */
+        .chart-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+            height: 100%;
+        }
+
+            .chart-card h4 {
+                color: var(--text-dark);
+                font-size: 1.25rem;
+                font-weight: 600;
+                margin-bottom: 1.5rem;
+            }
+
+        .chart-container {
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Data Tables */
+        .data-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+        }
+
+            .data-card h4 {
+                color: var(--text-dark);
+                font-size: 1.25rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+                .data-card h4 .card-tools {
+                    display: flex;
+                    gap: 0.5rem;
+                }
+
+                    .data-card h4 .card-tools button {
+                        background: #f1f5f9;
+                        border: none;
+                        width: 28px;
+                        height: 28px;
+                        border-radius: 6px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: var(--text-dark);
+                        transition: all 0.3s ease;
+                    }
+
+                        .data-card h4 .card-tools button:hover {
+                            background: #e2e8f0;
+                        }
+
+            .data-card table {
+                width: 100%;
+            }
+
+                .data-card table th {
+                    font-weight: 600;
+                    color: var(--text-dark);
+                    padding: 0.75rem 1rem;
+                    background: rgba(241, 245, 249, 0.5);
+                }
+
+                .data-card table td {
+                    padding: 0.75rem 1rem;
+                    vertical-align: middle;
+                }
+
+                .data-card table tbody tr {
+                    border-bottom: 1px solid #e2e8f0;
+                    transition: background 0.3s ease;
+                }
+
+                    .data-card table tbody tr:hover {
+                        background: rgba(241, 245, 249, 0.5);
+                    }
+
+        .badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+
+        .badge-success {
+            background-color: rgba(74, 222, 128, 0.1);
+            color: var(--success-color);
+        }
+
+        .badge-warning {
+            background-color: rgba(252, 211, 77, 0.1);
+            color: var(--warning-color);
+        }
+
+        .badge-danger {
+            background-color: rgba(248, 113, 113, 0.1);
+            color: var(--danger-color);
+        }
+
+        .badge-info {
+            background-color: rgba(96, 165, 250, 0.1);
+            color: var(--info-color);
+        }
+
+        .btn-action {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.8125rem;
+            border-radius: 6px;
+        }
+
+        .btn-view {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            border: none;
+        }
+
+            .btn-view:hover {
+                background-color: var(--primary-color);
+                color: white;
+            }
+
+        .btn-edit {
+            background-color: rgba(252, 211, 77, 0.1);
+            color: var(--warning-color);
+            border: none;
+        }
+
+            .btn-edit:hover {
+                background-color: var(--warning-color);
+                color: white;
+            }
+
+
+        .event-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 3px;
+        }
+
+            .event-dot.confirmed {
+                background-color: var(--success-color);
+            }
+
+            .event-dot.pending {
+                background-color: var(--warning-color);
+            }
+
+        .event-indicator {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            right: 5px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+        }
+
+        .event-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: 6px;
+            padding: 0.5rem;
+            min-width: 150px;
+            box-shadow: var(--card-shadow);
+            z-index: 10;
+            display: none;
+        }
+
+        .calendar-day:hover .event-tooltip {
+            display: block;
+        }
+
+        .event-item {
+            font-size: 0.75rem;
+            padding: 0.25rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+            .event-item:last-child {
+                border-bottom: none;
+            }
+
+            .event-item span {
+                display: block;
+                color: var(--text-muted);
+            }
+
+        /* Payment Summary Section */
+        .payment-progress {
+            height: 10px;
+            border-radius: 5px;
+            background: #e2e8f0;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
+        .payment-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+            .payment-summary .collected {
+                color: var(--success-color);
+            }
+
+            .payment-summary .pending {
+                color: var(--warning-color);
+            }
+
+        /* Customer Metrics */
+        .customer-card {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 10px;
+            background: white;
+            margin-bottom: 1rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .customer-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+
+        .customer-info {
+            flex-grow: 1;
+        }
+
+            .customer-info h5 {
+                margin: 0;
+                font-size: 1rem;
+                font-weight: 600;
+            }
+
+            .customer-info p {
+                margin: 0;
+                font-size: 0.875rem;
+                color: var(--text-muted);
+            }
+
+        .customer-metric {
+            text-align: right;
+        }
+
+            .customer-metric .value {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: var(--primary-color);
+            }
+
+            .customer-metric p {
+                margin: 0;
+                font-size: 0.75rem;
+                color: var(--text-muted);
+            }
+
+        /* Responsive Design */
+        @@media (max-width: 992px) {
+            .sidebar
+
+        {
+            width: 70px;
+            text-align: center;
+        }
+
+        .sidebar-brand h2 span,
+        .sidebar-menu a span {
+            display: none;
+        }
+
+        .sidebar-menu a i {
+            margin-right: 0;
+        }
+
+        .main-content {
+            margin-left: 70px;
+        }
+
+        }
+
+        @@media (max-width: 768px) {
+            .sidebar
+
+        {
+            left: -70px;
+        }
+
+        .main-content {
+            margin-left: 0;
+        }
+
+        .mobile-toggle {
+            display: block !important;
+        }
+
+        }
+    </style>
+
+
+        <div>
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Dashboard Header -->
+                <div class="dashboard-header">
+                    <div>
+                        <h4>Event Management Dashboard</h4>
+                    </div>
+                    <div class="dashboard-actions">
+                        <div class="date-filter">
+                            <i class="fas fa-calendar"></i>
+                            <select>
+                                <option>Today</option>
+                                <option>This Week</option>
+                                <option selected>This Month</option>
+                                <option>This Year</option>
+                                <option>Custom Range</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary"><i class="fas fa-plus"></i> Create New Event</button>
+                    </div>
+                </div>
+
+                <!-- Dashboard Statistics -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-4">
+                        <div class="stats-card">
+                            <div class="icon bookings-icon">
+                                <i class="fas fa-calendar-alt fa-lg"></i>
+                            </div>
+                            <h4>Total Bookings</h4>
+                            <div class="value">0</div>
+                            <div class="trend up">
+                                <i class="fas fa-arrow-up"></i> <span>0%</span> increase
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="stats-card">
+                            <div class="icon revenue-icon">
+                                <i class="fas fa-dollar-sign fa-lg"></i>
+                            </div>
+                            <h4>Total Revenue</h4>
+                            <div class="value">$0</div>
+                            <div class="trend up">
+                                <i class="fas fa-arrow-up"></i> <span>0%</span> increase
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="stats-card">
+                            <div class="icon pending-icon">
+                                <i class="fas fa-hourglass-half fa-lg"></i>
+                            </div>
+                            <h4>Pending Bookings</h4>
+                            <div class="value">0</div>
+                            <div class="trend down">
+                                <i class="fas fa-arrow-down"></i> <span>0%</span> decrease
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="stats-card">
+                            <div class="icon payment-icon">
+                                <i class="fas fa-wallet fa-lg"></i>
+                            </div>
+                            <h4>Pending Payments</h4>
+                            <div class="value">$0</div>
+                            <div class="trend down">
+                                <i class="fas fa-arrow-down"></i> <span>0%</span> decrease
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="row mb-4">
+                    <div class="col-md-8 mb-4">
+                        <div class="chart-card">
+                            <h4>Booking & Revenue Trends</h4>
+                            <div class="chart-container">
+                                <!-- Chart will be loaded dynamically by JS -->
+                                <canvas id="bookingRevenueChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="chart-card">
+                            <h4>Booking Status</h4>
+                            <div class="chart-container">
+                                <!-- Chart will be loaded dynamically by JS -->
+                                <canvas id="bookingStatusChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <!-- Recent Bookings Table -->
+                    <div class="col-md-8">
+                        <div class="data-card">
+                            <h4>
+                                Recent Bookings
+                                <div class="card-tools">
+                                    <button><i class="fas fa-download"></i></button>
+                                    <button><i class="fas fa-sync"></i></button>
+                                </div>
+                            </h4>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Customer</th>
+                                            <th>Event</th>
+                                            <th>Date</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                            <th>Payment</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Table rows will be populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="text-center mt-3">
+                                <a href="#" class="btn btn-sm btn-primary">View All Bookings</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calendar -->
+                 
+                </div>
+
+                <!-- Bottom Row -->
+                <div class="row">
+                    <!-- Payment Status -->
+                    <div class="col-md-4 mb-4">
+                        <div class="chart-card">
+                            <h4>Payment Collection Status</h4>
+                            <div class="payment-progress">
+                                <div class="progress-bar" style="width: 0%"></div>
+                            </div>
+                            <div class="payment-summary">
+                                <div class="collected">$0 collected</div>
+                                <div class="pending">$0 pending</div>
+                            </div>
+                            <div class="mt-4">
+                                <h5 class="mb-3">Recent Transactions</h5>
+                                <!-- Recent transactions will be loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Event Types -->
+                    <div class="col-md-4 mb-4">
+                        <div class="chart-card">
+                            <h4>Event Categories</h4>
+                            <div class="chart-container">
+                                <!-- Chart will be loaded dynamically by JS -->
+                                <canvas id="eventCategoriesChart" height="200"></canvas>
+                            </div>
+                            <div class="mt-3">
+                                <!-- Category progress bars will be loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Venues -->
+                    <div class="col-md-4 mb-4">
+                        <div class="chart-card">
+                            <h4>Top Venues</h4>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Venue</th>
+                                            <th>Events</th>
+                                            <th>Revenue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Will be populated dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3">
+                                <h5 class="mb-3">Upcoming Venue Bookings</h5>
+                                <!-- Will be populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Include necessary JS files -->
+   
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+   
+   
+
+    <!-- JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+
+    <script>
+            $(document).ready(function () {
+        // Set up date filter change event
+        $('.date-filter select').on('change', function() {
+            // Reload dashboard data based on selected date range
+            loadDashboardData($(this).val());
+        });
+
+        // Initial data load
+        loadDashboardData('This Month');
+
+        // Function to load all dashboard data based on date filter
+        function loadDashboardData(dateRange) {
+            loadStatistics();
+            loadBookingTrends();
+            loadBookingStatusChart();
+            loadRecentBookings();
+            loadPaymentStatus();
+            loadEventCategories();
+            loadTopVenues();
+           
+            loadRecentTransactions();
+            loadUpcomingVenueBookings();
+        }
+
+        // Load Dashboard Statistics Cards
+        function loadStatistics() {
+            // Handle API errors gracefully with default values
+            $.ajax({
+                url: '/DashBoard/GetTotalBookingsCount',
+                type: 'GET',
+                success: function (response) {
+                    if (response && response.success) {
+                        $('.stats-card .value').eq(0).text(response.totalBookings || 0);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Failed to fetch total bookings:', error);
+                    $('.stats-card .value').eq(0).text('0');
+                }
+            });
+
+            // Other statistics with error handling
+            $.ajax({
+                url: '/DashBoard/GetTotalRevenue',
+                type: 'GET',
+                   success: function (response) {
+                       
+                    if (response && response.success) {
+                        $('.stats-card .value').eq(1).text('$' + formatNumber(response.totalRevenue || 0));
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Failed to fetch total revenue:', error);
+                    $('.stats-card .value').eq(1).text('$0');
+                }
+            });
+
+            $.ajax({
+                url: '/DashBoard/GetPendingBookingsCount',
+                type: 'GET',
+                success: function (response) {
+                    if (response && response.success) {
+                        $('.stats-card .value').eq(2).text(response.pendingBookings || 0);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Failed to fetch pending bookings:', error);
+                    $('.stats-card .value').eq(2).text('0');
+                }
+            });
+
+            $.ajax({
+                url: '/DashBoard/GetPendingPaymentsAmount',
+                type: 'GET',
+                success: function (response) {
+                    if (response && response.success) {
+                        $('.stats-card .value').eq(3).text('$' + formatNumber(response.pendingPayments || 0));
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Failed to fetch pending payments:', error);
+                    $('.stats-card .value').eq(3).text('$0');
+                }
+            });
+        }
+
+        // Load Booking & Revenue Trends Chart
+        function loadBookingTrends() {
+            const currentYear = new Date().getFullYear();
+
+            // Get booking trends data
+            $.ajax({
+                url: '/DashBoard/GetMonthlyBookingTrends',
+                type: 'GET',
+                data: { year: currentYear },
+                success: function (bookingResponse) {
+                    if (bookingResponse && bookingResponse.success) {
+                        // Get revenue trends data
+                        $.ajax({
+                            url: '/DashBoard/GetMonthlyRevenueTrends',
+                            type: 'GET',
+                            data: { year: currentYear },
+                            success: function (revenueResponse) {
+                                if (revenueResponse && revenueResponse.success) {
+                                    renderTrendsChart(
+                                        bookingResponse.monthlyBookingTrends || {},
+                                        revenueResponse.monthlyRevenueTrends || {}
+                                    );
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Failed to fetch revenue trends:', error);
+                                renderTrendsChart({}, {});
+                            }
+                        });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Failed to fetch booking trends:', error);
+                }
+            });
+        }
+
+        // Render the booking and revenue trends chart
+        function renderTrendsChart(bookingData, revenueData) {
+            // Get the container
+            const container = $('.chart-card:first .chart-container');
+
+            // First destroy any existing chart
+            container.empty();
+
+            // Create new canvas
+            const ctx = document.createElement('canvas');
+            ctx.id = 'bookingRevenueChart';
+            ctx.height = 300;
+            container.append(ctx);
+
+            // Get months as labels
+            const months = Object.keys(bookingData);
+            const bookingValues = Object.values(bookingData);
+            const revenueValues = Object.values(revenueData);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months.length ? months : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [
+                        {
+                            label: 'Bookings',
+                            data: bookingValues.length ? bookingValues : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            borderColor: '#4361ee',
+                            backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                            tension: 0.3,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Revenue ($)',
+                            data: revenueValues.length ? revenueValues : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            borderColor: '#4cc9f0',
+                            backgroundColor: 'rgba(76, 201, 240, 0.1)',
+                            tension: 0.3,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Number of Bookings'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                            title: {
+                                display: true,
+                                text: 'Revenue ($)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load Booking Status Distribution Chart
+        function loadBookingStatusChart() {
+            $.ajax({
+                url: '/DashBoard/GetBookingStatusDistribution',
+                type: 'GET',
+                success: function (response) {
+                    if (response && response.success) {
+                        renderBookingStatusChart(response.bookingStatusDistribution || {});
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Failed to fetch booking status distribution:', error);
+                    renderBookingStatusChart({});
+                }
+            });
+        }
+
+        // Render the booking status chart
+        function renderBookingStatusChart(statusData) {
+            // Get the container
+            const container = $('.chart-card:eq(1) .chart-container');
+
+            // Clear the container
+            container.empty();
+
+            // Create new canvas
+            const ctx = document.createElement('canvas');
+            ctx.id = 'bookingStatusChart';
+            ctx.height = 300;
+            container.append(ctx);
+
+            const labels = Object.keys(statusData);
+            const data = Object.values(statusData);
+            const backgroundColors = ['#4ade80', '#fcd34d', '#f87171', '#60a5fa'];
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels.length ? labels : ['Confirmed', 'Pending', 'Cancelled'],
+                    datasets: [{
+                        data: data.length ? data : [0, 0, 0],
+                        backgroundColor: backgroundColors,
+                        borderColor: 'white',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                                    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load Recent Bookings Table
+        function loadRecentBookings() {
+            $.ajax({
+                url: '/DashBoard/GetRecentBookings',
+                type: 'GET',
+                data: { count: 5 },
+                success: function (response) {
+                    if (response && response.success) {
+                        renderRecentBookingsTable(response.recentBookings || []);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Failed to fetch recent bookings:', error);
+                    renderRecentBookingsTable([]);
+                }
+            });
+        }
+
+        // Render Recent Bookings table with data
+        function renderRecentBookingsTable(bookings) {
+            const tbody = $('.data-card table tbody');
+            tbody.empty();
+
+            if (!bookings || bookings.length === 0) {
+                tbody.append(`
+                    <tr>
+                        <td colspan="7" class="text-center">No recent bookings found</td>
+                    </tr>
+                `);
+                return;
+            }
+
+            bookings.forEach(booking => {
+                const dateFormatted = booking.eventDate ? new Date(booking.eventDate).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                }) : 'N/A';
+                debugger
+                tbody.append(`
+                    <tr>
+                        <td>${booking.customerName || 'Unknown'}</td>
+                        <td>${booking.eventName || 'Unknown'}</td>
+                        <td>${dateFormatted}</td>
+                        <td>$${formatNumber(booking.amount)}</td>
+                        <td><span class="badge badge-${getStatusClass(booking.status)}">${booking.status || 'Unknown'}</span></td>
+                        <td><span class="badge badge-${getPaymentClass(booking.paymentStatus)}">${booking.paymentStatus || 'Unknown'}</span></td>
+                        <td>
+                            <button class="btn btn-action btn-view me-1" data-id="${booking.bookingId}"><i class="fas fa-eye"></i></button>
+                                <button class="btn btn-action btn-edit" data-id="${booking.bookingId}"><i class="fas fa-pen"></i></button>
+                        </td>
+                    </tr>
+                `);
+            });
+
+            // Set up event handlers for action buttons
+            $('.btn-view').on('click', function() {
+                const bookingId = $(this).data('id');
+                viewBookingDetails(bookingId);
+            });
+
+            $('.btn-edit').on('click', function() {
+                const bookingId = $(this).data('id');
+                editBooking(bookingId);
+            });
+        }
+
+        // Load Payment Collection Status
+        function loadPaymentStatus() {
+            $.ajax({
+                url: '/DashBoard/GetPaymentCollectionStatus',
+                type: 'GET',
+                success: function (response) {
+                    if (response && response.success && response.paymentCollectionStatus) {
+                        const status = response.paymentCollectionStatus;
+                        const collected = formatNumber(status.CollectedAmount || 0);
+                        const pending = formatNumber(status.PendingAmount || 0);
+                        const percentage = status.CollectionPercentage || 0;
+
+                        $('.payment-progress .progress-bar').css('width', `${percentage}%`);
+                        $('.payment-summary .collected').text(`$${collected} collected`);
+                        $('.payment-summary .pending').text(`$${pending} pending`);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Failed to fetch payment collection status:', error);
+                    $('.payment-progress .progress-bar').css('width', '0%');
+                    $('.payment-summary .collected').text('$0 collected');
+                    $('.payment-summary .pending').text('$0 pending');
+                }
+            });
+        }
+
+        // Load Event Categories
+        function loadEventCategories() {
+            $.ajax({
+                url: '/DashBoard/GetEventsByCategory',
+                type: 'GET',
+                success: function (response) {
+                    if (response && response.success) {
+                        renderEventCategoriesChart(response.eventsByCategory || {});
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Failed to fetch event categories:', error);
+                    renderEventCategoriesChart({});
+                }
+            });
+        }
+
+        // Render Event Categories chart
+        function renderEventCategoriesChart(categoriesData) {
+            const container = $('.chart-card:eq(3) .chart-container');
+            container.empty();
+
+            const ctx = document.createElement('canvas');
+            ctx.id = 'eventCategoriesChart';
+            ctx.height = 200;
+            container.append(ctx);
+
+            const labels = Object.keys(categoriesData);
+            const data = Object.values(categoriesData);
+            const backgroundColors = ['#3498db', '#2ecc71', '#f1c40f', '#e74c3c', '#9b59b6', '#1abc9c'];
+
+            if (labels.length === 0) {
+                labels.push('No Categories');
+                data.push(0);
+            }
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: backgroundColors.slice(0, labels.length),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load Top Venues
+        function loadTopVenues() {
+            $.ajax({
+                url: '/DashBoard/GetTopVenues',
+                type: 'GET',
+                data: { count: 5 },
+                success: function (response) {
+                    debugger
+                    if (response && response.success) {
+                        renderTopVenuesTable(response.topVenues || []);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Failed to fetch top venues:', error);
+                    renderTopVenuesTable([]);
+                }
+            });
+        }
+
+        // Render Top Venues table
+        function renderTopVenuesTable(venues) {
+            debugger
+            const tbody = $('.chart-card:last table tbody');
+            tbody.empty();
+
+            if (!venues || venues.length === 0) {
+                tbody.append(`
+                    <tr>
+                        <td colspan="3" class="text-center">No venue data available</td>
+                    </tr>
+                `);
+                return;
+            }
+debugger
+            venues.forEach(venue => {
+                tbody.append(`
+                    <tr>
+                        <td>${venue.Name || 'Unknown'}</td>
+                        <td>${venue.EventCount || 0}</td>
+                        <td>$${formatNumber(venue.Revenue || 0)}</td>
+                    </tr>
+                `);
+            });
+        }
+
+        // Load Calendar Events
+    
+
+        // Update calendar with events data
+       
+        // Load Recent Transactions
+        function loadRecentTransactions() {
+            $.ajax({
+                url: '/DashBoard/GetRecentTransactions',
+                type: 'GET',
+                data: { count: 3 },
+                success: function (response) {
+                    if (response && response.success) {
+                        renderRecentTransactions(response.recentTransactions || []);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Failed to fetch recent transactions:', error);
+                    renderRecentTransactions([]);
+                }
+            });
+        }
+
+        // Render recent transactions
+        function renderRecentTransactions(transactions) {
+            const container = $('.chart-card:eq(2) .mt-4');
+            // Clear existing transactions except the heading
+            container.find('.customer-card').remove();
+
+            if (!transactions || transactions.length === 0) {
+                container.append('<p class="text-center">No recent transactions</p>');
+                return;
+            }
+
+            transactions.forEach(transaction => {
+                const initials = getInitials(transaction.CustomerName || 'Unknown');
+                const dateFormatted = transaction.EventDate ?
+                    new Date(transaction.EventDate).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric'
+                    }) : 'N/A';
+
+                container.append(`
+                    <div class="customer-card">
+                        <div class="customer-avatar">${initials}</div>
+                        <div class="customer-info">
+                            <h5>${transaction.CustomerName || 'Unknown'}</h5>
+                            <p>${transaction.EventName || 'Unknown'} - ${dateFormatted}</p>
+                        </div>
+                        <div class="customer-metric">
+                            <div class="value">$${formatNumber(transaction.Amount || 0)}</div>
+                            <p>${transaction.PaymentStatus || 'Unknown'}</p>
+                        </div>
+                    </div>
+                `);
+            });
+        }
+
+        // Load Upcoming Venue Bookings
+        function loadUpcomingVenueBookings() {
+            $.ajax({
+                url: '/DashBoard/GetUpcomingVenueBookings',
+                type: 'GET',
+                data: { count: 3 },
+                success: function (response) {
+                    if (response && response.success) {
+                        renderUpcomingVenueBookings(response.upcomingVenueBookings || []);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Failed to fetch upcoming venue bookings:', error);
+                    renderUpcomingVenueBookings([]);
+                }
+            });
+        }
+
+        // Render upcoming venue bookings
+        function renderUpcomingVenueBookings(bookings) {
+            const container = $('.chart-card:last .mt-3');
+            // Clear existing bookings except the heading
+            container.find('.d-flex.justify-content-between').remove();
+
+            if (!bookings || bookings.length === 0) {
+                container.append('<p class="text-center">No upcoming venue bookings</p>');
+                return;
+            }
+
+            bookings.forEach(booking => {
+                const dateFormatted = booking.eventDate ?
+                    new Date(booking.eventDate).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    }) : 'N/A';
+
+                container.append(`
+                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                        <div>
+                            <strong>${booking.venueName || 'Unknown Venue'}</strong>
+                            <div class="text-muted small">${dateFormatted}</div>
+                        </div>
+                        <span class="badge badge-${getStatusClass(booking.status)}">${booking.status || 'Unknown'}</span>
+                    </div>
+                `);
+            });
+        }
+
+        // Utility function to get initials from name
+        function getInitials(name) {
+            if (!name) return 'UN';
+
+            return name
+                .split(' ')
+                .map(part => part.charAt(0))
+                .join('')
+                .toUpperCase()
+                .substring(0, 2);
+        }
+
+        // Utility function to get status badge class
+        function getStatusClass(status) {
+            if (!status) return 'secondary';
+
+            switch (status) {
+                case 'Confirmed': return 'success';
+                case 'Pending': return 'warning';
+                case 'Cancelled': return 'danger';
+                default: return 'info';
+            }
+        }
+
+        // Utility function to get payment badge class
+        function getPaymentClass(paymentStatus) {
+            if (!paymentStatus) return 'secondary';
+
+            switch (paymentStatus) {
+                case 'Paid': return 'success';
+                case 'Partial': return 'info';
+                case 'Unpaid': return 'danger';
+                case 'Refund': return 'warning';
+                default: return 'info';
+            }
+        }
+
+        // Utility function to format numbers with commas
+        function formatNumber(num) {
+            if (num === null || num === undefined) return '0';
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // Function for viewing booking details
+        function viewBookingDetails(bookingId) {
+            console.log(`View booking details for ID: ${bookingId}`);
+            // In a real application, you might redirect to a details page or open a modal
+            // window.location.href = `/Booking/Details/${bookingId}`;
+        }
+
+        // Function for editing a booking
+        function editBooking(bookingId) {
+            console.log(`Edit booking with ID: ${bookingId}`);
+            // In a real application, you might redirect to an edit page or open a modal
+            // window.location.href = `/Booking/Edit/${bookingId}`;
+        }
+
+        // Set up other event listeners
+        $('.btn-primary').on('click', function() {
+            // Handle create new event button click
+            window.location.href = '/EventBooking/EventBooking';
+        });
+
+        // Set up calendar navigation
+        $('.calendar-nav button').on('click', function() {
+            // This would navigate between months in the calendar
+            // Placeholder for future implementation
+            console.log('Calendar navigation clicked');
+        });
+    });
+    </script>
+

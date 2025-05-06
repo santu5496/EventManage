@@ -38,14 +38,18 @@ namespace Assignment4.Controllers
             return View();
         }
 
-        public IActionResult GetUserByPhoneNumber(string phonenumber,string password)
+        public IActionResult GetUserByUserName(string username,string password)
         {
-            var result = _userService.ValidateUser(phonenumber,password);
+            var result = _userService.ValidateUser(username, password);
             if (result == null)
             {
                 return Json(new { success = false, message = "No user found." });
             }
-            return Json(result);
+            else
+            {
+                return Json(new { success = true, message = "User found. Login successful.", user = result });
+            }
+        
 
 
         }

@@ -2,264 +2,203 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Management Login System</title>
-
-    <!-- Bootstrap CSS and JS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- jQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-    <!-- Particles.js for background effect -->
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <title>Transparent Login Form with Blur Background</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r148/three.min.js"></script>
 
     <style>
-        :root {
-            --primary-color: #4e73df;
-            --secondary-color: #1cc88a;
-            --dark-color: #2c3e50;
-            --light-color: #ecf0f1;
-            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        body {
+        body, html {
             margin: 0;
             padding: 0;
-            min-height: 100vh;
-            font-family: 'Segoe UI', sans-serif;
-            background: var(--dark-color);
-            overflow-x: hidden;
-        }
-
-        #particles-js {
-            position: absolute;
-            width: 100%;
+            font-family: 'Poppins', sans-serif;
             height: 100%;
-            z-index: 1;
+            overflow: hidden;
         }
 
-        .container-fluid {
-            position: relative;
-            z-index: 2;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .login-container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 2rem;
-            width: 100%;
-            max-width: 450px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            color: white;
-            transform: translateY(0);
-            transition: transform 0.3s ease;
-        }
-
-            .login-container:hover {
-                transform: translateY(-5px);
+            body:before {
+                content: '';
+                position: fixed;
+                width: 100vw;
+                height: 100vh;
+                background-image: url(https://i.postimg.cc/8cf6v1rk/1.jpg);
+                background-position: center center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                background-size: cover;
+                filter: blur(10px);
+                z-index: -2;
             }
 
-        .login-title {
-            font-size: 2rem;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 2rem;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .form-floating {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-control {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-
-            .form-control:focus {
-                background: rgba(255, 255, 255, 0.1);
-                border-color: var(--primary-color);
-                color: white;
-                box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
-            }
-
-        .form-floating label {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .btn-login {
-            width: 100%;
-            padding: 0.75rem;
-            border-radius: 10px;
-            background: var(--gradient);
-            border: none;
-            color: white;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-            .btn-login:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            }
-
-        .social-login {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .social-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: all 0.3s ease;
-        }
-
-            .social-btn:hover {
-                background: var(--gradient);
-                transform: translateY(-2px);
-            }
-
-        .register-link {
-            text-align: center;
-            margin-top: 1.5rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-            .register-link a {
-                color: var(--secondary-color);
-                text-decoration: none;
-            }
-
-                .register-link a:hover {
-                    text-decoration: underline;
-                }
-
-        /* Loading animation */
-        .loading-overlay {
+        #canvas-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            z-index: -1;
         }
 
-        .ai-loader {
-            width: 100px;
-            height: 100px;
+        .contact-form {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            padding: 60px 40px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            box-shadow: 0 0 10px #000;
+        }
+
+        .avatar {
+            position: absolute;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            border: 3px solid transparent;
-            border-top-color: var(--primary-color);
-            animation: spin 1s linear infinite;
+            overflow: hidden;
+            top: -40px;
+            left: calc(50% - 40px);
         }
 
-        @@keyframes spin {
-            0%
-
-        {
-            transform: rotate(0deg);
+        .contact-form h2 {
+            margin-bottom: 20px;
+            color: #fff;
+            text-align: center;
         }
 
-        100% {
-            transform: rotate(360deg);
+        .contact-form p {
+            margin: 0;
+            font-weight: bold;
+            color: #fff;
         }
 
+        .contact-form input[type=email],
+        .contact-form input[type=password] {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid #fff;
+            background: transparent;
+            outline: none;
+            height: 40px;
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .contact-form input[type=submit] {
+            width: 100%;
+            height: 40px;
+            color: #fff;
+            font-size: 16px;
+            background: red;
+            cursor: pointer;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            margin-top: 10px;
+        }
+
+        .contact-form a {
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .contact-form input[type=checkbox] {
+            width: auto;
+            margin-right: 5px;
         }
     </style>
 </head>
 <body>
-    <div id="particles-js"></div>
+    <div id="canvas-container"></div>
 
-    <div class="container-fluid">
-        <div class="login-container">
-            <h1 class="login-title">AI Login System</h1>
-
-            <form id="loginForm">
-                <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="username" placeholder="Username">
-                    <label for="username">Username</label>
-                </div>
-
-                <div class="form-floating mb-4">
-                    <input type="password" class="form-control" id="password" placeholder="Password">
-                    <label for="password">Password</label>
-                </div>
-
-                <button type="button" class="btn btn-login" onclick="login()">
-                    <i class="fas fa-robot me-2"></i> Secure Login
-                </button>
-            </form>
-
-
-            <div class="register-link">
-                Don't have an account? <a href="/Home/Register">Register Now</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="ai-loader"></div>
+    <div class="contact-form">
+        <img class="avatar" src="https://i.postimg.cc/zDyt7KCv/a1.jpg" alt="avatar">
+        <h2>Login</h2>
+        <form onsubmit="event.preventDefault(); login();">
+            <p>UserName</p>
+            <input type="text" id="username" placeholder="Enter UserName" required>
+            <p>Password</p>
+            <input type="password" id="password" placeholder="Enter Password" required>
+            <input type="submit" value="Sign in">
+            <p><input type="checkbox">Remember Me</p>
+        </form>
     </div>
 
     <script>
-        // Initialize particles.js
-        particlesJS("particles-js", {
-            particles: {
-                number: { value: 80, density: { enable: true, value_area: 800 } },
-                color: { value: "#ffffff" },
-                shape: { type: "circle" },
-                opacity: { value: 0.5, random: true },
-                size: { value: 3, random: true },
-                line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
-                move: { enable: true, speed: 6, direction: "none", random: false, straight: false, out_mode: "out", bounce: false }
-            },
-            interactivity: {
-                detect_on: "canvas",
-                events: {
-                    onhover: { enable: true, mode: "repulse" },
-                    onclick: { enable: true, mode: "push" },
-                    resize: true
-                }
-            }
+         $(document).ready(function () {
+            $(".sidebar").hide();
         });
 
+        function initThreeJsBackground() {
+            const container = document.getElementById('canvas-container');
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(width, height);
+            container.appendChild(renderer.domElement);
+
+            const geometry = new THREE.BufferGeometry();
+            const particlesCount = 1500;
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for (let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 10;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 0.02,
+                color: 0x6366f1,
+                transparent: true
+            });
+
+            const particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+            camera.position.z = 3;
+
+            let mouseX = 0, mouseY = 0;
+            document.addEventListener('mousemove', e => {
+                mouseX = (e.clientX - width / 2) / 100;
+                mouseY = (e.clientY - height / 2) / 100;
+            });
+
+            const animate = () => {
+                requestAnimationFrame(animate);
+                particles.rotation.x += (mouseY * 0.02 - particles.rotation.x) * 0.05;
+                particles.rotation.y += (mouseX * 0.02 - particles.rotation.y) * 0.05;
+                renderer.render(scene, camera);
+            };
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                const newWidth = window.innerWidth;
+                const newHeight = window.innerHeight;
+                camera.aspect = newWidth / newHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(newWidth, newHeight);
+            });
+        }
+
         function showLoading() {
-            document.getElementById('loadingOverlay').style.display = 'flex';
+            console.log('Show loading...');
         }
 
         function hideLoading() {
-            document.getElementById('loadingOverlay').style.display = 'none';
+            console.log('Hide loading...');
         }
 
-              function login() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
+        function login() {
+            const username = $('#username').val().trim();
+            const password = $('#password').val().trim();
 
             if (!username || !password) {
                 alert('Please enter both username and password');
@@ -269,20 +208,15 @@
             showLoading();
 
             $.ajax({
-                url: '/Home/GetUserByPhoneNumber',
+                url: '/Home/GetUserByUserName',
                 type: 'POST',
                
-                data: JSON.stringify({ username, password }),
+                data: { username, password },
                 success: function (response) {
                     hideLoading();
-
-                    if (response.success) {
-                        // ✅ Show the sidebar after successful login
-                        document.getElementById('sidebar').style.display = 'block';
-
-                        // ✅ Redirect to dashboard
-                        window.location.href = '/Home/Dashboard';
-                    } else {
+                    if (response.success) {  
+                                           window.location.href = '/DashBoard/DashBoard';
+                                       } else {
                         alert(response.message || 'Invalid username or password');
                     }
                 },
@@ -293,11 +227,13 @@
             });
         }
 
+        // Initialize Three.js when document is ready
+        $(document).ready(() => {
+            initThreeJsBackground();
+        });
 
-       
-
-        // Handle Enter key
-        document.getElementById('password').addEventListener('keypress', function(e) {
+        // Allow login on Enter key
+        document.getElementById('password').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 login();

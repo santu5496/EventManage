@@ -32,6 +32,7 @@ namespace EventManagement.Controllers
                 var result = _eventBookingSerive.AddEventBooking(eventBooking);
                 if (!result)
                 {
+
                     return Json(new { success = false, message = "Failed to add event booking." });
                 }
                 return Json(new { success = true, message = "Event booking added successfully." });

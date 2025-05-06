@@ -49,14 +49,14 @@ namespace DbOperation.Implementation
                 return db.Users.ToList();
             }
         }
-        public Users? ValidateUser(string phoneNumber, string password)
+        public Users? ValidateUser(string UserName, string password)
         {
             try
             {
                 using (var db = new EventContext(_context))
                 {
-                    // Retrieve the user by phone number
-                    var user = db.Users.FirstOrDefault(u => u.phoneNumber == phoneNumber);
+                    // Retrieve the user by username
+                    var user = db.Users.FirstOrDefault(u => u.username == UserName);
 
                     if (user == null)
                     {
@@ -64,9 +64,12 @@ namespace DbOperation.Implementation
                         return null;
                     }
 
-                    // Password matches, return the user
+                    // Check if the password matches (assumes password is stored as plain text, you should hash it in production)
+                    if (user.passwordHash == password)
+                    {
+                        // Password matches, return the user
                         return user;
-                    
+                    }
 
                     // Password does not match
                     return null;
@@ -78,6 +81,7 @@ namespace DbOperation.Implementation
                 return null;
             }
         }
+
 
 
         public bool UpdateUser(Users user)

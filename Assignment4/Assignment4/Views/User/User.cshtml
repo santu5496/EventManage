@@ -57,11 +57,11 @@
     <table id="tblUsers" class="table table-striped mb-3">
         <thead>
             <tr>
-                <th>Name</th>
+                <th>FullName</th> 
+                <th>UserName</th>
                 <th>Email</th>
                 <th>Phone Number</th>
                 <th>Role</th>
-                
                 <th>Action</th>
             </tr>
         </thead>
@@ -90,6 +90,9 @@
                     <div class="mb-3">
                         <label class="form-label">Email</label>
                         <input type="email" class="form-control ClearUserModalData" id="txtEmail" />
+                    </div> <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control ClearUserModalData" id="Username" />
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Phone Number</label>
@@ -140,7 +143,7 @@
         });
     }
 
-    function GetUsersData() {
+      function GetUsersData() {
         var table = $('#tblUsers').DataTable();
         table.clear().draw();
 
@@ -148,18 +151,17 @@
             url: '/User/GetAllUsers',
             type: 'GET',
             success: function (response) {
-               
                 response.forEach(function (user) {
                     table.row.add([
-                        user.fullName,
-                        user.email,
-                        user.phoneNumber,
-                        user.userRole,
-                       
+                        user.fullName,            // FullName
+                        user.username,            // UserName (ensure you have the correct field here)
+                        user.email,               // Email
+                        user.phoneNumber,         // Phone Number
+                        user.userRole,            // Role
                         '<div class="contentCenter">' +
                             '<i class="fa fa-edit me-4 ml-2 btn-edit" style="color:green" data-user=\'' + JSON.stringify(user) + '\'></i>' +
                             '<i class="fa fa-trash ml-2 btn-delete" style="color:red" data-id=\'' + user.userId + '\'></i>' +
-                            '</div>'
+                        '</div>'                   // Action buttons
                     ]).draw();
                 });
             },
@@ -168,6 +170,7 @@
             }
         });
     }
+
 
     function EditUser(user) {
         $('#UserID').val(user.userId);
@@ -204,6 +207,7 @@
             email: $('#txtEmail').val(),
             phoneNumber: $('#txtPhoneNumber').val(),
             userRole: $('#ddlRole').val(),
+            userName: $('#Username').val(),
             address: $('#txtAddress').val(),
             passwordHash: $('#txtPassword').val()
         };
