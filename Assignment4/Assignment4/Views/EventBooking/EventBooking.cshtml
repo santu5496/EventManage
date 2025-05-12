@@ -5,16 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Booking Calendar</title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
+    <!-- jQuery UI -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
-    <style>
+    <!-- FullCalendar v6 -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
+
+    <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
@@ -29,7 +32,6 @@
             width: 90%;
             margin: 20px auto;
         }
-            
 
         /* Buttons styling */
         button {
@@ -79,12 +81,17 @@
         }
 
         .morning-booked {
-            background-color: #FF0000;
+            background-color: #FF9999;
             opacity: 0.5;
         }
 
         .evening-booked {
-            background-color: #00FF00;
+            background-color: #99FF99;
+            opacity: 0.5;
+        }
+
+        .fullday-booked {
+            background-color: #9999FF;
             opacity: 0.5;
         }
 
@@ -116,7 +123,11 @@
             font-weight: bold;
         }
 
-        input[type="text"], select {
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea {
             width: 100%;
             padding: 8px;
             border: 1px solid #ddd;
@@ -247,11 +258,16 @@
                     background-color: #d3d9df;
                 }
 
-        .selected-day {
-            background-color: #e6f2ff !important;
-        }
+            .modal-footer .btn-danger {
+                background-color: #dc3545;
+                color: white;
+            }
 
-        .selected1-day {
+                .modal-footer .btn-danger:hover {
+                    background-color: #c82333;
+                }
+
+        .selected-day {
             background-color: #e6f2ff !important;
         }
 
@@ -268,13 +284,16 @@
         }
 
         @@keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
+            0%
 
-            100% {
-                transform: rotate(360deg);
-            }
+        {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+
         }
 
         /* Tooltip styling */
@@ -301,31 +320,137 @@
             margin-top: 5px;
             font-size: 14px;
         }
+
+        .shift-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+            .shift-row label {
+                margin-right: 10px;
+                min-width: 100px;
+            }
+
+                .shift-row label:not(:first-child) {
+                    margin-right: 15px;
+                    display: inline-flex;
+                    align-items: center;
+                    min-width: auto;
+                }
+
+            .shift-row input[type="checkbox"] {
+                margin-right: 5px;
+            }
+
+        /* Event styles in calendar */
+        .fc-event {
+            cursor: pointer;
+        }
+
+        .event-morning {
+            background-color: #FF9999 !important;
+            border-color: #FF6666 !important;
+        }
+
+        .event-evening {
+            background-color: #99FF99 !important;
+            border-color: #66FF66 !important;
+        }
+
+        .event-fullday {
+            background-color: #9999FF !important;
+            border-color: #6666FF !important;
+        }
+
+        /* Event list styles */
+        #event-list {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+            #event-list th, #event-list td {
+                padding: 10px;
+                text-align: left;
+                border: 1px solid #ddd;
+            }
+
+            #event-list th {
+                background-color: #f2f2f2;
+            }
+
+            #event-list tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+
+            #event-list tr:hover {
+                background-color: #e6f2ff;
+            }
+
+        .action-buttons button {
+            padding: 5px 10px;
+            margin: 0 5px;
+            font-size: 14px;
+        }
+
+        .action-buttons .edit-btn {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .action-buttons .delete-btn {
+            background-color: #dc3545;
+        }
+
+        /* View Details Modal */
+        #detailsModal .booking-details {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        #detailsModal .detail-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+
+        #detailsModal .detail-label {
+            font-weight: bold;
+            width: 170px;
+        }
+
+        #detailsModal .detail-value {
+            flex: 1;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Evenet Booking Calendar</h1>
+    <h1>Event Booking Calendar</h1>
 
+    <!-- Booking Modal -->
     <div id="bookingModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Add / Update Booking</h2>
+                <h2 id="booking-modal-title">Add New Booking</h2>
                 <span class="close-button">&times;</span>
             </div>
             <div class="modal-body">
-                <div hidden class="form-group">
+                <div class="form-group" hidden>
                     <label>Booking ID</label>
                     <input type="number" id="bookingId" class="ClearBookingModalData" />
                 </div>
-                <div class="form-group">
-
-                    <input type="number" hidden id="userId" class="ClearBookingModalData" required />
+                <div class="form-group" hidden>
+                    <input type="number" id="userId" class="ClearBookingModalData" value="1" />
                 </div>
                 <div class="form-group">
                     <label>Event</label>
                     <select id="eventId" class="ClearBookingModalData" required>
                         <option value="">-- Select Event --</option>
+                        <option value="1">Birthday Party</option>
+                        <option value="2">Wedding</option>
+                        <option value="3">Corporate Event</option>
+                        <option value="4">Family Gathering</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -348,6 +473,9 @@
                         <option value="evening">Evening</option>
                         <option value="fullday">Full Day</option>
                     </select>
+                </div>
+                <div id="dateWiseShiftContainer">
+                    <!-- Will be filled dynamically -->
                 </div>
                 <div class="form-group">
                     <label>Booking Status</label>
@@ -379,7 +507,7 @@
                         <option value="Pending">Pending</option>
                     </select>
                 </div>
-                <div hidden class="form-group">
+                <div class="form-group" hidden>
                     <label>Created Date</label>
                     <input type="date" id="createdDate" class="ClearBookingModalData" />
                 </div>
@@ -403,11 +531,32 @@
             </div>
             <div class="modal-footer">
                 <button type="button" id="save-booking" class="btn btn-primary">Save</button>
+                <button type="button" id="delete-booking" class="btn btn-danger" style="display: none;">Delete</button>
                 <button type="button" id="close-booking-modal" class="btn btn-secondary">Close</button>
             </div>
         </div>
     </div>
 
+    <!-- View Details Modal -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Booking Details</h2>
+                <span class="close-button">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="booking-details">
+                    <!-- Will be filled dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="edit-from-details" class="btn btn-primary">Edit</button>
+                <button type="button" id="close-details-modal" class="btn btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Booking Form -->
     <div id="booking-form">
         <h3>Quick Booking</h3>
         <div class="form-group">
@@ -426,71 +575,69 @@
         <button id="quick-book">Quick Book</button>
     </div>
 
+    <!-- Action Buttons -->
     <div>
-        <button id="fetch-bookings">Fetch All Bookings</button>
+        <button id="fetch-bookings">Refresh Calendar</button>
         <button id="open-booking-modal">New Booking</button>
+        <button id="view-all-bookings">View All Bookings</button>
     </div>
 
     <div id="spinner" class="spinner"></div>
     <div id="message" class="success-message"></div>
+
+    <!-- Calendar Display -->
     <div id="calendar"></div>
 
+    <!-- Bookings List Table (initially hidden) -->
+    <div id="bookings-list-container" style="display: none;">
+        <h2>All Bookings</h2>
+        <table id="event-list">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Event</th>
+                    <th>Customer</th>
+                    <th>Date Range</th>
+                    <th>Shift</th>
+                    <th>Status</th>
+                    <th>Payment</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="event-list-body">
+                <!-- Will be filled dynamically -->
+            </tbody>
+        </table>
+        <button id="back-to-calendar">Back to Calendar</button>
+    </div>
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- jQuery UI -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+    <!-- FullCalendar -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+
     <script>
-               document.addEventListener('DOMContentLoaded', function() {
-            // Global variables
-            var calendarEl = document.getElementById('calendar');
-            var bookingData = {};
-            var selectedDate = null;
-            var calendar;
-            var bookingModal = document.getElementById('bookingModal');
-            var originalModalContent = $('#bookingModal .modal-body').html();
-            var eventsData = []; // Store events data for reference
-
-            // Add CSS styles for booking details
-            var css = `
-            .booking-info-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 10px;
+        $(document).ready(function ()
+        {
+            // Initialize storage for bookings if it doesn't exist
+            if (!localStorage.getItem('bookings')) {
+                localStorage.setItem('bookings', JSON.stringify([]));
             }
 
-            .booking-info-table td {
-                padding: 5px;
-                text-align: left;
-                border-bottom: 1px solid #eee;
+            // Initialize booking counter (for IDs)
+            if (!localStorage.getItem('bookingCounter')) {
+                localStorage.setItem('bookingCounter', '1');
             }
-
-            .booking-info-table td:first-child {
-                width: 40%;
-                font-weight: 500;
-            }
-
-            .booking-item {
-                margin-bottom: 15px;
-                padding: 10px;
-                background-color: #f9f9f9;
-                border-radius: 5px;
-            }
-
-            .booking-item h4 {
-                margin-top: 0;
-                color: #007BFF;
-            }
-
-            .btn-info {
-                background-color: #17a2b8;
-                color: white;
-            }
-
-            .btn-info:hover {
-                background-color: #138496;
-            }
-            `;
-
-            $('<style>').text(css).appendTo('head');
 
             // Initialize FullCalendar
-            calendar = new FullCalendar.Calendar(calendarEl, {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 selectable: true,
                 headerToolbar: {
@@ -498,493 +645,430 @@
                     center: 'title',
                     right: 'dayGridMonth,dayGridWeek'
                 },
-                datesSet: function() {
-                    setTimeout(function() {
-                        setupDayCells();
-                        fetchBookings();
-                    }, 100);
+                dateClick: function (info) {
+                    // Set the selected date in the quick booking form
+                    $('#booking-date').val(info.dateStr);
+
+                    // Also set this date in the booking modal
+                    let currentDate = new Date(info.dateStr);
+                    let formattedDate = currentDate.toISOString().split('T')[0];
+                    openBookingModal(formattedDate);
                 },
-                dateClick: function(info) {
-                    handleDateClick(info);
-                }
+                eventClick: function(info) {
+                    // Get the booking ID from the event
+                    const bookingId = info.event.id;
+                    viewBookingDetails(bookingId);
+                },
+                events: [] // Will be populated by loadEvents
             });
             calendar.render();
 
-            // Initialize datepicker
+            // Load initial events
+            loadEvents();
+
+            // Initialize jQuery UI Datepicker for the quick booking form
             $('#booking-date').datepicker({
                 dateFormat: 'yy-mm-dd',
-                minDate: 0,
                 onSelect: function(dateText) {
-                    selectedDate = dateText;
-                    $('.fc-day').removeClass('selected-day');
-                    $('.fc-day[data-date="' + selectedDate + '"]').addClass('selected-day');
+                    // When a date is selected in the datepicker, also set it in the booking modal
+                    $('#bookingDate').val(dateText);
+                    $('#fromDate').val(dateText);
+                    $('#toDate').val(dateText);
                 }
             });
 
-            // Event listeners
-            $('#save-booking').click(saveBooking);
-            $('#quick-book').click(quickBook);
-            $('#fetch-bookings').click(fetchBookings);
-            $('#open-booking-modal').click(function() { openBookingModal(); });
-            $('#close-booking-modal, .close-button').click(closeBookingModal);
-            $('#totalAmount, #advancePayment').on('input', calculateRemainingPayment);
+            // Event listeners for date inputs in booking modal
+            $('#bookingDate, #fromDate, #toDate').change(function() {
+                // When dates change, maybe need to regenerate shift options
+                if ($('#shiftType').val() !== 'fullday' && $('#fromDate').val() && $('#toDate').val()) {
+                    generateDateWiseShifts();
+                }
+            });
 
-            // ========== CORE FUNCTIONS ========== //
+            // Event listener for shift type change
+            $('#shiftType').change(function() {
+                const shiftType = $(this).val();
+                if (shiftType === 'fullday') {
+                    $('#dateWiseShiftContainer').hide();
+                } else if (shiftType && $('#fromDate').val() && $('#toDate').val()) {
+                    $('#dateWiseShiftContainer').show();
+                    generateDateWiseShifts();
+                }
+            });
 
-            function setupDayCells() {
-                $('.fc-daygrid-day').each(function() {
-                    var dateStr = $(this).attr('data-date');
-                    if (!$(this).find('.day-overlay').length) {
-                        $(this).append(`
-                            <div class="day-overlay" id="overlay-${dateStr}">
-                                <div class="morning-part" id="morning-${dateStr}"></div>
-                                <div class="evening-part" id="evening-${dateStr}"></div>
-                            </div>
-                        `);
-                    }
-                });
+            // Event listeners for payment calculation
+            $('#totalAmount, #advancePayment').on('input', function() {
+                calculateRemainingPayment();
+            });
+
+            // Function to calculate remaining payment
+            function calculateRemainingPayment() {
+                const total = parseFloat($('#totalAmount').val()) || 0;
+                const advance = parseFloat($('#advancePayment').val()) || 0;
+                const remaining = total - advance;
+                $('#remainingPayment').val(remaining >= 0 ? remaining : 0);
+
+                // Auto-update payment status based on values
+                if (advance === 0) {
+                    $('#paymentStatus').val('Pending');
+                } else if (advance >= total) {
+                    $('#paymentStatus').val('Paid');
+                } else {
+                    $('#paymentStatus').val('Partially Paid');
+                }
             }
 
-            function fetchBookings() {
-                showSpinner();
-                $.ajax({
-                    url: '/EventBooking/GetAllEventBookings',
-                    type: 'GET',
-                    success: function(data) {
-                        if (data && Array.isArray(data)) {
-                            bookingData = {};
-                            data.forEach(function(booking) {
-                                processBooking(booking);
-                            });
-                            renderAllBookings();
-                            showMessage("Bookings loaded successfully!", "success");
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        showMessage("Error loading bookings: " + error, "error");
-                    },
-                    complete: function() {
-                        hideSpinner();
-                    }
+            // Quick book button click
+            $('#quick-book').click(function() {
+                const selectedDate = $('#booking-date').val();
+                const selectedShift = $('#booking-shift').val();
+
+                if (!selectedDate) {
+                    showMessage('Please select a date first.', 'error');
+                    return;
+                }
+
+                if (!selectedShift) {
+                    showMessage('Please select a shift.', 'error');
+                    return;
+                }
+
+                // Open booking modal with pre-filled values
+                openBookingModal(selectedDate, {
+                    shiftType: selectedShift,
+                    fromDate: selectedDate,
+                    toDate: selectedDate
                 });
-            }
+            });
 
-            function processBooking(booking) {
-                var fromDate = new Date(booking.fromDate);
-                var toDate = new Date(booking.toDate);
-                var currentDate = new Date(fromDate);
+            // Open booking modal button click
+            $('#open-booking-modal').click(function() {
+                openBookingModal();
+            });
 
+            // Save booking button click
+            $('#save-booking').click(function() {
+                if (validateBookingForm()) {
+                    saveBooking();
+                }
+            });
+
+            // Delete booking button click
+            $('#delete-booking').click(function() {
+                const bookingId = $('#bookingId').val();
+                if (bookingId) {
+                    if (confirm('Are you sure you want to delete this booking?')) {
+                        deleteBooking(bookingId);
+                    }
+                }
+            });
+
+            // View all bookings button click
+            $('#view-all-bookings').click(function() {
+                $('#calendar').hide();
+                $('#booking-form').hide();
+                loadBookingsList();
+                $('#bookings-list-container').show();
+            });
+
+            // Back to calendar button click
+            $('#back-to-calendar').click(function() {
+                $('#bookings-list-container').hide();
+                $('#calendar').show();
+                $('#booking-form').show();
+            });
+
+            // Refresh calendar button click
+            $('#fetch-bookings').click(function() {
+                loadEvents();
+                showMessage('Calendar refreshed.', 'success');
+            });
+
+            // Edit from details modal
+            $('#edit-from-details').click(function() {
+                const bookingId = $(this).data('booking-id');
+                $('#detailsModal').hide();
+                openBookingModalForEdit(bookingId);
+            });
+
+            // Close booking modal
+            $('#close-booking-modal, .close-button').click(function() {
+                $('#bookingModal').hide();
+            });
+
+            // Close details modal
+            $('#close-details-modal, #detailsModal .close-button').click(function() {
+                $('#detailsModal').hide();
+            });
+
+            // Function to generate date-wise shift inputs
+            function generateDateWiseShifts() {
+                const fromDateStr = $('#fromDate').val();
+                const toDateStr = $('#toDate').val();
+                const container = $('#dateWiseShiftContainer');
+
+                if (!fromDateStr || !toDateStr) return;
+
+                const fromDate = new Date(fromDateStr);
+                const toDate = new Date(toDateStr);
+
+                if (fromDate > toDate) {
+                    showMessage('From Date must be before or equal to To Date.', 'error');
+                    return;
+                }
+
+                container.empty();
+
+                // Add header for the shift selection
+                container.append('<h4>Select Shifts for Each Date:</h4>');
+
+                const shiftTypes = ['Morning', 'Evening'];
+                const currentDate = new Date(fromDate);
+
+                // For each date in the range
                 while (currentDate <= toDate) {
-                    var dateStr = formatDate(currentDate);
-                    if (!bookingData[dateStr]) {
-                        bookingData[dateStr] = { morning: false, evening: false, details: [] };
-                    }
+                    const dateStr = currentDate.toISOString().split('T')[0];
+                    const shiftRow = $('<div class="shift-row"></div>');
 
-                    if (booking.shiftType === 'morning' || booking.shiftType === 'fullday') {
-                        bookingData[dateStr].morning = true;
-                    }
-                    if (booking.shiftType === 'evening' || booking.shiftType === 'fullday') {
-                        bookingData[dateStr].evening = true;
-                    }
+                    // Add date label
+                    const dateParts = dateStr.split('-');
+                    const formattedDate = `${dateParts[1]}/${dateParts[2]}/${dateParts[0]}`;
+                    shiftRow.append(`<label>${formattedDate}</label>`);
 
-                    bookingData[dateStr].details.push(booking);
+                    // Add checkboxes for each shift type
+                    shiftTypes.forEach(shift => {
+                        const checkbox = $(`
+                            <label>
+                                <input type="checkbox" name="shifts[${dateStr}]" value="${shift.toLowerCase()}"> ${shift}
+                            </label>
+                        `);
+                        shiftRow.append(checkbox);
+                    });
+
+                    container.append(shiftRow);
+
+                    // Move to next day
                     currentDate.setDate(currentDate.getDate() + 1);
                 }
             }
 
-            function handleDateClick(info) {
-                selectedDate = info.dateStr;
-                $('.fc-day').removeClass('selected-day');
-                $(info.dayEl).addClass('selected-day');
+            // Function to open booking modal for new booking or with specific date
+            function openBookingModal(dateStr = '', prefillData = {}) {
+                // Reset form
+                resetBookingForm();
 
-                $('#booking-date').datepicker('setDate', new Date(selectedDate));
+                // Set modal title for new booking
+                $('#booking-modal-title').text('Add New Booking');
 
-                var bookings = bookingData[selectedDate];
-                if (!bookings || bookings.details.length === 0) {
-                    openBookingModal(selectedDate);
-                } else {
-                    showBookingOptions(selectedDate, bookings);
-                }
-            }
+                // Hide delete button for new bookings
+                $('#delete-booking').hide();
 
-            // function showBookingOptions(date, bookings) {
-            //     var morningBooked = bookings.morning;
-            //     var eveningBooked = bookings.evening;
-            //     var content = `<div class="booking-options"><h3>${date}</h3>`;
+                // Set today as default for booking date if not specified
+                const today = new Date().toISOString().split('T')[0];
+                $('#bookingDate').val(dateStr || today);
+                $('#fromDate').val(dateStr || today);
+                $('#toDate').val(dateStr || today);
 
-            //     // Add View Details button at the top if there are bookings
-            //     if (bookings.details.length > 0) {
-            //         content += `<button class="btn btn-info view-details-btn">View Booking Details</button><hr>`;
-            //     }
+                // Set created date
+                $('#createdDate').val(today);
 
-            //     if (morningBooked && eveningBooked) {
-            //         content += `
-            //             <p>Both shifts booked</p>
-            //             <button class="btn btn-primary edit-btn" data-shift="morning">Edit Morning</button>
-            //             <button class="btn btn-primary edit-btn" data-shift="evening">Edit Evening</button>
-            //             <button class="btn btn-danger delete-btn">Delete Booking</button>`;
-            //     } else if (morningBooked) {
-            //         content += `
-            //             <p>Morning booked</p>
-            //             <button class="btn btn-primary edit-btn" data-shift="morning">Edit Morning</button>
-            //             <button class="btn btn-success book-btn" data-shift="evening">Book Evening</button>`;
-            //     } else if (eveningBooked) {
-            //         content += `
-            //             <p>Evening booked</p>
-            //             <button class="btn btn-primary edit-btn" data-shift="evening">Edit Evening</button>
-            //             <button class="btn btn-success book-btn" data-shift="morning">Book Morning</button>`;
-            //     } else {
-            //         content += `
-            //             <p>No bookings for this date.</p>
-            //             <button class="btn btn-success book-btn" data-shift="morning">Book Morning</button>
-            //             <button class="btn btn-success book-btn" data-shift="evening">Book Evening</button>
-            //             <button class="btn btn-success book-btn" data-shift="fullday">Book Full Day</button>`;
-            //     }
-
-            //     content += `</div>`;
-            //     $('#bookingModal .modal-body').html(content);
-            //     bookingModal.style.display = "block";
-
-            //     // Bind event handlers
-            //     $('.view-details-btn').click(function() {
-            //         showBookingDetails(date, bookings);
-            //     });
-
-            //     $('.edit-btn').click(function() {
-            //         var shift = $(this).data('shift');
-            //         editBooking(date, shift);
-            //     });
-
-            //     $('.book-btn').click(function() {
-            //         var shift = $(this).data('shift');
-            //         openBookingModal(date, shift);
-            //     });
-
-            //     $('.delete-btn').click(function() {
-            //         deleteBookingPrompt(date);
-            //     });
-            // }
-
-
-
-                    function showBookingOptions(date, bookings) {
-            var morningBooked = bookings.morning;
-            var eveningBooked = bookings.evening;
-            var content = `<div class="booking-options"><h3>${date}</h3>`;
-
-            // Add View Details button at the top if there are bookings
-            if (bookings.details.length > 0) {
-                content += `<button class="btn btn-info view-details-btn">View Booking Details</button><hr>`;
-            }
-
-            // Always show delete option if there are any bookings
-            if (bookings.details.length > 0) {
-                content += `<button class="btn btn-danger delete-btn">Delete Booking</button><hr>`;
-            }
-
-            if (morningBooked && eveningBooked) {
-                content += `
-                    <p>Both shifts booked</p>
-                    <button class="btn btn-primary edit-btn" data-shift="morning">Edit Morning</button>
-                    <button class="btn btn-primary edit-btn" data-shift="evening">Edit Evening</button>`;
-            } else if (morningBooked) {
-                content += `
-                    <p>Morning booked</p>
-                    <button class="btn btn-primary edit-btn" data-shift="morning">Edit Morning</button>
-                    <button class="btn btn-success book-btn" data-shift="evening">Book Evening</button>`;
-            } else if (eveningBooked) {
-                content += `
-                    <p>Evening booked</p>
-                    <button class="btn btn-primary edit-btn" data-shift="evening">Edit Evening</button>
-                    <button class="btn btn-success book-btn" data-shift="morning">Book Morning</button>`;
-            } else {
-                content += `
-                    <p>No bookings for this date.</p>
-                    <button class="btn btn-success book-btn" data-shift="morning">Book Morning</button>
-                    <button class="btn btn-success book-btn" data-shift="evening">Book Evening</button>
-                    <button class="btn btn-success book-btn" data-shift="fullday">Book Full Day</button>`;
-            }
-
-            content += `</div>`;
-            $('#bookingModal .modal-body').html(content);
-            bookingModal.style.display = "block";
-
-            // Bind event handlers
-            $('.view-details-btn').click(function() {
-                showBookingDetails(date, bookings);
-            });
-
-            $('.edit-btn').click(function() {
-                var shift = $(this).data('shift');
-                editBooking(date, shift);
-            });
-
-            $('.book-btn').click(function() {
-                var shift = $(this).data('shift');
-                openBookingModal(date, shift);
-            });
-
-            $('.delete-btn').click(function() {
-                deleteBookingPrompt(date);
-            });
-        }
-
-
-            function showBookingDetails(date, bookings) {
-                var content = `<div class="booking-details">
-                                <h3>Booking Details for ${date}</h3>
-                                <div class="booking-list">`;
-
-                bookings.details.forEach(function(booking, index) {
-                    content += `
-                        <div class="booking-item">
-                            <h4>${booking.customerName} (${booking.shiftType})</h4>
-                            <table class="booking-info-table">
-                                <tr><td><strong>Booking ID:</strong></td><td>${booking.bookingId}</td></tr>
-                                <tr><td><strong>Event:</strong></td><td>${getEventName(booking.eventId)}</td></tr>
-                                <tr><td><strong>From Date:</strong></td><td>${booking.fromDate}</td></tr>
-                                <tr><td><strong>To Date:</strong></td><td>${booking.toDate}</td></tr>
-                                <tr><td><strong>Shift Type:</strong></td><td>${booking.shiftType}</td></tr>
-                                <tr><td><strong>Booking Status:</strong></td><td>${booking.bookingStatus}</td></tr>
-                                <tr><td><strong>Total Amount:</strong></td><td>$${booking.totalAmount}</td></tr>
-                                <tr><td><strong>Advance Payment:</strong></td><td>$${booking.advancePayment || 0}</td></tr>
-                                <tr><td><strong>Remaining Payment:</strong></td><td>$${booking.remainingPayment}</td></tr>
-                                <tr><td><strong>Payment Status:</strong></td><td>${booking.paymentStatus}</td></tr>
-                                <tr><td><strong>Phone:</strong></td><td>${booking.phoneNumber}</td></tr>
-                                <tr><td><strong>Alt. Phone:</strong></td><td>${booking.alternativeNumber || '-'}</td></tr>
-                                <tr><td><strong>Address:</strong></td><td>${booking.address || '-'}</td></tr>
-                            </table>
-                        </div>`;
-
-                    // Add a divider between bookings except after the last one
-                    if (index < bookings.details.length - 1) {
-                        content += `<hr>`;
-                    }
-                });
-
-                content += `</div>
-                            <button class="btn btn-secondary back-to-options-btn">Back</button>
-                            </div>`;
-
-                $('#bookingModal .modal-body').html(content);
-
-                // Add event handler for Back button
-                $('.back-to-options-btn').click(function() {
-                    showBookingOptions(date, bookings);
-                });
-            }
-
-            function editBooking(date, shift) {
-                var booking = bookingData[date].details.find(b =>
-                    b.shiftType === shift || b.shiftType === 'fullday');
-                if (booking) {
-                    openBookingModal(date);
-                    populateBookingForm(booking);
-                }
-            }
-
-            function deleteBookingPrompt(date) {
-                var bookings = bookingData[date].details;
-                if (bookings.length === 1) {
-                    if (confirm(`Delete booking for ${bookings[0].customerName}?`)) {
-                        deleteBooking(bookings[0].bookingId);
-                    }
-                } else {
-                    var content = `<div class="delete-options"><h3>Which shift to delete?</h3>`;
-
-                    if (bookingData[date].morning) {
-                        var morningBooking = bookings.find(b =>
-                            b.shiftType === 'morning' || b.shiftType === 'fullday');
-                        content += `
-                            <button class="btn btn-danger delete-shift-btn"
-                                    data-id="${morningBooking.bookingId}">
-                                Delete Morning (${morningBooking.customerName})
-                            </button>`;
+                // Prefill data if provided
+                if (prefillData) {
+                    for (const [key, value] of Object.entries(prefillData)) {
+                        $(`#${key}`).val(value);
                     }
 
-                    if (bookingData[date].evening) {
-                        var eveningBooking = bookings.find(b =>
-                            b.shiftType === 'evening' || b.shiftType === 'fullday');
-                        content += `
-                            <button class="btn btn-danger delete-shift-btn"
-                                    data-id="${eveningBooking.bookingId}">
-                                Delete Evening (${eveningBooking.customerName})
-                            </button>`;
+                    // If shift type is specified, maybe need to show date-wise shifts
+                    if (prefillData.shiftType && prefillData.shiftType !== 'fullday' &&
+                        $('#fromDate').val() && $('#toDate').val()) {
+                        generateDateWiseShifts();
                     }
-
-                    content += `</div>`;
-                    $('#bookingModal .modal-body').html(content);
-
-                    $('.delete-shift-btn').click(function() {
-                        if (confirm("Are you sure you want to delete this booking?")) {
-                            deleteBooking($(this).data('id'));
-                        }
-                    });
-                }
-            }
-
-            function deleteBooking(bookingId)
-            {
-                showSpinner();
-                $.ajax({
-                    url: '/EventBooking/Delete',
-                    type: 'POST',
-                    data: { id: bookingId },
-                    success: function(response) {
-                        fetchBookings();
-                        closeBookingModal();
-                        showMessage("Booking deleted successfully!", "success");
-                    },
-                    error: function(xhr, status, error) {
-                        showMessage("Error deleting booking: " + error, "error");
-                    },
-                    complete: function() {
-                        hideSpinner();
-                    }
-                });
-            }
-
-            function openBookingModal(date = null, shift = null) {
-                $('#bookingModal .modal-body').html(originalModalContent);
-                if (date) {
-                    $('#bookingDate, #fromDate, #toDate').val(date);
-                } else {
-                    var today = new Date();
-                    $('#bookingDate, #fromDate, #toDate').val(formatDate(today));
                 }
 
-                if (shift) {
-                    $('#shiftType').val(shift);
-                }
-
-                // Set default values
-                if (!$('#bookingId').val()) {
-                    $('#bookingStatus').val('Pending');
-                    $('#paymentStatus').val('Pending');
-                    $('#createdDate').val(formatDate(new Date()));
-                }
-
-                populateEventDropdown();
-                bookingModal.style.display = "block";
+                // Show the modal
+                $('#bookingModal').show();
             }
 
-            function closeBookingModal() {
-                bookingModal.style.display = "none";
-                $('.ClearBookingModalData').val('');
-            }
+            // Function to open booking modal for editing
+            function openBookingModalForEdit(bookingId) {
+                // Get booking data
+                const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+                const booking = bookings.find(b => b.id == bookingId);
 
-            function saveBooking() {
-                if (!validateBookingForm()) {
+                if (!booking) {
+                    showMessage('Booking not found.', 'error');
                     return;
                 }
 
-                var bookingData = {
-                    bookingId: $('#bookingId').val() || 0,
-                    userId: $('#userId').val(),
-                    eventId: $('#eventId').val(),
-                    bookingDate: $('#bookingDate').val(),
-                    fromDate: $('#fromDate').val(),
-                    toDate: $('#toDate').val(),
-                    shiftType: $('#shiftType').val(),
-                    bookingStatus: $('#bookingStatus').val(),
-                    totalAmount: $('#totalAmount').val(),
-                    advancePayment: $('#advancePayment').val() || 0,
-                    remainingPayment: $('#remainingPayment').val(),
-                    paymentStatus: $('#paymentStatus').val(),
-                    createdDate: $('#createdDate').val() || formatDate(new Date()),
-                    customerName: $('#customerName').val(),
-                    phoneNumber: $('#phoneNumber').val(),
-                    alternativeNumber: $('#alternativeNumber').val() || '',
-                    address: $('#address').val() || ''
-                };
+                // Reset form first
+                resetBookingForm();
 
-                showSpinner();
-                $.ajax({
-                    url: '/EventBooking/AddOrUpdateEventBooking',
-                    type: 'POST',
-                    data: bookingData,
-                    success: function(response) {
-                        if (response && response.success) {
-                            fetchBookings();
-                            closeBookingModal();
-                            showMessage("Booking saved successfully!", "success");
-                        } else {
-                            showMessage("Error saving booking: " + (response.message || "Unknown error"), "error");
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        showMessage("Error saving booking: " + error, "error");
-                    },
-                    complete: function() {
-                        hideSpinner();
-                    }
-                });
-            }
+                // Set modal title for editing
+                $('#booking-modal-title').text('Edit Booking');
 
-            function quickBook() {
-                if (!selectedDate) {
-                    showMessage("Please select a date first.", "error");
-                    return;
-                }
+                // Show delete button for existing bookings
+                $('#delete-booking').show();
 
-                var shift = $('#booking-shift').val();
-                if (!shift) {
-                    showMessage("Please select a shift.", "error");
-                    return;
-                }
+                // Fill form with booking data
+                $('#bookingId').val(booking.id);
+                $('#userId').val(booking.userId || 1);
+                $('#eventId').val(booking.eventId);
+                $('#bookingDate').val(booking.bookingDate);
+                $('#fromDate').val(booking.fromDate);
+                $('#toDate').val(booking.toDate);
+                $('#shiftType').val(booking.shiftType);
+                $('#bookingStatus').val(booking.bookingStatus);
+                $('#totalAmount').val(booking.totalAmount);
+                $('#advancePayment').val(booking.advancePayment);
+                $('#remainingPayment').val(booking.remainingPayment);
+                $('#paymentStatus').val(booking.paymentStatus);
+                $('#createdDate').val(booking.createdDate);
+                $('#customerName').val(booking.customerName);
+                $('#phoneNumber').val(booking.phoneNumber);
+                $('#alternativeNumber').val(booking.alternativeNumber);
+                $('#address').val(booking.address);
 
-                // Check if date is already booked for the selected shift
-                if (bookingData[selectedDate]) {
-                    if ((shift === 'morning' || shift === 'fullday') && bookingData[selectedDate].morning) {
-                        showMessage("Morning shift is already booked for this date.", "error");
-                        return;
-                    }
-                    if ((shift === 'evening' || shift === 'fullday') && bookingData[selectedDate].evening) {
-                        showMessage("Evening shift is already booked for this date.", "error");
-                        return;
-                    }
-                }
+                // If it's not a full day shift and we have a date range, generate shift selections
+                if (booking.shiftType !== 'fullday') {
+                    generateDateWiseShifts();
 
-                openBookingModal(selectedDate, shift);
-            }
-
-            // ========== HELPER FUNCTIONS ========== //
-
-            function populateEventDropdown() {
-                var eventDropdown = $('#eventId');
-                eventDropdown.empty().append('<option value="">-- Select Event --</option>');
-
-                showSpinner();
-                $.ajax({
-                    url: '/EventCrud/GetAllEvents',
-                    type: 'GET',
-                    success: function(data) {
-                        if (data && Array.isArray(data)) {
-                            eventsData = data; // Store events data globally
-                            data.forEach(function(event) {
-                                eventDropdown.append(`<option value="${event.eventId}">${event.eventName}</option>`);
+                    // Check the corresponding shift checkboxes
+                    if (booking.dateWiseShifts) {
+                        setTimeout(() => {
+                            Object.entries(booking.dateWiseShifts).forEach(([date, shifts]) => {
+                                shifts.forEach(shift => {
+                                    $(`input[name="shifts[${date}]"][value="${shift}"]`).prop('checked', true);
+                                });
                             });
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        showMessage("Error loading events: " + error, "error");
-                    },
-                    complete: function() {
-                        hideSpinner();
+                        }, 100); // Small delay to ensure DOM is ready
                     }
-                });
+                }
+
+                // Show the modal
+                $('#bookingModal').show();
             }
 
-            function getEventName(eventId) {
-                var event = eventsData.find(e => e.eventId == eventId);
-                return event ? event.eventName : 'Unknown Event';
+            // Function to view booking details
+            function viewBookingDetails(bookingId) {
+                // Get booking data
+                const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+                const booking = bookings.find(b => b.id == bookingId);
+
+                if (!booking) {
+                    showMessage('Booking not found.', 'error');
+                    return;
+                }
+
+                // Get event name
+                const eventName = getEventName(booking.eventId);
+
+                // Prepare the detail content
+                let detailsHTML = `
+                    <div class="detail-row">
+                        <div class="detail-label">Event Type:</div>
+                        <div class="detail-value">${eventName}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Customer:</div>
+                        <div class="detail-value">${booking.customerName}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Contact:</div>
+                        <div class="detail-value">${booking.phoneNumber}</div>
+                    </div>`;
+
+                if (booking.alternativeNumber) {
+                    detailsHTML += `
+                    <div class="detail-row">
+                        <div class="detail-label">Alternative Contact:</div>
+                        <div class="detail-value">${booking.alternativeNumber}</div>
+                    </div>`;
+                }
+
+                detailsHTML += `
+                    <div class="detail-row">
+                        <div class="detail-label">Booking Date:</div>
+                        <div class="detail-value">${formatDate(booking.bookingDate)}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Date Range:</div>
+                        <div class="detail-value">${formatDate(booking.fromDate)} to ${formatDate(booking.toDate)}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Shift Type:</div>
+                        <div class="detail-value">${capitalizeFirstLetter(booking.shiftType)}</div>
+                    </div>`;
+
+                // If there are date-wise shifts, show them
+                if (booking.dateWiseShifts && Object.keys(booking.dateWiseShifts).length > 0) {
+                    detailsHTML += `
+                    <div class="detail-row">
+                        <div class="detail-label">Selected Shifts:</div>
+                        <div class="detail-value">`;
+
+                    Object.entries(booking.dateWiseShifts).forEach(([date, shifts]) => {
+                        detailsHTML += `${formatDate(date)}: ${shifts.map(s => capitalizeFirstLetter(s)).join(', ')}<br>`;
+                    });
+
+                    detailsHTML += `</div>
+                    </div>`;
+                }
+
+                detailsHTML += `
+                    <div class="detail-row">
+                        <div class="detail-label">Booking Status:</div>
+                        <div class="detail-value">${booking.bookingStatus}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Total Amount:</div>
+                        <div class="detail-value">${booking.totalAmount}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Advance Payment:</div>
+                        <div class="detail-value">${booking.advancePayment || '0'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Remaining Payment:</div>
+                        <div class="detail-value">${booking.remainingPayment}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Payment Status:</div>
+                        <div class="detail-value">${booking.paymentStatus}</div>
+                    </div>`;
+
+                if (booking.address) {
+                    detailsHTML += `
+                    <div class="detail-row">
+                        <div class="detail-label">Address:</div>
+                        <div class="detail-value">${booking.address}</div>
+                    </div>`;
+                }
+
+                // Add created date if available
+                if (booking.createdDate) {
+                    detailsHTML += `
+                    <div class="detail-row">
+                        <div class="detail-label">Booking Created:</div>
+                        <div class="detail-value">${formatDate(booking.createdDate)}</div>
+                    </div>`;
+                }
+
+                // Set the details content
+                $('#detailsModal .booking-details').html(detailsHTML);
+
+                // Set the booking ID for the edit button
+                $('#edit-from-details').data('booking-id', booking.id);
+
+                // Show the modal
+                $('#detailsModal').show();
             }
 
+            // Function to validate booking form
             function validateBookingForm() {
                 // Required fields
-                var requiredFields = [
-
+                const requiredFields = [
                     { id: 'eventId', name: 'Event' },
+                    { id: 'bookingDate', name: 'Booking Date' },
                     { id: 'fromDate', name: 'From Date' },
                     { id: 'toDate', name: 'To Date' },
                     { id: 'shiftType', name: 'Shift Type' },
@@ -995,139 +1079,373 @@
                     { id: 'phoneNumber', name: 'Phone Number' }
                 ];
 
-                var isValid = true;
-                $('#modal-message').text('').removeClass('error-message success-message');
-
-                requiredFields.forEach(function(field) {
-                    var value = $('#' + field.id).val();
-                    if (!value) {
-                        $('#modal-message').text(field.name + ' is required.').addClass('error-message');
-                        isValid = false;
+                for (const field of requiredFields) {
+                    const value = $(`#${field.id}`).val();
+                    if (!value || value.trim() === '') {
+                        showMessage(`${field.name} is required.`, 'error', 'modal-message');
                         return false;
                     }
-                });
+                }
 
-                // Check if toDate is after fromDate
-                if (isValid) {
-                    var fromDate = new Date($('#fromDate').val());
-                    var toDate = new Date($('#toDate').val());
-                    if (toDate < fromDate) {
-                        $('#modal-message').text('To Date must be after From Date.').addClass('error-message');
-                        isValid = false;
+                // Date validation
+                const bookingDate = new Date($('#bookingDate').val());
+                const fromDate = new Date($('#fromDate').val());
+                const toDate = new Date($('#toDate').val());
+
+                if (fromDate > toDate) {
+                    showMessage('From Date must be before or equal to To Date.', 'error', 'modal-message');
+                    return false;
+                }
+
+                if (bookingDate < fromDate || bookingDate > toDate) {
+                    showMessage('Booking Date must be within the From and To Date range.', 'error', 'modal-message');
+                    return false;
+                }
+
+                // Shift validation for non-full day bookings
+                const shiftType = $('#shiftType').val();
+                if (shiftType !== 'fullday') {
+                    // Check if at least one shift is selected
+                    const anyShiftSelected = $('#dateWiseShiftContainer input[type="checkbox"]:checked').length > 0;
+                    if (!anyShiftSelected) {
+                        showMessage('Please select at least one shift.', 'error', 'modal-message');
+                        return false;
                     }
                 }
 
-                return isValid;
+                return true;
             }
 
-            function renderAllBookings() {
-                // First clear all existing bookings visual indicators
-                $('.morning-part, .evening-part').removeClass('morning-booked evening-booked');
+            // Function to save booking
+            function saveBooking() {
+                const bookingId = $('#bookingId').val();
+                const isNewBooking = !bookingId;
 
-                // Then add indicators for current bookings
-                Object.keys(bookingData).forEach(function(date) {
-                    $('#morning-' + date).toggleClass('morning-booked', bookingData[date].morning);
-                    $('#evening-' + date).toggleClass('evening-booked', bookingData[date].evening);
-                });
+                // Collect all form data
+                const bookingData = {
+                    id: isNewBooking ? getNextBookingId() : bookingId,
+                    userId: $('#userId').val() || 1,
+                    eventId: $('#eventId').val(),
+                    bookingDate: $('#bookingDate').val(),
+                    fromDate: $('#fromDate').val(),
+                    toDate: $('#toDate').val(),
+                    shiftType: $('#shiftType').val(),
+                    bookingStatus: $('#bookingStatus').val(),
+                    totalAmount: parseFloat($('#totalAmount').val()),
+                    advancePayment: parseFloat($('#advancePayment').val()) || 0,
+                    remainingPayment: parseFloat($('#remainingPayment').val()),
+                    paymentStatus: $('#paymentStatus').val(),
+                    createdDate: $('#createdDate').val() || new Date().toISOString().split('T')[0],
+                    customerName: $('#customerName').val(),
+                    phoneNumber: $('#phoneNumber').val(),
+                    alternativeNumber: $('#alternativeNumber').val(),
+                    address: $('#address').val(),
+                    dateWiseShifts: {}
+                };
 
-                // Add tooltips to show booking info on hover
-                setupBookingTooltips();
-            }
+                // If not full day, collect shift selections
+                if (bookingData.shiftType !== 'fullday') {
+                    $('#dateWiseShiftContainer .shift-row').each(function() {
+                        const dateLabel = $(this).find('label').first().text();
+                        // Convert MM/DD/YYYY to YYYY-MM-DD
+                        const dateParts = dateLabel.split('/');
+                        const date = `${dateParts[2]}-${dateParts[0].padStart(2, '0')}-${dateParts[1].padStart(2, '0')}`;
 
-            function setupBookingTooltips() {
-                $('.day-overlay').off('mouseenter mouseleave');
+                        const selectedShifts = [];
+                        $(this).find('input[type="checkbox"]:checked').each(function() {
+                            selectedShifts.push($(this).val());
+                        });
 
-                $('.day-overlay').hover(
-                    function() {
-                        var dateStr = $(this).attr('id').replace('overlay-', '');
-                        if (bookingData[dateStr] && bookingData[dateStr].details.length > 0) {
-                            showBookingTooltip(dateStr, $(this));
+                        if (selectedShifts.length > 0) {
+                            bookingData.dateWiseShifts[date] = selectedShifts;
                         }
-                    },
-                    function() {
-                        $('#booking-tooltip').hide();
-                    }
-                );
-            }
-
-            function showBookingTooltip(date, element) {
-                var bookings = bookingData[date].details;
-                var content = `<strong>Bookings for ${date}</strong><br>`;
-
-                bookings.forEach(function(booking) {
-                    content += `${booking.customerName} (${booking.shiftType})<br>`;
-                });
-
-                $('#booking-tooltip').html(content);
-
-                var pos = element.offset();
-                $('#booking-tooltip').css({
-                    top: pos.top + 10,
-                    left: pos.left + 10
-                }).show();
-            }
-
-            function populateBookingForm(booking) {
-                // Clear form first
-                $('.ClearBookingModalData').val('');
-
-                // Then populate with booking data
-                Object.keys(booking).forEach(key => {
-                    if ($('#' + key).length) {
-                        $('#' + key).val(booking[key]);
-                    }
-                });
-
-                calculateRemainingPayment();
-            }
-
-            function calculateRemainingPayment() {
-                var total = parseFloat($('#totalAmount').val()) || 0;
-                var advance = parseFloat($('#advancePayment').val()) || 0;
-                var remaining = total - advance;
-                $('#remainingPayment').val(remaining >= 0 ? remaining : 0);
-
-                // Auto-select payment status based on payments
-                if (advance === 0) {
-                    $('#paymentStatus').val('Pending');
-                } else if (advance < total) {
-                    $('#paymentStatus').val('Partially Paid');
-                } else {
-                    $('#paymentStatus').val('Paid');
+                    });
                 }
+
+                // Get existing bookings
+                const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+
+                // Check for conflicts - make sure we don't double-book
+                const overlappingBookings = bookings.filter(booking => {
+                    // Skip the current booking if editing
+                    if (!isNewBooking && booking.id == bookingId) {
+                        return false;
+                    }
+
+                    // Check date overlap
+                    const bookingFromDate = new Date(booking.fromDate);
+                    const bookingToDate = new Date(booking.toDate);
+                    const newFromDate = new Date(bookingData.fromDate);
+                    const newToDate = new Date(bookingData.toDate);
+
+                    // If dates don't overlap, no conflict
+                    if (newToDate < bookingFromDate || newFromDate > bookingToDate) {
+                        return false;
+                    }
+
+                    // If dates overlap, check for shift conflicts
+                    // For full day bookings, any overlap is a conflict
+                    if (booking.shiftType === 'fullday' || bookingData.shiftType === 'fullday') {
+                        return true;
+                    }
+
+                    // Check date-wise shift conflicts
+                    const currentDates = getDatesInRange(bookingData.fromDate, bookingData.toDate);
+                    for (const date of currentDates) {
+                        const dateStr = date.toISOString().split('T')[0];
+                        const existingShifts = booking.dateWiseShifts && booking.dateWiseShifts[dateStr] || [];
+                        const newShifts = bookingData.dateWiseShifts[dateStr] || [];
+
+                        // Check if any shifts overlap
+                        for (const shift of newShifts) {
+                            if (existingShifts.includes(shift)) {
+                                return true; // Conflict found
+                            }
+                        }
+                    }
+
+                    return false; // No conflicts
+                });
+
+                if (overlappingBookings.length > 0) {
+                    showMessage('Booking conflict detected. Another booking exists for the selected date(s) and shift(s).', 'error', 'modal-message');
+                    return;
+                }
+
+                // Save the booking
+                if (isNewBooking) {
+                    // Add new booking
+                    bookings.push(bookingData);
+                } else {
+                    // Update existing booking
+                    const index = bookings.findIndex(b => b.id == bookingId);
+                    if (index !== -1) {
+                        bookings[index] = bookingData;
+                    }
+                }
+
+                // Save back to localStorage
+                localStorage.setItem('bookings', JSON.stringify(bookings));
+
+                // Refresh calendar
+                loadEvents();
+
+                // Show success message
+                showMessage(
+                    isNewBooking ? 'Booking created successfully.' : 'Booking updated successfully.',
+                    'success',
+                    'modal-message'
+                );
+
+                // Close the modal after a delay
+                setTimeout(() => {
+                    $('#bookingModal').hide();
+                }, 1500);
             }
 
-            function formatDate(date) {
-                var d = new Date(date),
-                    month = '' + (d.getMonth() + 1),
-                    day = '' + d.getDate(),
-                    year = d.getFullYear();
+            // Function to delete booking
+            function deleteBooking(bookingId) {
+                // Get existing bookings
+                let bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
 
-                if (month.length < 2) month = '0' + month;
-                if (day.length < 2) day = '0' + day;
+                // Remove the booking
+                bookings = bookings.filter(b => b.id != bookingId);
 
-                return [year, month, day].join('-');
+                // Save back to localStorage
+                localStorage.setItem('bookings', JSON.stringify(bookings));
+
+                // Refresh calendar
+                loadEvents();
+
+                // Show success message
+                showMessage('Booking deleted successfully.', 'success');
+
+                // Close the modal
+                $('#bookingModal').hide();
             }
 
-            function showSpinner() {
-                $('#spinner').show();
+            // Function to reset booking form
+            function resetBookingForm() {
+                $('.ClearBookingModalData').val('');
+                $('#modal-message').text('').removeClass('error-message').addClass('success-message');
+                $('#dateWiseShiftContainer').empty().hide();
             }
 
-            function hideSpinner()
-            {
-                $('#spinner').hide();
+            // Function to load events into calendar
+            function loadEvents() {
+                // Clear existing events
+                calendar.removeAllEvents();
+
+                // Get bookings from localStorage
+                const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+
+                // Convert bookings to calendar events
+                bookings.forEach(booking => {
+                    // Skip cancelled bookings
+                    if (booking.bookingStatus === 'Cancelled') {
+                        return;
+                    }
+
+                    const eventName = getEventName(booking.eventId);
+
+                    if (booking.shiftType === 'fullday') {
+                        // Add a single event spanning the whole date range
+                        calendar.addEvent({
+                            id: booking.id,
+                            title: `${eventName} - ${booking.customerName}`,
+                            start: booking.fromDate,
+                            end: new Date(new Date(booking.toDate).setDate(new Date(booking.toDate).getDate() + 1)).toISOString().split('T')[0], // Add one day for inclusive display
+                            allDay: true,
+                            className: 'event-fullday',
+                            extendedProps: {
+                                bookingId: booking.id,
+                                customerName: booking.customerName,
+                                phoneNumber: booking.phoneNumber,
+                                shiftType: booking.shiftType
+                            }
+                        });
+                    } else {
+                        // Add events for each selected shift
+                        Object.entries(booking.dateWiseShifts || {}).forEach(([date, shifts]) => {
+                            shifts.forEach(shift => {
+                                calendar.addEvent({
+                                    id: booking.id,
+                                    title: `${eventName} - ${capitalizeFirstLetter(shift)}`,
+                                    start: date,
+                                    allDay: true,
+                                    className: `event-${shift}`,
+                                    extendedProps: {
+                                        bookingId: booking.id,
+                                        customerName: booking.customerName,
+                                        phoneNumber: booking.phoneNumber,
+                                        shiftType: shift
+                                    }
+                                });
+                            });
+                        });
+                    }
+                });
             }
 
-            function showMessage(text, type) {
-                $('#message').text(text)
-                    .removeClass('error-message success-message')
-                    .addClass(type === 'error' ? 'error-message' : 'success-message')
-                    .show().delay(5000).fadeOut();
+            // Function to load bookings list
+            function loadBookingsList() {
+                const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+                const tbody = $('#event-list-body');
+                tbody.empty();
+
+                if (bookings.length === 0) {
+                    // Display a message when no bookings exist
+                    tbody.append(`
+                        <tr>
+                            <td colspan="8" style="text-align: center;">No bookings found.</td>
+                        </tr>
+                    `);
+                    return;
+                }
+
+                // Sort bookings by date (most recent first)
+                bookings.sort((a, b) => new Date(b.bookingDate) - new Date(a.bookingDate));
+
+                // Add each booking to the table
+                bookings.forEach(booking => {
+                    const eventName = getEventName(booking.eventId);
+
+                    tbody.append(`
+                        <tr>
+                            <td>${booking.id}</td>
+                            <td>${eventName}</td>
+                            <td>${booking.customerName}</td>
+                            <td>${formatDate(booking.fromDate)} to ${formatDate(booking.toDate)}</td>
+                            <td>${capitalizeFirstLetter(booking.shiftType)}</td>
+                            <td>${booking.bookingStatus}</td>
+                            <td>${booking.paymentStatus}</td>
+                            <td class="action-buttons">
+                                <button class="view-btn" onclick="viewBookingDetails(${booking.id})">View</button>
+                                <button class="edit-btn" onclick="openBookingModalForEdit(${booking.id})">Edit</button>
+                                <button class="delete-btn" onclick="confirmDeleteBooking(${booking.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `);
+                });
             }
 
-            // Initial setup
-            setupDayCells();
-            fetchBookings();
+            // Helper function to get the next booking ID
+            function getNextBookingId() {
+                const counter = parseInt(localStorage.getItem('bookingCounter') || '1');
+                localStorage.setItem('bookingCounter', (counter + 1).toString());
+                return counter;
+            }
+
+            // Helper function to get event name from ID
+            function getEventName(eventId) {
+                const events = {
+                    '1': 'Birthday Party',
+                    '2': 'Wedding',
+                    '3': 'Corporate Event',
+                    '4': 'Family Gathering'
+                };
+                return events[eventId] || 'Unknown Event';
+            }
+
+            // Helper function to format date: YYYY-MM-DD to MM/DD/YYYY
+            function formatDate(dateStr) {
+                if (!dateStr) return '';
+                const date = new Date(dateStr);
+                return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+            }
+
+            // Helper function to capitalize first letter
+            function capitalizeFirstLetter(string) {
+                if (!string) return '';
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+
+            // Helper function to get all dates between start and end
+            function getDatesInRange(startDate, endDate) {
+                const dates = [];
+                const currentDate = new Date(startDate);
+                const lastDate = new Date(endDate);
+
+                while (currentDate <= lastDate) {
+                    dates.push(new Date(currentDate));
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                return dates;
+            }
+
+            // Function to show messages
+            function showMessage(message, type = 'success', elementId = 'message') {
+                const element = $(`#${elementId}`);
+                element.text(message);
+
+                if (type === 'error') {
+                    element.removeClass('success-message').addClass('error-message');
+                } else {
+                    element.removeClass('error-message').addClass('success-message');
+                }
+
+                // Clear the message after 5 seconds
+                setTimeout(() => {
+                    element.text('');
+                }, 5000);
+            }
+
+            // Make functions available globally for inline event handlers
+            window.viewBookingDetails = function(bookingId) {
+                viewBookingDetails(bookingId);
+            };
+
+            window.openBookingModalForEdit = function(bookingId) {
+                openBookingModalForEdit(bookingId);
+            };
+
+            window.confirmDeleteBooking = function(bookingId) {
+                if (confirm('Are you sure you want to delete this booking?')) {
+                    deleteBooking(bookingId);
+                    loadBookingsList(); // Refresh the list after deletion
+                }
+            };
         });
     </script>
 </body>
