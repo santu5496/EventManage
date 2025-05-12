@@ -4,425 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Booking Calendar</title>
-
-    <!-- jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
-    <!-- jQuery UI -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-
-    <!-- FullCalendar v6 -->
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
-        }
-
-        h1 {
-            margin-bottom: 20px;
-        }
-
-        #calendar {
-            width: 90%;
-            margin: 20px auto;
-        }
-
-        /* Buttons styling */
-        button {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            margin: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-            button:hover {
-                background-color: #0056b3;
-            }
-
-        /* Custom styling for day cells */
-        .fc-daygrid-day {
-            position: relative;
-        }
-
-        .day-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .morning-part {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 50%;
-        }
-
-        .evening-part {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 50%;
-        }
-
-        .morning-booked {
-            background-color: #FF9999;
-            opacity: 0.5;
-        }
-
-        .evening-booked {
-            background-color: #99FF99;
-            opacity: 0.5;
-        }
-
-        .fullday-booked {
-            background-color: #9999FF;
-            opacity: 0.5;
-        }
-
-        /* Make sure day numbers remain visible */
-        .fc-daygrid-day-top {
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Booking form styling */
-        #booking-form {
-            width: 350px;
-            margin: 20px auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            text-align: left;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        input[type="text"],
-        input[type="date"],
-        input[type="number"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        #confirm-booking {
-            background-color: #28a745;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-            #confirm-booking:hover {
-                background-color: #218838;
-            }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.5);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 10% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 90%;
-            max-width: 500px;
-            border-radius: 8px;
-            position: relative;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-
-            .modal-header h2 {
-                margin: 0;
-                font-size: 20px;
-            }
-
-        .close-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-            .close-button:hover,
-            .close-button:focus {
-                color: #000;
-                text-decoration: none;
-            }
-
-        .modal-body {
-            margin-bottom: 15px;
-            max-height: 60vh;
-            overflow-y: auto;
-        }
-
-            .modal-body label {
-                display: block;
-                margin-bottom: 5px;
-                font-weight: bold;
-            }
-
-            .modal-body input[type="text"],
-            .modal-body input[type="number"],
-            .modal-body input[type="date"],
-            .modal-body select,
-            .modal-body textarea {
-                width: 100%;
-                padding: 8px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                box-sizing: border-box;
-                margin-bottom: 10px;
-            }
-
-            .modal-body textarea {
-                resize: vertical;
-            }
-
-        .modal-footer {
-            text-align: right;
-        }
-
-            .modal-footer button {
-                padding: 10px 20px;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 16px;
-            }
-
-            .modal-footer .btn-primary {
-                background-color: #007BFF;
-                color: white;
-                margin-right: 10px;
-            }
-
-                .modal-footer .btn-primary:hover {
-                    background-color: #0056b3;
-                }
-
-            .modal-footer .btn-secondary {
-                background-color: #e9ecef;
-                color: #495057;
-            }
-
-                .modal-footer .btn-secondary:hover {
-                    background-color: #d3d9df;
-                }
-
-            .modal-footer .btn-danger {
-                background-color: #dc3545;
-                color: white;
-            }
-
-                .modal-footer .btn-danger:hover {
-                    background-color: #c82333;
-                }
-
-        .selected-day {
-            background-color: #e6f2ff !important;
-        }
-
-        /* Loading spinner */
-        .spinner {
-            display: none;
-            margin: 0 auto;
-            width: 50px;
-            height: 50px;
-            border: 3px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 3px solid #3498db;
-            animation: spin 1s linear infinite;
-        }
-
-        @@keyframes spin {
-            0%
-
-        {
-            transform: rotate(0deg);
-        }
-
-        100% {
-            transform: rotate(360deg);
-        }
-
-        }
-
-        /* Tooltip styling */
-        .booking-tooltip {
-            position: absolute;
-            background-color: white;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            z-index: 100;
-            display: none;
-        }
-
-        /* Error message styling */
-        .error-message {
-            color: red;
-            margin-top: 5px;
-            font-size: 14px;
-        }
-
-        .success-message {
-            color: green;
-            margin-top: 5px;
-            font-size: 14px;
-        }
-
-        .shift-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-            .shift-row label {
-                margin-right: 10px;
-                min-width: 100px;
-            }
-
-                .shift-row label:not(:first-child) {
-                    margin-right: 15px;
-                    display: inline-flex;
-                    align-items: center;
-                    min-width: auto;
-                }
-
-            .shift-row input[type="checkbox"] {
-                margin-right: 5px;
-            }
-
-        /* Event styles in calendar */
-        .fc-event {
-            cursor: pointer;
-        }
-
-        .event-morning {
-            background-color: #FF9999 !important;
-            border-color: #FF6666 !important;
-        }
-
-        .event-evening {
-            background-color: #99FF99 !important;
-            border-color: #66FF66 !important;
-        }
-
-        .event-fullday {
-            background-color: #9999FF !important;
-            border-color: #6666FF !important;
-        }
-
-        /* Event list styles */
-        #event-list {
-            width: 90%;
-            margin: 20px auto;
-            border-collapse: collapse;
-        }
-
-            #event-list th, #event-list td {
-                padding: 10px;
-                text-align: left;
-                border: 1px solid #ddd;
-            }
-
-            #event-list th {
-                background-color: #f2f2f2;
-            }
-
-            #event-list tr:nth-child(even) {
-                background-color: #f9f9f9;
-            }
-
-            #event-list tr:hover {
-                background-color: #e6f2ff;
-            }
-
-        .action-buttons button {
-            padding: 5px 10px;
-            margin: 0 5px;
-            font-size: 14px;
-        }
-
-        .action-buttons .edit-btn {
-            background-color: #ffc107;
-            color: #212529;
-        }
-
-        .action-buttons .delete-btn {
-            background-color: #dc3545;
-        }
-
-        /* View Details Modal */
-        #detailsModal .booking-details {
-            text-align: left;
-            margin-bottom: 20px;
-        }
-
-        #detailsModal .detail-row {
-            display: flex;
-            margin-bottom: 8px;
-        }
-
-        #detailsModal .detail-label {
-            font-weight: bold;
-            width: 170px;
-        }
-
-        #detailsModal .detail-value {
-            flex: 1;
-        }
-    </style>
+    <!-- CSS styles would go here, but we're keeping the existing styling -->
 </head>
 <body>
 
@@ -621,20 +203,8 @@
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
-
     <script>
-        $(document).ready(function ()
-        {
-            // Initialize storage for bookings if it doesn't exist
-            if (!localStorage.getItem('bookings')) {
-                localStorage.setItem('bookings', JSON.stringify([]));
-            }
-
-            // Initialize booking counter (for IDs)
-            if (!localStorage.getItem('bookingCounter')) {
-                localStorage.setItem('bookingCounter', '1');
-            }
-
+        $(document).ready(function () {
             // Initialize FullCalendar
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -654,7 +224,7 @@
                     let formattedDate = currentDate.toISOString().split('T')[0];
                     openBookingModal(formattedDate);
                 },
-                eventClick: function(info) {
+                eventClick: function (info) {
                     // Get the booking ID from the event
                     const bookingId = info.event.id;
                     viewBookingDetails(bookingId);
@@ -669,7 +239,7 @@
             // Initialize jQuery UI Datepicker for the quick booking form
             $('#booking-date').datepicker({
                 dateFormat: 'yy-mm-dd',
-                onSelect: function(dateText) {
+                onSelect: function (dateText) {
                     // When a date is selected in the datepicker, also set it in the booking modal
                     $('#bookingDate').val(dateText);
                     $('#fromDate').val(dateText);
@@ -678,7 +248,7 @@
             });
 
             // Event listeners for date inputs in booking modal
-            $('#bookingDate, #fromDate, #toDate').change(function() {
+            $('#bookingDate, #fromDate, #toDate').change(function () {
                 // When dates change, maybe need to regenerate shift options
                 if ($('#shiftType').val() !== 'fullday' && $('#fromDate').val() && $('#toDate').val()) {
                     generateDateWiseShifts();
@@ -686,7 +256,7 @@
             });
 
             // Event listener for shift type change
-            $('#shiftType').change(function() {
+            $('#shiftType').change(function () {
                 const shiftType = $(this).val();
                 if (shiftType === 'fullday') {
                     $('#dateWiseShiftContainer').hide();
@@ -697,7 +267,7 @@
             });
 
             // Event listeners for payment calculation
-            $('#totalAmount, #advancePayment').on('input', function() {
+            $('#totalAmount, #advancePayment').on('input', function () {
                 calculateRemainingPayment();
             });
 
@@ -719,7 +289,7 @@
             }
 
             // Quick book button click
-            $('#quick-book').click(function() {
+            $('#quick-book').click(function () {
                 const selectedDate = $('#booking-date').val();
                 const selectedShift = $('#booking-shift').val();
 
@@ -742,19 +312,19 @@
             });
 
             // Open booking modal button click
-            $('#open-booking-modal').click(function() {
+            $('#open-booking-modal').click(function () {
                 openBookingModal();
             });
 
             // Save booking button click
-            $('#save-booking').click(function() {
+            $('#save-booking').click(function () {
                 if (validateBookingForm()) {
                     saveBooking();
                 }
             });
 
             // Delete booking button click
-            $('#delete-booking').click(function() {
+            $('#delete-booking').click(function () {
                 const bookingId = $('#bookingId').val();
                 if (bookingId) {
                     if (confirm('Are you sure you want to delete this booking?')) {
@@ -764,7 +334,7 @@
             });
 
             // View all bookings button click
-            $('#view-all-bookings').click(function() {
+            $('#view-all-bookings').click(function () {
                 $('#calendar').hide();
                 $('#booking-form').hide();
                 loadBookingsList();
@@ -772,32 +342,32 @@
             });
 
             // Back to calendar button click
-            $('#back-to-calendar').click(function() {
+            $('#back-to-calendar').click(function () {
                 $('#bookings-list-container').hide();
                 $('#calendar').show();
                 $('#booking-form').show();
             });
 
             // Refresh calendar button click
-            $('#fetch-bookings').click(function() {
+            $('#fetch-bookings').click(function () {
                 loadEvents();
                 showMessage('Calendar refreshed.', 'success');
             });
 
             // Edit from details modal
-            $('#edit-from-details').click(function() {
+            $('#edit-from-details').click(function () {
                 const bookingId = $(this).data('booking-id');
                 $('#detailsModal').hide();
                 openBookingModalForEdit(bookingId);
             });
 
             // Close booking modal
-            $('#close-booking-modal, .close-button').click(function() {
+            $('#close-booking-modal, .close-button').click(function () {
                 $('#bookingModal').hide();
             });
 
             // Close details modal
-            $('#close-details-modal, #detailsModal .close-button').click(function() {
+            $('#close-details-modal, #detailsModal .close-button').click(function () {
                 $('#detailsModal').hide();
             });
 
@@ -891,176 +461,220 @@
 
             // Function to open booking modal for editing
             function openBookingModalForEdit(bookingId) {
-                // Get booking data
-                const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-                const booking = bookings.find(b => b.id == bookingId);
+                // Show spinner
+                $('#spinner').show();
 
-                if (!booking) {
-                    showMessage('Booking not found.', 'error');
-                    return;
-                }
+                // Get booking data from API
+                $.ajax({
+                    url: `/EventBooking/GetBookingById`,
+                    type: 'GET',
+                    data: { id: bookingId },
+                    success: function (booking) {
+                        if (!booking) {
+                            showMessage('Booking not found.', 'error');
+                            $('#spinner').hide();
+                            return;
+                        }
 
-                // Reset form first
-                resetBookingForm();
+                        // Reset form first
+                        resetBookingForm();
 
-                // Set modal title for editing
-                $('#booking-modal-title').text('Edit Booking');
+                        // Set modal title for editing
+                        $('#booking-modal-title').text('Edit Booking');
 
-                // Show delete button for existing bookings
-                $('#delete-booking').show();
+                        // Show delete button for existing bookings
+                        $('#delete-booking').show();
 
-                // Fill form with booking data
-                $('#bookingId').val(booking.id);
-                $('#userId').val(booking.userId || 1);
-                $('#eventId').val(booking.eventId);
-                $('#bookingDate').val(booking.bookingDate);
-                $('#fromDate').val(booking.fromDate);
-                $('#toDate').val(booking.toDate);
-                $('#shiftType').val(booking.shiftType);
-                $('#bookingStatus').val(booking.bookingStatus);
-                $('#totalAmount').val(booking.totalAmount);
-                $('#advancePayment').val(booking.advancePayment);
-                $('#remainingPayment').val(booking.remainingPayment);
-                $('#paymentStatus').val(booking.paymentStatus);
-                $('#createdDate').val(booking.createdDate);
-                $('#customerName').val(booking.customerName);
-                $('#phoneNumber').val(booking.phoneNumber);
-                $('#alternativeNumber').val(booking.alternativeNumber);
-                $('#address').val(booking.address);
+                        // Fill form with booking data
+                        $('#bookingId').val(booking.id);
+                        $('#userId').val(booking.userId || 1);
+                        $('#eventId').val(booking.eventId);
+                        $('#bookingDate').val(formatDateForInput(booking.bookingDate));
+                        $('#fromDate').val(formatDateForInput(booking.fromDate));
+                        $('#toDate').val(formatDateForInput(booking.toDate));
+                        $('#shiftType').val(booking.shiftType);
+                        $('#bookingStatus').val(booking.bookingStatus);
+                        $('#totalAmount').val(booking.totalAmount);
+                        $('#advancePayment').val(booking.advancePayment);
+                        $('#remainingPayment').val(booking.remainingPayment);
+                        $('#paymentStatus').val(booking.paymentStatus);
+                        $('#createdDate').val(formatDateForInput(booking.createdDate));
+                        $('#customerName').val(booking.customerName);
+                        $('#phoneNumber').val(booking.phoneNumber);
+                        $('#alternativeNumber').val(booking.alternativeNumber);
+                        $('#address').val(booking.address);
 
-                // If it's not a full day shift and we have a date range, generate shift selections
-                if (booking.shiftType !== 'fullday') {
-                    generateDateWiseShifts();
+                        // If it's not a full day shift and we have a date range, generate shift selections
+                        if (booking.shiftType !== 'fullday') {
+                            generateDateWiseShifts();
 
-                    // Check the corresponding shift checkboxes
-                    if (booking.dateWiseShifts) {
-                        setTimeout(() => {
-                            Object.entries(booking.dateWiseShifts).forEach(([date, shifts]) => {
-                                shifts.forEach(shift => {
-                                    $(`input[name="shifts[${date}]"][value="${shift}"]`).prop('checked', true);
-                                });
-                            });
-                        }, 100); // Small delay to ensure DOM is ready
+                            // Check the corresponding shift checkboxes if we have dateWiseShifts data
+                            if (booking.dateWiseShifts) {
+                                setTimeout(() => {
+                                    try {
+                                        const dateWiseShifts = JSON.parse(booking.dateWiseShifts);
+
+                                        Object.entries(dateWiseShifts).forEach(([date, shifts]) => {
+                                            shifts.forEach(shift => {
+                                                $(`input[name="shifts[${date}]"][value="${shift}"]`).prop('checked', true);
+                                            });
+                                        });
+                                    } catch (e) {
+                                        console.error("Error parsing dateWiseShifts:", e);
+                                    }
+                                }, 100); // Small delay to ensure DOM is ready
+                            }
+                        }
+
+                        // Hide spinner
+                        $('#spinner').hide();
+
+                        // Show the modal
+                        $('#bookingModal').show();
+                    },
+                    error: function (xhr) {
+                        $('#spinner').hide();
+                        showMessage('Error loading booking details: ' + xhr.responseText, 'error');
                     }
-                }
-
-                // Show the modal
-                $('#bookingModal').show();
+                });
             }
 
             // Function to view booking details
             function viewBookingDetails(bookingId) {
-                // Get booking data
-                const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-                const booking = bookings.find(b => b.id == bookingId);
+                // Show spinner
+                $('#spinner').show();
 
-                if (!booking) {
-                    showMessage('Booking not found.', 'error');
-                    return;
-                }
+                // Get booking data from API
+                $.ajax({
+                    url: `/EventBooking/GetBookingById`,
+                    type: 'GET',
+                    data: { id: bookingId },
+                    success: function (booking) {
+                        if (!booking) {
+                            showMessage('Booking not found.', 'error');
+                            $('#spinner').hide();
+                            return;
+                        }
 
-                // Get event name
-                const eventName = getEventName(booking.eventId);
+                        // Get event name
+                        const eventName = getEventName(booking.eventId);
 
-                // Prepare the detail content
-                let detailsHTML = `
-                    <div class="detail-row">
-                        <div class="detail-label">Event Type:</div>
-                        <div class="detail-value">${eventName}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Customer:</div>
-                        <div class="detail-value">${booking.customerName}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Contact:</div>
-                        <div class="detail-value">${booking.phoneNumber}</div>
-                    </div>`;
+                        // Prepare the detail content
+                        let detailsHTML = `
+                            <div class="detail-row">
+                                <div class="detail-label">Event Type:</div>
+                                <div class="detail-value">${eventName}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Customer:</div>
+                                <div class="detail-value">${booking.customerName}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Contact:</div>
+                                <div class="detail-value">${booking.phoneNumber}</div>
+                            </div>`;
 
-                if (booking.alternativeNumber) {
-                    detailsHTML += `
-                    <div class="detail-row">
-                        <div class="detail-label">Alternative Contact:</div>
-                        <div class="detail-value">${booking.alternativeNumber}</div>
-                    </div>`;
-                }
+                        if (booking.alternativeNumber) {
+                            detailsHTML += `
+                            <div class="detail-row">
+                                <div class="detail-label">Alternative Contact:</div>
+                                <div class="detail-value">${booking.alternativeNumber}</div>
+                            </div>`;
+                        }
 
-                detailsHTML += `
-                    <div class="detail-row">
-                        <div class="detail-label">Booking Date:</div>
-                        <div class="detail-value">${formatDate(booking.bookingDate)}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Date Range:</div>
-                        <div class="detail-value">${formatDate(booking.fromDate)} to ${formatDate(booking.toDate)}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Shift Type:</div>
-                        <div class="detail-value">${capitalizeFirstLetter(booking.shiftType)}</div>
-                    </div>`;
+                        detailsHTML += `
+                            <div class="detail-row">
+                                <div class="detail-label">Booking Date:</div>
+                                <div class="detail-value">${formatDate(booking.bookingDate)}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Date Range:</div>
+                                <div class="detail-value">${formatDate(booking.fromDate)} to ${formatDate(booking.toDate)}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Shift Type:</div>
+                                <div class="detail-value">${capitalizeFirstLetter(booking.shiftType)}</div>
+                            </div>`;
 
-                // If there are date-wise shifts, show them
-                if (booking.dateWiseShifts && Object.keys(booking.dateWiseShifts).length > 0) {
-                    detailsHTML += `
-                    <div class="detail-row">
-                        <div class="detail-label">Selected Shifts:</div>
-                        <div class="detail-value">`;
+                        // If there are date-wise shifts, show them
+                        if (booking.dateWiseShifts) {
+                            try {
+                                const dateWiseShifts = JSON.parse(booking.dateWiseShifts);
 
-                    Object.entries(booking.dateWiseShifts).forEach(([date, shifts]) => {
-                        detailsHTML += `${formatDate(date)}: ${shifts.map(s => capitalizeFirstLetter(s)).join(', ')}<br>`;
-                    });
+                                if (Object.keys(dateWiseShifts).length > 0) {
+                                    detailsHTML += `
+                                    <div class="detail-row">
+                                        <div class="detail-label">Selected Shifts:</div>
+                                        <div class="detail-value">`;
 
-                    detailsHTML += `</div>
-                    </div>`;
-                }
+                                    Object.entries(dateWiseShifts).forEach(([date, shifts]) => {
+                                        detailsHTML += `${formatDate(date)}: ${shifts.map(s => capitalizeFirstLetter(s)).join(', ')}<br>`;
+                                    });
 
-                detailsHTML += `
-                    <div class="detail-row">
-                        <div class="detail-label">Booking Status:</div>
-                        <div class="detail-value">${booking.bookingStatus}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Total Amount:</div>
-                        <div class="detail-value">${booking.totalAmount}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Advance Payment:</div>
-                        <div class="detail-value">${booking.advancePayment || '0'}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Remaining Payment:</div>
-                        <div class="detail-value">${booking.remainingPayment}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Payment Status:</div>
-                        <div class="detail-value">${booking.paymentStatus}</div>
-                    </div>`;
+                                    detailsHTML += `</div>
+                                    </div>`;
+                                }
+                            } catch (e) {
+                                console.error("Error parsing dateWiseShifts:", e);
+                            }
+                        }
 
-                if (booking.address) {
-                    detailsHTML += `
-                    <div class="detail-row">
-                        <div class="detail-label">Address:</div>
-                        <div class="detail-value">${booking.address}</div>
-                    </div>`;
-                }
+                        detailsHTML += `
+                            <div class="detail-row">
+                                <div class="detail-label">Booking Status:</div>
+                                <div class="detail-value">${booking.bookingStatus}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Total Amount:</div>
+                                <div class="detail-value">${booking.totalAmount}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Advance Payment:</div>
+                                <div class="detail-value">${booking.advancePayment || '0'}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Remaining Payment:</div>
+                                <div class="detail-value">${booking.remainingPayment}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Payment Status:</div>
+                                <div class="detail-value">${booking.paymentStatus}</div>
+                            </div>`;
 
-                // Add created date if available
-                if (booking.createdDate) {
-                    detailsHTML += `
-                    <div class="detail-row">
-                        <div class="detail-label">Booking Created:</div>
-                        <div class="detail-value">${formatDate(booking.createdDate)}</div>
-                    </div>`;
-                }
+                        if (booking.address) {
+                            detailsHTML += `
+                            <div class="detail-row">
+                                <div class="detail-label">Address:</div>
+                                <div class="detail-value">${booking.address}</div>
+                            </div>`;
+                        }
 
-                // Set the details content
-                $('#detailsModal .booking-details').html(detailsHTML);
+                        // Add created date if available
+                        if (booking.createdDate) {
+                            detailsHTML += `
+                            <div class="detail-row">
+                                <div class="detail-label">Booking Created:</div>
+                                <div class="detail-value">${formatDate(booking.createdDate)}</div>
+                            </div>`;
+                        }
 
-                // Set the booking ID for the edit button
-                $('#edit-from-details').data('booking-id', booking.id);
+                        // Set the details content
+                        $('#detailsModal .booking-details').html(detailsHTML);
 
-                // Show the modal
-                $('#detailsModal').show();
+                        // Set the booking ID for the edit button
+                        $('#edit-from-details').data('booking-id', booking.id);
+
+                        // Hide spinner
+                        $('#spinner').hide();
+
+                        // Show the modal
+                        $('#detailsModal').show();
+                    },
+                    error: function (xhr) {
+                        $('#spinner').hide();
+                        showMessage('Error loading booking details: ' + xhr.responseText, 'error');
+                    }
+                });
             }
 
             // Function to validate booking form
@@ -1118,33 +732,15 @@
 
             // Function to save booking
             function saveBooking() {
+                // Show spinner
+                $('#spinner').show();
+
                 const bookingId = $('#bookingId').val();
-                const isNewBooking = !bookingId;
+                const isNewBooking = !bookingId || bookingId === '0';
 
-                // Collect all form data
-                const bookingData = {
-                    id: isNewBooking ? getNextBookingId() : bookingId,
-                    userId: $('#userId').val() || 1,
-                    eventId: $('#eventId').val(),
-                    bookingDate: $('#bookingDate').val(),
-                    fromDate: $('#fromDate').val(),
-                    toDate: $('#toDate').val(),
-                    shiftType: $('#shiftType').val(),
-                    bookingStatus: $('#bookingStatus').val(),
-                    totalAmount: parseFloat($('#totalAmount').val()),
-                    advancePayment: parseFloat($('#advancePayment').val()) || 0,
-                    remainingPayment: parseFloat($('#remainingPayment').val()),
-                    paymentStatus: $('#paymentStatus').val(),
-                    createdDate: $('#createdDate').val() || new Date().toISOString().split('T')[0],
-                    customerName: $('#customerName').val(),
-                    phoneNumber: $('#phoneNumber').val(),
-                    alternativeNumber: $('#alternativeNumber').val(),
-                    address: $('#address').val(),
-                    dateWiseShifts: {}
-                };
-
-                // If not full day, collect shift selections
-                if (bookingData.shiftType !== 'fullday') {
+                // Collect date-wise shifts if applicable
+                let dateWiseShifts = {};
+                if ($('#shiftType').val() !== 'fullday') {
                     $('#dateWiseShiftContainer .shift-row').each(function() {
                         const dateLabel = $(this).find('label').first().text();
                         // Convert MM/DD/YYYY to YYYY-MM-DD
@@ -1157,241 +753,384 @@
                         });
 
                         if (selectedShifts.length > 0) {
-                            bookingData.dateWiseShifts[date] = selectedShifts;
+                            dateWiseShifts[date] = selectedShifts;
                         }
                     });
                 }
 
-                // Get existing bookings
-                const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+                // Collect all form data
+                const bookingData = {
+                    id: isNewBooking ? 0 : parseInt(bookingId),
+                    userId: $('#userId').val() || 1,
+                    eventId:3,
+                    id: isNewBooking ? 0 : parseInt(bookingId),
+                    userId: $('#userId').val() || 1,
+                    eventId: parseInt($('#eventId').val()),
+                    bookingDate: $('#bookingDate').val(),
+                    fromDate: $('#fromDate').val(),
+                    toDate: $('#toDate').val(),
+                    shiftType: $('#shiftType').val(),
+                    dateWiseShifts: Object.keys(dateWiseShifts).length > 0 ? JSON.stringify(dateWiseShifts) : null,
+                    bookingStatus: $('#bookingStatus').val(),
+                    totalAmount: parseFloat($('#totalAmount').val()),
+                    advancePayment: parseFloat($('#advancePayment').val()) || 0,
+                    remainingPayment: parseFloat($('#remainingPayment').val()),
+                    paymentStatus: $('#paymentStatus').val(),
+                    createdDate: $('#createdDate').val() || new Date().toISOString().split('T')[0],
+                    customerName: $('#customerName').val(),
+                    phoneNumber: $('#phoneNumber').val(),
+                    alternativeNumber: $('#alternativeNumber').val(),
+                    address: $('#address').val()
+                };
 
-                // Check for conflicts - make sure we don't double-book
-                const overlappingBookings = bookings.filter(booking => {
-                    // Skip the current booking if editing
-                    if (!isNewBooking && booking.id == bookingId) {
-                        return false;
-                    }
+                // Send data to API
+                $.ajax({
+                    url: `/EventBooking/AddOrUpdateEventBooking`,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(bookingData),
+                    success: function (response) {
+                        // Hide spinner
+                        $('#spinner').hide();
 
-                    // Check date overlap
-                    const bookingFromDate = new Date(booking.fromDate);
-                    const bookingToDate = new Date(booking.toDate);
-                    const newFromDate = new Date(bookingData.fromDate);
-                    const newToDate = new Date(bookingData.toDate);
+                        if (response.success) {
+                            // Show success message
+                            showMessage(isNewBooking ? 'Booking created successfully!' : 'Booking updated successfully!', 'success', 'modal-message');
 
-                    // If dates don't overlap, no conflict
-                    if (newToDate < bookingFromDate || newFromDate > bookingToDate) {
-                        return false;
-                    }
+                            // Reload calendar events
+                            loadEvents();
 
-                    // If dates overlap, check for shift conflicts
-                    // For full day bookings, any overlap is a conflict
-                    if (booking.shiftType === 'fullday' || bookingData.shiftType === 'fullday') {
-                        return true;
-                    }
-
-                    // Check date-wise shift conflicts
-                    const currentDates = getDatesInRange(bookingData.fromDate, bookingData.toDate);
-                    for (const date of currentDates) {
-                        const dateStr = date.toISOString().split('T')[0];
-                        const existingShifts = booking.dateWiseShifts && booking.dateWiseShifts[dateStr] || [];
-                        const newShifts = bookingData.dateWiseShifts[dateStr] || [];
-
-                        // Check if any shifts overlap
-                        for (const shift of newShifts) {
-                            if (existingShifts.includes(shift)) {
-                                return true; // Conflict found
-                            }
+                            // Close modal after a short delay
+                            setTimeout(function() {
+                                $('#bookingModal').hide();
+                                resetBookingForm();
+                            }, 1500);
+                        } else {
+                            showMessage('Error: ' + response.message, 'error', 'modal-message');
                         }
+                    },
+                    error: function (xhr) {
+                        $('#spinner').hide();
+                        showMessage('Error saving booking: ' + xhr.responseText, 'error', 'modal-message');
                     }
-
-                    return false; // No conflicts
                 });
-
-                if (overlappingBookings.length > 0) {
-                    showMessage('Booking conflict detected. Another booking exists for the selected date(s) and shift(s).', 'error', 'modal-message');
-                    return;
-                }
-
-                // Save the booking
-                if (isNewBooking) {
-                    // Add new booking
-                    bookings.push(bookingData);
-                } else {
-                    // Update existing booking
-                    const index = bookings.findIndex(b => b.id == bookingId);
-                    if (index !== -1) {
-                        bookings[index] = bookingData;
-                    }
-                }
-
-                // Save back to localStorage
-                localStorage.setItem('bookings', JSON.stringify(bookings));
-
-                // Refresh calendar
-                loadEvents();
-
-                // Show success message
-                showMessage(
-                    isNewBooking ? 'Booking created successfully.' : 'Booking updated successfully.',
-                    'success',
-                    'modal-message'
-                );
-
-                // Close the modal after a delay
-                setTimeout(() => {
-                    $('#bookingModal').hide();
-                }, 1500);
             }
 
             // Function to delete booking
             function deleteBooking(bookingId) {
-                // Get existing bookings
-                let bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+                // Show spinner
+                $('#spinner').show();
 
-                // Remove the booking
-                bookings = bookings.filter(b => b.id != bookingId);
+                $.ajax({
+                    url: `/EventBooking/DeleteBooking`,
+                    type: 'DELETE',
+                    data: { id: bookingId },
+                    success: function (response) {
+                        // Hide spinner
+                        $('#spinner').hide();
 
-                // Save back to localStorage
-                localStorage.setItem('bookings', JSON.stringify(bookings));
+                        if (response.success) {
+                            // Show success message
+                            showMessage('Booking deleted successfully!', 'success');
 
-                // Refresh calendar
-                loadEvents();
+                            // Reload calendar events
+                            loadEvents();
 
-                // Show success message
-                showMessage('Booking deleted successfully.', 'success');
-
-                // Close the modal
-                $('#bookingModal').hide();
-            }
-
-            // Function to reset booking form
-            function resetBookingForm() {
-                $('.ClearBookingModalData').val('');
-                $('#modal-message').text('').removeClass('error-message').addClass('success-message');
-                $('#dateWiseShiftContainer').empty().hide();
-            }
-
-            // Function to load events into calendar
-            function loadEvents() {
-                // Clear existing events
-                calendar.removeAllEvents();
-
-                // Get bookings from localStorage
-                const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-
-                // Convert bookings to calendar events
-                bookings.forEach(booking => {
-                    // Skip cancelled bookings
-                    if (booking.bookingStatus === 'Cancelled') {
-                        return;
+                            // Close modal
+                            $('#bookingModal').hide();
+                            resetBookingForm();
+                        } else {
+                            showMessage('Error: ' + response.message, 'error', 'modal-message');
+                        }
+                    },
+                    error: function (xhr) {
+                        $('#spinner').hide();
+                        showMessage('Error deleting booking: ' + xhr.responseText, 'error', 'modal-message');
                     }
+                });
+            }
 
-                    const eventName = getEventName(booking.eventId);
+            // Function to load events for calendar
+            function loadEvents() {
+                // Show spinner
+                $('#spinner').show();
 
-                    if (booking.shiftType === 'fullday') {
-                        // Add a single event spanning the whole date range
-                        calendar.addEvent({
-                            id: booking.id,
-                            title: `${eventName} - ${booking.customerName}`,
-                            start: booking.fromDate,
-                            end: new Date(new Date(booking.toDate).setDate(new Date(booking.toDate).getDate() + 1)).toISOString().split('T')[0], // Add one day for inclusive display
-                            allDay: true,
-                            className: 'event-fullday',
-                            extendedProps: {
-                                bookingId: booking.id,
-                                customerName: booking.customerName,
-                                phoneNumber: booking.phoneNumber,
-                                shiftType: booking.shiftType
+                $.ajax({
+                    url: '/EventBooking/GetAllEventBookings',
+                    type: 'GET',
+                    success: function (bookings) {
+                        // Clear existing events
+                        calendar.removeAllEvents();
+
+                        // Add new events
+                        bookings.forEach(function (booking) {
+                            const eventColor = getEventColor(booking.eventId, booking.bookingStatus);
+                            const title = `${getEventName(booking.eventId)} - ${booking.customerName}`;
+
+                            // Determine if it's a multi-day event or a single day with shifts
+                            if (booking.fromDate === booking.toDate) {
+                                // Single day event
+                                let eventShifts = [];
+
+                                if (booking.shiftType === 'fullday') {
+                                    eventShifts.push({
+                                        id: booking.id,
+                                        title: title,
+                                        start: booking.fromDate,
+                                        backgroundColor: eventColor,
+                                        borderColor: eventColor,
+                                        textColor: '#ffffff',
+                                        allDay: true
+                                    });
+                                } else if (booking.dateWiseShifts) {
+                                    try {
+                                        const dateWiseShifts = JSON.parse(booking.dateWiseShifts);
+                                        const dateStr = booking.fromDate;
+
+                                        if (dateStr in dateWiseShifts) {
+                                            const shifts = dateWiseShifts[dateStr];
+                                            shifts.forEach(shift => {
+                                                const shiftTitle = `${title} (${capitalizeFirstLetter(shift)})`;
+                                                eventShifts.push({
+                                                    id: booking.id,
+                                                    title: shiftTitle,
+                                                    start: dateStr,
+                                                    backgroundColor: eventColor,
+                                                    borderColor: eventColor,
+                                                    textColor: '#ffffff',
+                                                    allDay: true
+                                                });
+                                            });
+                                        }
+                                    } catch (e) {
+                                        console.error("Error parsing dateWiseShifts:", e);
+                                        eventShifts.push({
+                                            id: booking.id,
+                                            title: `${title} (${capitalizeFirstLetter(booking.shiftType)})`,
+                                            start: booking.fromDate,
+                                            backgroundColor: eventColor,
+                                            borderColor: eventColor,
+                                            textColor: '#ffffff',
+                                            allDay: true
+                                        });
+                                    }
+                                } else {
+                                    eventShifts.push({
+                                        id: booking.id,
+                                        title: `${title} (${capitalizeFirstLetter(booking.shiftType)})`,
+                                        start: booking.fromDate,
+                                        backgroundColor: eventColor,
+                                        borderColor: eventColor,
+                                        textColor: '#ffffff',
+                                        allDay: true
+                                    });
+                                }
+
+                                // Add all shift events to calendar
+                                eventShifts.forEach(eventShift => {
+                                    calendar.addEvent(eventShift);
+                                });
+                            } else {
+                                // Multi-day event
+                                if (booking.shiftType === 'fullday') {
+                                    // For full day events that span multiple days
+                                    calendar.addEvent({
+                                        id: booking.id,
+                                        title: title,
+                                        start: booking.fromDate,
+                                        end: new Date(new Date(booking.toDate).getTime() + 86400000), // Add one day to include the end date
+                                        backgroundColor: eventColor,
+                                        borderColor: eventColor,
+                                        textColor: '#ffffff',
+                                        allDay: true
+                                    });
+                                } else if (booking.dateWiseShifts) {
+                                    // For events with specific shifts on specific days
+                                    try {
+                                        const dateWiseShifts = JSON.parse(booking.dateWiseShifts);
+
+                                        Object.entries(dateWiseShifts).forEach(([dateStr, shifts]) => {
+                                            shifts.forEach(shift => {
+                                                const shiftTitle = `${title} (${capitalizeFirstLetter(shift)})`;
+                                                calendar.addEvent({
+                                                    id: booking.id,
+                                                    title: shiftTitle,
+                                                    start: dateStr,
+                                                    backgroundColor: eventColor,
+                                                    borderColor: eventColor,
+                                                    textColor: '#ffffff',
+                                                    allDay: true
+                                                });
+                                            });
+                                        });
+                                    } catch (e) {
+                                        console.error("Error parsing dateWiseShifts:", e);
+                                        // Fallback to showing full range if parsing fails
+                                        calendar.addEvent({
+                                            id: booking.id,
+                                            title: `${title} (${capitalizeFirstLetter(booking.shiftType)})`,
+                                            start: booking.fromDate,
+                                            end: new Date(new Date(booking.toDate).getTime() + 86400000),
+                                            backgroundColor: eventColor,
+                                            borderColor: eventColor,
+                                            textColor: '#ffffff',
+                                            allDay: true
+                                        });
+                                    }
+                                } else {
+                                    // Default handling for multiple days with a single shift type
+                                    calendar.addEvent({
+                                        id: booking.id,
+                                        title: `${title} (${capitalizeFirstLetter(booking.shiftType)})`,
+                                        start: booking.fromDate,
+                                        end: new Date(new Date(booking.toDate).getTime() + 86400000),
+                                        backgroundColor: eventColor,
+                                        borderColor: eventColor,
+                                        textColor: '#ffffff',
+                                        allDay: true
+                                    });
+                                }
                             }
                         });
-                    } else {
-                        // Add events for each selected shift
-                        Object.entries(booking.dateWiseShifts || {}).forEach(([date, shifts]) => {
-                            shifts.forEach(shift => {
-                                calendar.addEvent({
-                                    id: booking.id,
-                                    title: `${eventName} - ${capitalizeFirstLetter(shift)}`,
-                                    start: date,
-                                    allDay: true,
-                                    className: `event-${shift}`,
-                                    extendedProps: {
-                                        bookingId: booking.id,
-                                        customerName: booking.customerName,
-                                        phoneNumber: booking.phoneNumber,
-                                        shiftType: shift
-                                    }
-                                });
-                            });
-                        });
+
+                        // Hide spinner
+                        $('#spinner').hide();
+                    },
+                    error: function (xhr) {
+                        $('#spinner').hide();
+                        showMessage('Error loading events: ' + xhr.responseText, 'error');
                     }
                 });
             }
 
             // Function to load bookings list
             function loadBookingsList() {
-                const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-                const tbody = $('#event-list-body');
-                tbody.empty();
+                // Show spinner
+                $('#spinner').show();
 
-                if (bookings.length === 0) {
-                    // Display a message when no bookings exist
-                    tbody.append(`
-                        <tr>
-                            <td colspan="8" style="text-align: center;">No bookings found.</td>
-                        </tr>
-                    `);
-                    return;
-                }
+                $.ajax({
+                    url: '/EventBooking/GetAllBookings',
+                    type: 'GET',
+                    success: function (bookings) {
+                        // Clear existing rows
+                        $('#event-list-body').empty();
 
-                // Sort bookings by date (most recent first)
-                bookings.sort((a, b) => new Date(b.bookingDate) - new Date(a.bookingDate));
+                        // Add new rows
+                        bookings.forEach(function (booking) {
+                            const eventName = getEventName(booking.eventId);
+                            const dateRange = `${formatDate(booking.fromDate)} to ${formatDate(booking.toDate)}`;
+                            const shiftDisplay = booking.shiftType === 'fullday' ? 'Full Day' :
+                                (booking.dateWiseShifts ? 'Multiple Shifts' : capitalizeFirstLetter(booking.shiftType));
 
-                // Add each booking to the table
-                bookings.forEach(booking => {
-                    const eventName = getEventName(booking.eventId);
+                            const row = `
+                                <tr>
+                                    <td>${booking.id}</td>
+                                    <td>${eventName}</td>
+                                    <td>${booking.customerName}</td>
+                                    <td>${dateRange}</td>
+                                    <td>${shiftDisplay}</td>
+                                    <td>${booking.bookingStatus}</td>
+                                    <td>${booking.paymentStatus}</td>
+                                    <td>
+                                        <button class="view-booking-btn" data-id="${booking.id}">View</button>
+                                        <button class="edit-booking-btn" data-id="${booking.id}">Edit</button>
+                                    </td>
+                                </tr>
+                            `;
 
-                    tbody.append(`
-                        <tr>
-                            <td>${booking.id}</td>
-                            <td>${eventName}</td>
-                            <td>${booking.customerName}</td>
-                            <td>${formatDate(booking.fromDate)} to ${formatDate(booking.toDate)}</td>
-                            <td>${capitalizeFirstLetter(booking.shiftType)}</td>
-                            <td>${booking.bookingStatus}</td>
-                            <td>${booking.paymentStatus}</td>
-                            <td class="action-buttons">
-                                <button class="view-btn" onclick="viewBookingDetails(${booking.id})">View</button>
-                                <button class="edit-btn" onclick="openBookingModalForEdit(${booking.id})">Edit</button>
-                                <button class="delete-btn" onclick="confirmDeleteBooking(${booking.id})">Delete</button>
-                            </td>
-                        </tr>
-                    `);
+                            $('#event-list-body').append(row);
+                        });
+
+                        // Add event listeners for new buttons
+                        $('.view-booking-btn').click(function() {
+                            const bookingId = $(this).data('id');
+                            viewBookingDetails(bookingId);
+                        });
+
+                        $('.edit-booking-btn').click(function() {
+                            const bookingId = $(this).data('id');
+                            openBookingModalForEdit(bookingId);
+                        });
+
+                        // Hide spinner
+                        $('#spinner').hide();
+                    },
+                    error: function (xhr) {
+                        $('#spinner').hide();
+                        showMessage('Error loading bookings: ' + xhr.responseText, 'error');
+                    }
                 });
             }
 
-            // Helper function to get the next booking ID
-            function getNextBookingId() {
-                const counter = parseInt(localStorage.getItem('bookingCounter') || '1');
-                localStorage.setItem('bookingCounter', (counter + 1).toString());
-                return counter;
+            // Function to reset booking form
+            function resetBookingForm() {
+                // Clear form fields
+                $('.ClearBookingModalData').val('');
+
+                // Hide date-wise shift container
+                $('#dateWiseShiftContainer').hide();
+
+                // Clear date-wise shift container
+                $('#dateWiseShiftContainer').empty();
+
+                // Clear modal message
+                $('#modal-message').empty();
+
+                // Reset payment fields
+                $('#totalAmount').val('');
+                $('#advancePayment').val('');
+                $('#remainingPayment').val('');
+
+                // Reset user ID to default
+                $('#userId').val('1');
             }
 
-            // Helper function to get event name from ID
-            function getEventName(eventId) {
-                const events = {
-                    '1': 'Birthday Party',
-                    '2': 'Wedding',
-                    '3': 'Corporate Event',
-                    '4': 'Family Gathering'
-                };
-                return events[eventId] || 'Unknown Event';
-            }
-
-            // Helper function to format date: YYYY-MM-DD to MM/DD/YYYY
+            // Helper function to format date for display
             function formatDate(dateStr) {
                 if (!dateStr) return '';
                 const date = new Date(dateStr);
-                return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+                return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear()}`;
+            }
+
+            // Helper function to format date for input fields
+            function formatDateForInput(dateStr) {
+                if (!dateStr) return '';
+                const date = new Date(dateStr);
+                return date.toISOString().split('T')[0];
+            }
+
+            // Helper function to get event name by ID
+            function getEventName(eventId) {
+                const events = {
+                    1: 'Birthday Party',
+                    2: 'Wedding',
+                    3: 'Corporate Event',
+                    4: 'Family Gathering'
+                };
+
+                return events[eventId] || 'Unknown Event';
+            }
+
+            // Helper function to get event color based on event ID and status
+            function getEventColor(eventId, status) {
+                // First check status
+                if (status === 'Cancelled') {
+                    return '#FF0000'; // Red for cancelled
+                }
+
+                if (status === 'Pending') {
+                    return '#FFA500'; // Orange for pending
+                }
+
+                // Then use event type colors for confirmed bookings
+                const eventColors = {
+                    1: '#4CAF50', // Green for Birthday Party
+                    2: '#2196F3', // Blue for Wedding
+                    3: '#9C27B0', // Purple for Corporate Event
+                    4: '#FF9800'  // Orange for Family Gathering
+                };
+
+                return eventColors[eventId] || '#607D8B'; // Default gray
             }
 
             // Helper function to capitalize first letter
@@ -1400,53 +1139,304 @@
                 return string.charAt(0).toUpperCase() + string.slice(1);
             }
 
-            // Helper function to get all dates between start and end
-            function getDatesInRange(startDate, endDate) {
-                const dates = [];
-                const currentDate = new Date(startDate);
-                const lastDate = new Date(endDate);
-
-                while (currentDate <= lastDate) {
-                    dates.push(new Date(currentDate));
-                    currentDate.setDate(currentDate.getDate() + 1);
-                }
-
-                return dates;
-            }
-
             // Function to show messages
-            function showMessage(message, type = 'success', elementId = 'message') {
-                const element = $(`#${elementId}`);
-                element.text(message);
+            function showMessage(message, type = 'success', targetId = 'message') {
+                const target = $(`#${targetId}`);
+                target.html(message);
+                target.removeClass('success-message error-message');
+                target.addClass(type === 'success' ? 'success-message' : 'error-message');
+                target.show();
 
-                if (type === 'error') {
-                    element.removeClass('success-message').addClass('error-message');
-                } else {
-                    element.removeClass('error-message').addClass('success-message');
+                // Auto-hide message after 5 seconds unless it's in the modal
+                if (targetId !== 'modal-message') {
+                    setTimeout(function() {
+                        target.hide();
+                    }, 5000);
                 }
-
-                // Clear the message after 5 seconds
-                setTimeout(() => {
-                    element.text('');
-                }, 5000);
             }
-
-            // Make functions available globally for inline event handlers
-            window.viewBookingDetails = function(bookingId) {
-                viewBookingDetails(bookingId);
-            };
-
-            window.openBookingModalForEdit = function(bookingId) {
-                openBookingModalForEdit(bookingId);
-            };
-
-            window.confirmDeleteBooking = function(bookingId) {
-                if (confirm('Are you sure you want to delete this booking?')) {
-                    deleteBooking(bookingId);
-                    loadBookingsList(); // Refresh the list after deletion
-                }
-            };
         });
     </script>
+
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        /* Calendar Styles */
+        #calendar {
+            max-width: 90%;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Form Styles */
+        #booking-form {
+            max-width: 500px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+            button:hover {
+                background-color: #45a049;
+            }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 700px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+            .close-button:hover {
+                color: black;
+            }
+
+        /* Detail View Styles */
+        .booking-details {
+            margin-bottom: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            width: 150px;
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            flex-grow: 1;
+        }
+
+        /* Shift Selection Styles */
+        .shift-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+            .shift-row label {
+                margin-right: 15px;
+            }
+
+            .shift-row input[type="checkbox"] {
+                width: auto;
+                margin-right: 5px;
+            }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: white;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background-color: #4CAF50;
+        }
+
+        .btn-secondary {
+            background-color: #607D8B;
+        }
+
+        .btn-danger {
+            background-color: #F44336;
+        }
+
+        /* Message Styles */
+        .success-message, .error-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .success-message {
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+
+        .error-message {
+            background-color: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+
+        /* Spinner */
+        .spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: #4CAF50;
+            animation: spin 1s ease-in-out infinite;
+            z-index: 1100;
+        }
+
+        @@keyframes spin {
+            to
+
+        {
+            transform: translate(-50%, -50%) rotate(360deg);
+        }
+
+        }
+
+        /* Responsive Adjustments */
+        @@media (max-width: 768px) {
+            .modal-content
+
+        {
+            width: 95%;
+            margin: 5% auto;
+        }
+
+        .detail-row {
+            flex-direction: column;
+        }
+
+        .detail-label {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .shift-row {
+            flex-wrap: wrap;
+        }
+
+        }
+    </style>
 </body>
 </html>

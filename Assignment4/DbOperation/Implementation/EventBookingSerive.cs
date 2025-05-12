@@ -122,7 +122,17 @@ namespace DbOperation.Implementation
                 return false;
             }
         }
-       
-        
+        public List<Bookings> GetBookingByID(int id)
+        {
+            using (var db = new EventContext(_context))
+            {
+                var selectedBooking = db.Bookings.FirstOrDefault(x => x.bookingId == id);
+                return selectedBooking != null ? new List<Bookings> { selectedBooking } : new List<Bookings>();
+            }
+        }
+
+
+
+
     }
 }

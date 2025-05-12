@@ -13,6 +13,7 @@ namespace DbOperation.Interface
         bool DeleteBooking(int id);
         bool AddEventBooking(Bookings eventBooking);
         List<Bookings> GetAllBookings();
+        List<Bookings> GetBookingByID(int id);
 
 
 

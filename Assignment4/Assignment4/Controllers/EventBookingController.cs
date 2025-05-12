@@ -58,6 +58,16 @@ namespace EventManagement.Controllers
 
 
         }
+        public IActionResult GetBookingByID(int id)
+        {
+            var result = _eventBookingSerive.GetBookingByID(id);
+            if(result==null || result.Count==0)
+            {
+                return Json(result);
+            }
+            return Json(result);
+
+        }
        
     }
 }
