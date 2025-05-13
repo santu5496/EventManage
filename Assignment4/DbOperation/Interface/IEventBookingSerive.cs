@@ -14,6 +14,7 @@ namespace DbOperation.Interface
         bool AddEventBooking(Bookings eventBooking);
         List<Bookings> GetAllBookings();
         List<Bookings> GetBookingByID(int id);
+        bool AddBooking(Bookings bookings);
 
 
 

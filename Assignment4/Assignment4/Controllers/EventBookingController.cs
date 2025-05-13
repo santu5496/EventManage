@@ -18,7 +18,7 @@ namespace EventManagement.Controllers
         [HttpPost]
         public IActionResult AddOrUpdateEventBooking(Bookings eventBooking)
         {
-            if (eventBooking.eventId != 0)
+            if (eventBooking.bookingId != 0)
             {
                 var result = _eventBookingSerive.UpdateBooking(eventBooking);
                 if (!result)
@@ -29,7 +29,7 @@ namespace EventManagement.Controllers
             }
             else
             {
-                var result = _eventBookingSerive.AddEventBooking(eventBooking);
+                var result = _eventBookingSerive.AddBooking(eventBooking);
                 if (!result)
                 {
 

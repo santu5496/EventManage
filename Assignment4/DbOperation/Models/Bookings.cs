@@ -44,4 +44,6 @@ public partial class Bookings
     public virtual Events _event { get; set; }
 
     public virtual Users user { get; set; }
+    public string? dateWiseShifts { get; set; }
+
 }

@@ -6,55 +6,64 @@ namespace EventManagement.Controllers
 {
     public class EventCrudController : Controller
     {
-        private readonly IEventCrudService _eventCrudService;
-        public EventCrudController(IEventCrudService eventCrudService)
+        private readonly IEventBookingSerive _eventBookingSerive;
+
+        public EventCrudController(IEventBookingSerive eventBookingSerive)
         {
-            _eventCrudService = eventCrudService;
+            _eventBookingSerive = eventBookingSerive;
         }
-        public IActionResult EventCrud()
+
+        public IActionResult EventBooking()
         {
             return View();
         }
+
         [HttpPost]
-        public IActionResult AddOrUpdateEvent(Events events)
+        public IActionResult AddOrUpdateEventBooking(Bookings eventBooking)
         {
-            if (events.eventId != 0)
+            if (eventBooking.eventId != 0)
             {
-                var result = _eventCrudService.UpdateEvent(events);
+                var result = _eventBookingSerive.UpdateBooking(eventBooking);
                 if (!result)
                 {
-                    return Json(new { success = false, message = "Failed to update event." });
+                    return Json(new { success = false, message = "Failed to update event booking." });
                 }
-                return Json(new { success = true, message = "Event updated successfully." });
+                return Json(new { success = true, message = "Event booking updated successfully." });
             }
             else
             {
-                var result = _eventCrudService.AddEvent(events);
+                var result = _eventBookingSerive.AddEventBooking(eventBooking);
                 if (!result)
                 {
-                    return Json(new { success = false, message = "Failed to add event." });
+                    return Json(new { success = false, message = "Failed to add event booking." });
                 }
-                return Json(new { success = true, message = "Event added successfully." });
+                return Json(new { success = true, message = "Event booking added successfully." });
             }
         }
+
+        [HttpPost]
         public IActionResult Delete(int id)
         {
-            var result = _eventCrudService.DeleteEvent(id);
+            var result = _eventBookingSerive.DeleteBooking(id);
             if (!result)
             {
-                return Json(new { success = false, message = "Failed to delete event." });
+                return Json(new { success = false, message = "Failed to delete event booking." });
             }
-            return Json(new { success = true, message = "Event deleted successfully." });
+            return Json(new { success = true, message = "Event booking deleted successfully." });
         }
-        public IActionResult GetAllEvents()
-        {
-            var result = _eventCrudService.GetAllEvents();
-            if (result == null || result.Count == 0)
-            {
-                return Json(result);
-            }
-            return Json(result);
 
+        [HttpGet]
+        public IActionResult GetAllEventBookings()
+        {
+            var result = _eventBookingSerive.GetAllBookings();
+            return Json(result ?? new List<Bookings>());
+        }
+
+        [HttpGet]
+        public IActionResult GetBookingByID(int id)
+        {
+            var result = _eventBookingSerive.GetBookingByID(id);
+            return Json(result ?? new List<Bookings>());
         }
     }
 }

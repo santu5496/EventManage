@@ -46,6 +46,7 @@ namespace DbOperation.Implementation
         {
             using (var db = new EventContext(_context))
             {
+                var a= db.Users.ToList();
                 return db.Users.ToList();
             }
         }

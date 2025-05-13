@@ -1,20 +1,26 @@
 ﻿using DbOperation.Interface;
 using DbOperation.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DbOperation.Implementation
 {
     public class EventBookingSerive : IEventBookingSerive
     {
         private readonly DbContextOptions<EventContext> _context;
-        public EventBookingSerive(string context)
+        private readonly string _connectionString;
+
+        public EventBookingSerive(string connectionString)
         {
-            _context = new DbContextOptionsBuilder<EventContext>().UseSqlServer(context).Options;
+            _connectionString = connectionString;
+            _context = new DbContextOptionsBuilder<EventContext>()
+                            .UseSqlServer(connectionString).Options;
+            //var a = AddDateWiseShiftsColumn();
+
+
         }
 
         public bool AddBooking(Bookings bookings)
@@ -23,12 +29,78 @@ namespace DbOperation.Implementation
             {
                 using (var db = new EventContext(_context))
                 {
-                    bookings.createdDate = DateTime.Now;
-                    bookings.userId = 4;
-                    db.Bookings.Add(bookings);
-                  
+                    if (bookings.bookingId == 0)
+                    {
+                        bookings.createdDate = DateTime.Now;
+                        
+                            bookings.userId = 6; // Default fallback
+
+                        db.Bookings.Add(bookings);
+                    }
+                    else
+                    {
+                        var existing = db.Bookings.FirstOrDefault(b => b.bookingId == bookings.bookingId);
+                        if (existing != null)
+                        {
+                            // Update fields
+                            existing.eventId = bookings.eventId;
+                            existing.bookingDate = bookings.bookingDate;
+                            existing.fromDate = bookings.fromDate;
+                            existing.toDate = bookings.toDate;
+                            existing.shiftType = bookings.shiftType;
+                            existing.bookingStatus = bookings.bookingStatus;
+                            existing.totalAmount = bookings.totalAmount;
+                            existing.advancePayment = bookings.advancePayment;
+                            existing.remainingPayment = bookings.remainingPayment;
+                            existing.paymentStatus = bookings.paymentStatus;
+                            existing.customerName = bookings.customerName;
+                            existing.phoneNumber = bookings.phoneNumber;
+                            existing.alternativeNumber = bookings.alternativeNumber;
+                            existing.address = bookings.address;
+                            existing.dateWiseShifts = bookings.dateWiseShifts;
+                        }
+                    }
+
                     return db.SaveChanges() > 0;
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return false;
+            }
+        }
+
+
+        public bool AddDateWiseShiftsColumn()
+        {
+            const string alterQuery = @"
+                IF NOT EXISTS (
+                    SELECT * 
+                    FROM INFORMATION_SCHEMA.COLUMNS 
+                    WHERE TABLE_NAME = 'Bookings' 
+                      AND COLUMN_NAME = 'dateWiseShifts'
+                )
+                BEGIN
+                    ALTER TABLE Bookings ADD dateWiseShifts NVARCHAR(MAX);
+                END";
+
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                using (var command = new SqlCommand(alterQuery, connection))
+                {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+
+                Console.WriteLine("Column 'dateWiseShifts' checked/added successfully.");
+                return true;
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine($"SQL Error: {ex.Message}");
+                return false;
             }
             catch (Exception ex)
             {
@@ -68,7 +140,6 @@ namespace DbOperation.Implementation
             }
         }
 
-        // Implementing missing interface members
         public bool AddEventBooking(Bookings eventBooking)
         {
             try
@@ -104,7 +175,6 @@ namespace DbOperation.Implementation
             using (var db = new EventContext(_context))
             {
                 db.Bookings.Update(eventBooking);
-                
                 return db.SaveChanges() > 0;
             }
         }
@@ -122,6 +192,7 @@ namespace DbOperation.Implementation
                 return false;
             }
         }
+
         public List<Bookings> GetBookingByID(int id)
         {
             using (var db = new EventContext(_context))
@@ -130,9 +201,5 @@ namespace DbOperation.Implementation
                 return selectedBooking != null ? new List<Bookings> { selectedBooking } : new List<Bookings>();
             }
         }
-
-
-
-
     }
 }
