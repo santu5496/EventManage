@@ -208,6 +208,9 @@
    <script>
 
         $(document).ready(function () {
+
+           
+             
             // Add CSS to the head
             $('head').append(`
                 <style>
@@ -274,34 +277,116 @@
                     }
                 </style>
             `);
+                    var calendarEl = document.getElementById('calendar');
+        let shiftMap = {};
 
-            // Initialize FullCalendar
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                selectable: true,
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,dayGridWeek'
-                },
-                dateClick: function (info) {
-                    // Set the selected date in the quick booking form
-                    $('#booking-date').val(info.dateStr);
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            selectable: true,
+            height: 'auto',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,dayGridWeek'
+            },
+            dateClick: function (info) {
+                $('#booking-date').val(info.dateStr);
+                openBookingModal(info.dateStr);
+            },
+            eventClick: function (info) {
+                viewBookingDetails(info.event.extendedProps);
+            },
+            events: [],
+            dayCellDidMount: function (arg) {
+                let dateStr = arg.date.toISOString().split('T')[0];
+                let shift = shiftMap[dateStr];
+                if (!shift) return;
 
-                    // Also set this date in the booking modal
-                    let currentDate = new Date(info.dateStr);
-                    let formattedDate = currentDate.toISOString().split('T')[0];
-                    openBookingModal(formattedDate);
+                arg.el.style.position = 'relative';
+                arg.el.style.overflow = 'hidden';
+
+                if (shift.morning) {
+                    let topDiv = document.createElement('div');
+                    topDiv.style.position = 'absolute';
+                    topDiv.style.top = '0';
+                    topDiv.style.left = '0';
+                    topDiv.style.right = '0';
+                    topDiv.style.height = '50%';
+                    topDiv.style.backgroundColor = 'rgba(255, 0, 0, 0.7)'; // Red
+                    topDiv.style.zIndex = '0';
+                    arg.el.appendChild(topDiv);
+                }
+
+                if (shift.evening) {
+                    let bottomDiv = document.createElement('div');
+                    bottomDiv.style.position = 'absolute';
+                    bottomDiv.style.bottom = '0';
+                    bottomDiv.style.left = '0';
+                    bottomDiv.style.right = '0';
+                    bottomDiv.style.height = '50%';
+                    bottomDiv.style.backgroundColor = 'rgba(0, 255, 0, 0.7)'; // Green
+                    bottomDiv.style.zIndex = '0';
+                    arg.el.appendChild(bottomDiv);
+                }
+            },
+            datesSet: function (info) {
+                loadEvents();
+            }
+        });
+
+        // 🚫 DO NOT render here:
+        // calendar.render();
+
+        // ✅ Only render once events and shiftMap are ready
+        function loadEvents() {
+            $.ajax({
+                url: '/EventBooking/GetAllEventBookings',
+                type: 'GET',
+                success: function (bookings) {
+                    shiftMap = {};
+
+                    const events = bookings
+                        .filter(booking => booking && booking.fromDate && booking.shiftType)
+                        .map(booking => {
+                            const dateStr = new Date(booking.fromDate).toISOString().split('T')[0];
+
+                            if (!shiftMap[dateStr]) {
+                                shiftMap[dateStr] = { morning: false, evening: false };
+                            }
+
+                            if (booking.shiftType === 'morning') shiftMap[dateStr].morning = true;
+                            if (booking.shiftType === 'evening') shiftMap[dateStr].evening = true;
+                            if (booking.shiftType === 'fullday') {
+                                shiftMap[dateStr].morning = true;
+                                shiftMap[dateStr].evening = true;
+                            }
+
+                            return {
+                                title: booking.customerName + ' - ' + booking.shiftType,
+                                start: booking.fromDate,
+                                end: booking.toDate || booking.fromDate,
+                                backgroundColor: 'transparent',
+                                borderColor: 'transparent',
+                                extendedProps: booking
+                            };
+                        });
+
+                    calendar.removeAllEvents();
+                    events.forEach(event => calendar.addEvent(event));
+
+                    // ✅ Render only after events are added and shiftMap is ready
+                    calendar.render();
                 },
-                eventClick: function (info) {
-                    // Get the booking details from the event's extended properties
-                    const bookingData = info.event.extendedProps;
-                    viewBookingDetails(bookingData);
-                },
-                events: [] // Will be populated by loadEvents
+                error: function () {
+                    alert('Failed to load bookings.');
+                }
             });
-            calendar.render();
+        }
+
+        // 🚀 Load events (this will trigger calendar.render when ready)
+        loadEvents();
+
+   
 
             // Load initial events
             loadEvents();
@@ -577,38 +662,7 @@
             }
 
             // Function to load events for the calendar
-              function loadEvents() {
-            $.ajax({
-                url: '/EventBooking/GetAllEventBookings',
-                type: 'GET',
-                success: function(bookings) {
-                    const events = bookings.map(booking => {
-                        let color = '#3788d8'; // Default blue
-
-                        if (booking.shiftType === 'morning') {
-                            color = 'red';
-                        } else if (booking.shiftType === 'evening') {
-                            color = 'green';
-                        }
-
-                        return {
-                            title: booking.customerName + ' - ' + booking.shiftType,
-                            start: booking.fromDate,
-                            end: booking.toDate,
-                            backgroundColor: color,
-                            borderColor: color,
-                            extendedProps: booking
-                        };
-                    });
-
-                    calendar.removeAllEvents(); // Clear old events
-                    events.forEach(event => calendar.addEvent(event)); // Add new ones
-                },
-                error: function(xhr) {
-                    showMessage('Failed to load bookings.', 'error');
-                }
-            });
-        }
+          
 
 
             // Function to load bookings list
