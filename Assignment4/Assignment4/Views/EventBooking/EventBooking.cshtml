@@ -277,6 +277,7 @@
                     }
                 </style>
             `);
+
                     var calendarEl = document.getElementById('calendar');
         let shiftMap = {};
 
@@ -292,9 +293,11 @@
             dateClick: function (info) {
                 $('#booking-date').val(info.dateStr);
                 openBookingModal(info.dateStr);
+                debugger;
             },
             eventClick: function (info) {
                 viewBookingDetails(info.event.extendedProps);
+                debugger;
             },
             events: [],
             dayCellDidMount: function (arg) {
@@ -305,6 +308,7 @@
                 arg.el.style.position = 'relative';
                 arg.el.style.overflow = 'hidden';
 
+                // Handle morning shift (Red)
                 if (shift.morning) {
                     let topDiv = document.createElement('div');
                     topDiv.style.position = 'absolute';
@@ -315,8 +319,15 @@
                     topDiv.style.backgroundColor = 'rgba(255, 0, 0, 0.7)'; // Red
                     topDiv.style.zIndex = '0';
                     arg.el.appendChild(topDiv);
+
+                    // Attach click event to the red section
+                    topDiv.addEventListener('click', function () {
+                        const bookingData = getBookingDataForDate(dateStr, 'morning'); // Function to get morning booking data
+                        viewBookingDetails(bookingData);
+                    });
                 }
 
+                // Handle evening shift (Green)
                 if (shift.evening) {
                     let bottomDiv = document.createElement('div');
                     bottomDiv.style.position = 'absolute';
@@ -327,8 +338,16 @@
                     bottomDiv.style.backgroundColor = 'rgba(0, 255, 0, 0.7)'; // Green
                     bottomDiv.style.zIndex = '0';
                     arg.el.appendChild(bottomDiv);
+
+                    // Attach click event to the green section
+                    bottomDiv.addEventListener('click', function () {
+                        const bookingData = getBookingDataForDate(dateStr, 'evening'); // Function to get evening booking data
+                        viewBookingDetails(bookingData);
+                    });
                 }
             },
+
+            // Corrected placement of datesSet
             datesSet: function (info) {
                 loadEvents();
             }
@@ -338,7 +357,7 @@
         // calendar.render();
 
         // ✅ Only render once events and shiftMap are ready
-        function loadEvents() {
+             function loadEvents() {
             $.ajax({
                 url: '/EventBooking/GetAllEventBookings',
                 type: 'GET',
@@ -348,17 +367,30 @@
                     const events = bookings
                         .filter(booking => booking && booking.fromDate && booking.shiftType)
                         .map(booking => {
-                            const dateStr = new Date(booking.fromDate).toISOString().split('T')[0];
+                            // Process each day in the date range
+                            const fromDate = new Date(booking.fromDate);
+                            const toDate = booking.toDate ? new Date(booking.toDate) : new Date(booking.fromDate);
 
-                            if (!shiftMap[dateStr]) {
-                                shiftMap[dateStr] = { morning: false, evening: false };
-                            }
+                            // Loop through each date in the range
+                            let currentDate = new Date(fromDate);
+                            while (currentDate <= toDate) {
+                                const dateStr = currentDate.toISOString().split('T')[0];
 
-                            if (booking.shiftType === 'morning') shiftMap[dateStr].morning = true;
-                            if (booking.shiftType === 'evening') shiftMap[dateStr].evening = true;
-                            if (booking.shiftType === 'fullday') {
-                                shiftMap[dateStr].morning = true;
-                                shiftMap[dateStr].evening = true;
+                                // Initialize shiftMap for this date if needed
+                                if (!shiftMap[dateStr]) {
+                                    shiftMap[dateStr] = { morning: false, evening: false };
+                                }
+
+                                // Update shift information
+                                if (booking.shiftType === 'morning') shiftMap[dateStr].morning = true;
+                                if (booking.shiftType === 'evening') shiftMap[dateStr].evening = true;
+                                if (booking.shiftType === 'fullday') {
+                                    shiftMap[dateStr].morning = true;
+                                    shiftMap[dateStr].evening = true;
+                                }
+
+                                // Move to next day
+                                currentDate.setDate(currentDate.getDate() + 1);
                             }
 
                             return {
@@ -374,7 +406,7 @@
                     calendar.removeAllEvents();
                     events.forEach(event => calendar.addEvent(event));
 
-                    // ✅ Render only after events are added and shiftMap is ready
+                    // Render only after events are added and shiftMap is ready
                     calendar.render();
                 },
                 error: function () {
@@ -383,13 +415,14 @@
             });
         }
 
+
         // 🚀 Load events (this will trigger calendar.render when ready)
         loadEvents();
 
    
 
             // Load initial events
-            loadEvents();
+          
 
             // Initialize jQuery UI Datepicker for the quick booking form
             $('#booking-date').datepicker({
@@ -1413,6 +1446,53 @@
         }
 
         }
+
+        .fc-daygrid-day-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .fc-event-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .fc-daygrid-day-frame {
+            padding: 6px;
+        }
+
+        .fc .fc-daygrid-day {
+            min-height: 90px;
+        }
+
+        .fc .fc-daygrid-day-frame > div {
+            border-radius: 4px;
+        }
+
+        .fc-daygrid-day-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #000;
+        }
+
+
+        .fc-daygrid-day-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .fc-daygrid-dot-event .fc-event-title {
+            flex-grow: 1;
+            flex-shrink: 1;
+            font-weight: 700;
+            min-width: 0px;
+           
+        }
+
+
     </style>
 </body>
 </html>
