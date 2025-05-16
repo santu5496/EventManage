@@ -1,45 +1,46 @@
 using DbOperation.Interface;
 using DbOperation.Implementation;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<IConfigurationService, ConfigurationService>(provider =>
+builder.Services.AddSingleton<IUserService, UsersService>(provider =>
 {
-    return new ConfigurationService(builder.Configuration.GetConnectionString("Assignment4"));
+    var connectionString = builder.Configuration.GetConnectionString("Assignment4");
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+        throw new InvalidOperationException("Connection string 'Assignment4' is not configured or is empty.");
+    }
+    return new UsersService(connectionString);
 });
+builder.Services.AddSingleton<IEventCrudService, EventCrudService>(provider =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("Assignment4");
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+        throw new InvalidOperationException("Connection string 'Assignment4' is not configured or is empty.");
+    }
+    return new EventCrudService(connectionString);
+});
+builder.Services.AddSingleton<IEventBookingSerive, EventBookingSerive>(provider =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("Assignment4");
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+        throw new InvalidOperationException("Connection string 'Assignment4' is not configured or is empty.");
+    }
+    return new EventBookingSerive(connectionString);
 
-
-builder.Services.AddSingleton<IInventoryMaterialLog, InventoryMaterialLogService>(provider =>
-{
-    return new InventoryMaterialLogService(builder.Configuration.GetConnectionString("Assignment4"));
 });
-builder.Services.AddSingleton<IFinishedGoodsService, FinishedGoodsService>(provider =>
+builder.Services.AddSingleton<IDashBoard, DashBoardSerivice>(provider =>
 {
-    return new FinishedGoodsService(builder.Configuration.GetConnectionString("Assignment4"));
-});
-builder.Services.AddSingleton<IBillingService, BillingService>(provider =>
-{
-    return new BillingService(builder.Configuration.GetConnectionString("Assignment4"));
-});
-
-builder.Services.AddSingleton<IRecipeService,RecipeService>(provider =>
-{
-    return new RecipeService(builder.Configuration.GetConnectionString("Assignment4"));
-});
-builder.Services.AddSingleton<IReturnmanagementService, ReturnManagementService>(provider =>
-{
-    return new ReturnManagementService(builder.Configuration.GetConnectionString("Assignment4"));
-});
-builder.Services.AddSingleton<IOrderManagement, OrderManagementSerivice>(provider =>
-{
-    return new OrderManagementSerivice(builder.Configuration.GetConnectionString("Assignment4"));
-});
-builder.Services.AddSingleton<IReportService, ReportService>(provider =>
-{
-    return new ReportService(builder.Configuration.GetConnectionString("Assignment4"));
+    var connectionString = builder.Configuration.GetConnectionString("Assignment4");
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+        throw new InvalidOperationException("Connection string 'Assignment4' is not configured or is empty.");
+    }
+    return new DashBoardSerivice(connectionString);
 });
 
 var app = builder.Build();
@@ -48,7 +49,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -61,6 +61,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=EventBooking}/{action=EventBooking}/{id?}");
 
 app.Run();

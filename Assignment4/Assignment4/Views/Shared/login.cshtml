@@ -1,0 +1,244 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Transparent Login Form with Blur Background</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r148/three.min.js"></script>
+
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            height: 100%;
+            overflow: hidden;
+        }
+
+            body:before {
+                content: '';
+                position: fixed;
+                width: 100vw;
+                height: 100vh;
+                background-image: url(https://i.postimg.cc/8cf6v1rk/1.jpg);
+                background-position: center center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                background-size: cover;
+                filter: blur(10px);
+                z-index: -2;
+            }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .contact-form {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            padding: 60px 40px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            box-shadow: 0 0 10px #000;
+        }
+
+        .avatar {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            top: -40px;
+            left: calc(50% - 40px);
+        }
+
+        .contact-form h2 {
+            margin-bottom: 20px;
+            color: #fff;
+            text-align: center;
+        }
+
+        .contact-form p {
+            margin: 0;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .contact-form input[type=email],
+        .contact-form input[type=password] {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid #fff;
+            background: transparent;
+            outline: none;
+            height: 40px;
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .contact-form input[type=submit] {
+            width: 100%;
+            height: 40px;
+            color: #fff;
+            font-size: 16px;
+            background: red;
+            cursor: pointer;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            margin-top: 10px;
+        }
+
+        .contact-form a {
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .contact-form input[type=checkbox] {
+            width: auto;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+
+    <div class="contact-form">
+        <img class="avatar" src="https://i.postimg.cc/zDyt7KCv/a1.jpg" alt="avatar">
+        <h2>Login</h2>
+        <form onsubmit="event.preventDefault(); login();">
+            <p>UserName</p>
+            <input type="text" id="username" placeholder="Enter UserName" required>
+            <p>Password</p>
+            <input type="password" id="password" placeholder="Enter Password" required>
+            <input type="submit" value="Sign in">
+            <p><input type="checkbox">Remember Me</p>
+        </form>
+    </div>
+
+    <script>
+         $(document).ready(function () {
+            $(".sidebar").hide();
+        });
+
+        function initThreeJsBackground() {
+            const container = document.getElementById('canvas-container');
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(width, height);
+            container.appendChild(renderer.domElement);
+
+            const geometry = new THREE.BufferGeometry();
+            const particlesCount = 1500;
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for (let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 10;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 0.02,
+                color: 0x6366f1,
+                transparent: true
+            });
+
+            const particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+            camera.position.z = 3;
+
+            let mouseX = 0, mouseY = 0;
+            document.addEventListener('mousemove', e => {
+                mouseX = (e.clientX - width / 2) / 100;
+                mouseY = (e.clientY - height / 2) / 100;
+            });
+
+            const animate = () => {
+                requestAnimationFrame(animate);
+                particles.rotation.x += (mouseY * 0.02 - particles.rotation.x) * 0.05;
+                particles.rotation.y += (mouseX * 0.02 - particles.rotation.y) * 0.05;
+                renderer.render(scene, camera);
+            };
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                const newWidth = window.innerWidth;
+                const newHeight = window.innerHeight;
+                camera.aspect = newWidth / newHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(newWidth, newHeight);
+            });
+        }
+
+        function showLoading() {
+            console.log('Show loading...');
+        }
+
+        function hideLoading() {
+            console.log('Hide loading...');
+        }
+
+        function login() {
+            const username = $('#username').val().trim();
+            const password = $('#password').val().trim();
+
+            if (!username || !password) {
+                alert('Please enter both username and password');
+                return;
+            }
+
+            showLoading();
+
+            $.ajax({
+                url: '/Home/GetUserByUserName',
+                type: 'POST',
+               
+                data: { username, password },
+                success: function (response) {
+                    hideLoading();
+                    if (response.success) {  
+                                           window.location.href = '/DashBoard/DashBoard';
+                                       } else {
+                        alert(response.message || 'Invalid username or password');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    hideLoading();
+                    alert('An error occurred during login: ' + (xhr.responseText || error));
+                }
+            });
+        }
+
+        // Initialize Three.js when document is ready
+        $(document).ready(() => {
+            initThreeJsBackground();
+        });
+
+        // Allow login on Enter key
+        document.getElementById('password').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                login();
+            }
+        });
+    </script>
+</body>
+</html>
