@@ -111,7 +111,8 @@ namespace DbOperation.Implementation
 
         public List<Bookings> GetAllBookings()
         {
-            
+         
+
 
 
             using (var db = new EventContext(_context))

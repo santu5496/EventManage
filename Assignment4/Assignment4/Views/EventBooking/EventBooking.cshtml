@@ -296,6 +296,7 @@
 
         const calendarEl = document.getElementById('calendar');
         let shiftMap = {};
+       
 
         // ─────────────────────────────────────────────────────────────────────────────
         // 1) FULLCALENDAR SETUP
@@ -361,6 +362,7 @@
           // reload on navigation
           datesSet() {
             loadEvents();
+            //loadFestivals();
           }
         });
 
@@ -370,62 +372,58 @@
         // ─────────────────────────────────────────────────────────────────────────────
         // 2) loadEvents(): fetch, normalize & repaint
         // ─────────────────────────────────────────────────────────────────────────────
-        function loadEvents() {
+            function loadEvents() {
+          // Fetch bookings
           $.ajax({
             url: '/EventBooking/GetAllEventBookings',
             type: 'GET'
-          })
-          .done(function(bookings) {
+          }).done(function(bookings) {
             shiftMap = {};
 
+            const bgEvents = [];
+
             bookings.forEach(function(booking) {
-              // normalize from/to at midnight
               const from = booking.fromDate
                 ? new Date(booking.fromDate)
                 : new Date(booking.createdDate);
-              const to   = booking.toDate
+              const to = booking.toDate
                 ? new Date(booking.toDate)
                 : booking.fromDate
                   ? new Date(booking.fromDate)
                   : new Date(booking.createdDate);
-              from.setHours(0,0,0,0);
-              to.setHours(0,0,0,0);
 
-              // parse overrides
+              from.setHours(0, 0, 0, 0);
+              to.setHours(0, 0, 0, 0);
+
               const parsedShifts = booking.dateWiseShifts
                 ? JSON.parse(booking.dateWiseShifts)
                 : {};
 
-              // fallback shiftType → full day if null
               let defaultShift = [];
               if (booking.shiftType) {
                 const s = booking.shiftType.toLowerCase();
-                if (['morning','evening','full day'].includes(s)) {
-                  defaultShift = [ s ];
+                if (['morning', 'evening', 'full day'].includes(s)) {
+                  defaultShift = [s];
                 }
               } else {
-                defaultShift = [ 'full day' ];
+                defaultShift = ['full day'];
               }
 
-              // walk each date in the range
               for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
                 const key = localYMD(d);
 
                 let dayArray;
                 if (parsedShifts.hasOwnProperty(key)) {
                   dayArray = parsedShifts[key].length
-                             ? parsedShifts[key]
-                             : [ 'full day' ];
+                    ? parsedShifts[key]
+                    : ['full day'];
                 } else {
                   dayArray = defaultShift;
                 }
 
                 dayArray.forEach(function(item) {
-                  const shiftName = (typeof item === 'string'
-                                     ? item
-                                     : item.shift
-                                    ).toLowerCase();
-                  if (['morning','evening','full day'].includes(shiftName)) {
+                  const shiftName = (typeof item === 'string' ? item : item.shift).toLowerCase();
+                  if (['morning', 'evening', 'full day'].includes(shiftName)) {
                     shiftMap[key] = shiftMap[key] || [];
                     shiftMap[key].push({
                       shift: shiftName,
@@ -434,37 +432,55 @@
                   }
                 });
               }
-            });
 
-            // build invisible background events
-            const bgEvents = bookings.map(function(bk) {
-              const start = bk.fromDate
-                ? new Date(bk.fromDate)
-                : new Date(bk.createdDate);
-              const end   = bk.toDate
-                ? new Date(bk.toDate)
-                : bk.fromDate
-                  ? new Date(bk.fromDate)
-                  : new Date(bk.createdDate);
-              end.setDate(end.getDate() + 1);
+              const bgStart = new Date(from);
+              const bgEnd = new Date(to);
+              bgEnd.setDate(bgEnd.getDate() + 1);
 
-              return {
-                id: bk.bookingId,
-                title: bk.customerName || '',
-                start: localYMD(start),
-                end:   localYMD(end),
+              bgEvents.push({
+                id: booking.bookingId,
+                title: booking.customerName || '',
+                start: localYMD(bgStart),
+                end: localYMD(bgEnd),
                 display: 'background',
                 backgroundColor: 'rgba(0,0,0,0)',
-                borderColor:     'transparent',
-                extendedProps: bk
-              };
+                borderColor: 'transparent',
+                extendedProps: booking
+              });
             });
 
-            calendar.removeAllEvents();
-            bgEvents.forEach(e => calendar.addEvent(e));
-            calendar.render();
-          })
-          .fail(function() {
+            // Load festivals now that bookings are processed
+            $.getJSON('/hindu_festivals_2025_2034.json', function(festivals) {
+              const currentYear = calendar.view.currentStart.getFullYear();
+              const nextYear = currentYear + 1;
+
+              const filteredFestivals = festivals.filter(fest => {
+                const year = new Date(fest.date).getFullYear();
+                return year === currentYear || year === nextYear;
+              });
+
+              const festEvents = filteredFestivals.map(fest => ({
+                title: fest.name,
+                start: fest.date,
+                allDay: true,
+                display: 'auto',
+                backgroundColor: '#FFD700',
+                textColor: '#000',
+                extendedProps: {
+                  type: fest.type,
+                  region: fest.region
+                }
+              }));
+
+              // First remove all current events (both types)
+              calendar.removeAllEvents();
+
+              // Add fresh events
+              [...bgEvents, ...festEvents].forEach(e => calendar.addEvent(e));
+              calendar.render();
+            });
+
+          }).fail(function() {
             alert('Failed to load bookings.');
           });
         }
@@ -664,80 +680,90 @@
                 loadEvents();
                 showMessage('Calendar refreshed.', 'success');
             });
+        function validateBookingForm() {
+            // Required fields
+            const requiredFields = [
+                { id: 'eventId', name: 'Event' },
+                { id: 'fromDate', name: 'From Date' },
+                { id: 'toDate', name: 'To Date' },
+                { id: 'bookingStatus', name: 'Booking Status' },
+                { id: 'totalAmount', name: 'Total Amount' },
+                { id: 'customerName', name: 'Customer Name' },
+                { id: 'phoneNumber', name: 'Phone Number' }
+            ];
 
-            // Function to validate booking form
-            function validateBookingForm() {
-                // Required fields
-                const requiredFields = [
-                    { id: 'eventId', name: 'Event' },
-               
-                    { id: 'fromDate', name: 'From Date' },
-                    { id: 'toDate', name: 'To Date' },
-                  
-                    { id: 'bookingStatus', name: 'Booking Status' },
-                    { id: 'totalAmount', name: 'Total Amount' },
-                    { id: 'customerName', name: 'Customer Name' },
-                    { id: 'phoneNumber', name: 'Phone Number' }
-                ];
+            // Clear previous error messages
+            $('.error-message').remove();
 
-                // Clear previous error messages
-                $('.error-message').remove();
+            let isValid = true;
 
-                let isValid = true;
-
-                // Check required fields
-                requiredFields.forEach(field => {
-                    const $field = $(`#${field.id}`);
-                    if (!$field.val().trim()) {
-                        $field.after(`<span class="error-message">*${field.name} is required</span>`);
-                        isValid = false;
-                    }
-                });
-
-                // Validate date ranges
-                const fromDate = new Date($('#fromDate').val());
-                const toDate = new Date($('#toDate').val());
-                const bookingDate = new Date($('#bookingDate').val());
-
-                if (fromDate > toDate) {
-                    $('#fromDate').after('<span class="error-message">*From Date must be before or equal to To Date</span>');
+            // Check required fields
+            requiredFields.forEach(field => {
+                const $field = $(`#${field.id}`);
+                if (!$field.val().trim()) {
+                    $field.after(`<span class="error-message">*${field.name} is required</span>`);
                     isValid = false;
                 }
+            });
 
-                if (bookingDate > toDate) {
-                    $('#bookingDate').after('<span class="error-message">*Booking Date must be before or equal to To Date</span>');
-                    isValid = false;
-                }
+            // Validate date ranges
+            const fromDateStr = $('#fromDate').val();
+            const toDateStr = $('#toDate').val();
+            const bookingDateStr = $('#bookingDate').val();
 
-                // Validate phone number (basic validation)
-                const phoneNumber = $('#phoneNumber').val().trim();
-                const phoneRegex = /^[0-9]{10}$/; // Assumes 10-digit phone number
-                if (!phoneRegex.test(phoneNumber)) {
-                    $('#phoneNumber').after('<span class="error-message">*Please enter a valid 10-digit phone number</span>');
-                    isValid = false;
-                }
+            const fromDate = new Date(fromDateStr);
+            const toDate = new Date(toDateStr);
+            const bookingDate = new Date(bookingDateStr);
 
-                // Validate shift selection for non-full-day bookings
-                if ($('#shiftType').val() !== 'fullday') {
-                    const fromDateStr = $('#fromDate').val();
-                    const toDateStr = $('#toDate').val();
-                    let shiftSelected = false;
-
-                    $(`input[name^="shifts["]`).each(function() {
-                        if ($(this).is(':checked')) {
-                            shiftSelected = true;
-                            return false; // break the loop
-                        }
-                    });
-
-                    if (!shiftSelected) {
-                        $('#dateWiseShiftContainer').prepend('<span class="error-message">*Please select at least one shift</span>');
-                        isValid = false;
-                    }
-                }
-
-                return isValid;
+            if (fromDate > toDate) {
+                $('#fromDate').after('<span class="error-message">*From Date must be before or equal to To Date</span>');
+                isValid = false;
             }
+
+            if (bookingDate > toDate) {
+                $('#bookingDate').after('<span class="error-message">*Booking Date must be before or equal to To Date</span>');
+                isValid = false;
+            }
+
+            // Validate phone number (basic validation)
+            const phoneNumber = $('#phoneNumber').val().trim();
+            const phoneRegex = /^[0-9]{10}$/; // Assumes 10-digit phone number
+            if (!phoneRegex.test(phoneNumber)) {
+                $('#phoneNumber').after('<span class="error-message">*Please enter a valid 10-digit phone number</span>');
+                isValid = false;
+            }
+
+            // Validate shift selection for non-full-day bookings
+            if ($('#shiftType').val() !== 'fullday') {
+                const missingShiftDates = [];
+
+                const currentDate = new Date(fromDate);
+                while (currentDate <= toDate) {
+                    const dateStr = currentDate.toISOString().split('T')[0];
+                    const checked = $(`input[name="shifts[${dateStr}]"]:checked`).length;
+
+                    if (!checked) {
+                        // Format date as DD/MM/YYYY
+                        const formattedDate = `${String(currentDate.getDate()).padStart(2, '0')}/` +
+                                              `${String(currentDate.getMonth() + 1).padStart(2, '0')}/` +
+                                              `${currentDate.getFullYear()}`;
+                        missingShiftDates.push(formattedDate);
+                    }
+
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                if (missingShiftDates.length > 0) {
+                    $('#dateWiseShiftContainer').prepend(
+                        `<span class="error-message">*Please select at least one shift for: ${missingShiftDates.join(', ')}</span>`
+                    );
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
 
             // Function to save booking
             function saveBooking() {
@@ -941,7 +967,8 @@
                     const shiftRow = $('<div class="shift-row"></div>');
 
                     const dateParts = dateStr.split('-');
-                    const formattedDate = `${dateParts[1]}/${dateParts[2]}/${dateParts[0]}`;
+                  //  const formattedDate = `${dateParts[1]}/${dateParts[2]}/${dateParts[0]}`;
+                  const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`; // ✅ DD/MM/YYYY
 
                     shiftRow.append(`<label class="date-label">${formattedDate}</label>`);
 

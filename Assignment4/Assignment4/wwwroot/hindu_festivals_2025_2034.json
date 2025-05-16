@@ -1,0 +1,1802 @@
+[
+  {
+    "name": "Makar Sankranti",
+    "date": "2025-01-14",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Swami Vivekananda Jayanti",
+    "date": "2025-01-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Republic Day",
+    "date": "2025-01-26",
+    "type": "National",
+    "region": "All India"
+  },
+  {
+    "name": "Maha Shivaratri",
+    "date": "2025-02-26",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ramkrishna Jayanti",
+    "date": "2025-03-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Holi",
+    "date": "2025-03-14",
+    "type": "Religious",
+    "region": "North India"
+  },
+  {
+    "name": "Gudi Padwa",
+    "date": "2025-03-30",
+    "type": "Religious",
+    "region": "Maharashtra"
+  },
+  {
+    "name": "Ram Navami",
+    "date": "2025-04-06",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Hanuman Jayanti",
+    "date": "2025-04-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Mahavir Jayanti",
+    "date": "2025-04-10",
+    "type": "Jayanti",
+    "region": "Jain Community"
+  },
+  {
+    "name": "Basava Jayanti",
+    "date": "2025-05-03",
+    "type": "Jayanti",
+    "region": "Karnataka"
+  },
+  {
+    "name": "Buddha Purnima",
+    "date": "2025-05-12",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Jagannath Rath Yatra",
+    "date": "2025-06-26",
+    "type": "Religious",
+    "region": "Odisha"
+  },
+  {
+    "name": "Guru Purnima",
+    "date": "2025-07-10",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Nag Panchami",
+    "date": "2025-08-01",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Raksha Bandhan",
+    "date": "2025-08-09",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Krishna Janmashtami",
+    "date": "2025-08-15",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ganesh Chaturthi",
+    "date": "2025-08-27",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Onam",
+    "date": "2025-09-05",
+    "type": "Religious",
+    "region": "Kerala"
+  },
+  {
+    "name": "Navratri Begins",
+    "date": "2025-09-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Durga Ashtami",
+    "date": "2025-09-30",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Dussehra",
+    "date": "2025-10-02",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Sharad Purnima",
+    "date": "2025-10-16",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Karwa Chauth",
+    "date": "2025-10-29",
+    "type": "Cultural",
+    "region": "North India"
+  },
+  {
+    "name": "Diwali",
+    "date": "2025-10-20",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Bhai Dooj",
+    "date": "2025-10-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Kartika Purnima",
+    "date": "2025-11-07",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Guru Nanak Jayanti",
+    "date": "2025-11-15",
+    "type": "Jayanti",
+    "region": "Punjab"
+  },
+  {
+    "name": "Geeta Jayanti",
+    "date": "2025-12-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Christmas",
+    "date": "2025-12-25",
+    "type": "Religious",
+    "region": "Christian Community"
+  },
+  {
+    "name": "Makar Sankranti",
+    "date": "2026-01-14",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Swami Vivekananda Jayanti",
+    "date": "2026-01-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Republic Day",
+    "date": "2026-01-26",
+    "type": "National",
+    "region": "All India"
+  },
+  {
+    "name": "Maha Shivaratri",
+    "date": "2026-02-26",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ramkrishna Jayanti",
+    "date": "2026-03-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Holi",
+    "date": "2026-03-14",
+    "type": "Religious",
+    "region": "North India"
+  },
+  {
+    "name": "Gudi Padwa",
+    "date": "2026-03-30",
+    "type": "Religious",
+    "region": "Maharashtra"
+  },
+  {
+    "name": "Ram Navami",
+    "date": "2026-04-06",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Hanuman Jayanti",
+    "date": "2026-04-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Mahavir Jayanti",
+    "date": "2026-04-10",
+    "type": "Jayanti",
+    "region": "Jain Community"
+  },
+  {
+    "name": "Basava Jayanti",
+    "date": "2026-05-03",
+    "type": "Jayanti",
+    "region": "Karnataka"
+  },
+  {
+    "name": "Buddha Purnima",
+    "date": "2026-05-12",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Jagannath Rath Yatra",
+    "date": "2026-06-26",
+    "type": "Religious",
+    "region": "Odisha"
+  },
+  {
+    "name": "Guru Purnima",
+    "date": "2026-07-10",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Nag Panchami",
+    "date": "2026-08-01",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Raksha Bandhan",
+    "date": "2026-08-09",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Krishna Janmashtami",
+    "date": "2026-08-15",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ganesh Chaturthi",
+    "date": "2026-08-27",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Onam",
+    "date": "2026-09-05",
+    "type": "Religious",
+    "region": "Kerala"
+  },
+  {
+    "name": "Navratri Begins",
+    "date": "2026-09-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Durga Ashtami",
+    "date": "2026-09-30",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Dussehra",
+    "date": "2026-10-02",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Sharad Purnima",
+    "date": "2026-10-16",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Karwa Chauth",
+    "date": "2026-10-29",
+    "type": "Cultural",
+    "region": "North India"
+  },
+  {
+    "name": "Diwali",
+    "date": "2026-10-20",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Bhai Dooj",
+    "date": "2026-10-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Kartika Purnima",
+    "date": "2026-11-07",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Guru Nanak Jayanti",
+    "date": "2026-11-15",
+    "type": "Jayanti",
+    "region": "Punjab"
+  },
+  {
+    "name": "Geeta Jayanti",
+    "date": "2026-12-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Christmas",
+    "date": "2026-12-25",
+    "type": "Religious",
+    "region": "Christian Community"
+  },
+  {
+    "name": "Makar Sankranti",
+    "date": "2027-01-14",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Swami Vivekananda Jayanti",
+    "date": "2027-01-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Republic Day",
+    "date": "2027-01-26",
+    "type": "National",
+    "region": "All India"
+  },
+  {
+    "name": "Maha Shivaratri",
+    "date": "2027-02-26",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ramkrishna Jayanti",
+    "date": "2027-03-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Holi",
+    "date": "2027-03-14",
+    "type": "Religious",
+    "region": "North India"
+  },
+  {
+    "name": "Gudi Padwa",
+    "date": "2027-03-30",
+    "type": "Religious",
+    "region": "Maharashtra"
+  },
+  {
+    "name": "Ram Navami",
+    "date": "2027-04-06",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Hanuman Jayanti",
+    "date": "2027-04-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Mahavir Jayanti",
+    "date": "2027-04-10",
+    "type": "Jayanti",
+    "region": "Jain Community"
+  },
+  {
+    "name": "Basava Jayanti",
+    "date": "2027-05-03",
+    "type": "Jayanti",
+    "region": "Karnataka"
+  },
+  {
+    "name": "Buddha Purnima",
+    "date": "2027-05-12",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Jagannath Rath Yatra",
+    "date": "2027-06-26",
+    "type": "Religious",
+    "region": "Odisha"
+  },
+  {
+    "name": "Guru Purnima",
+    "date": "2027-07-10",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Nag Panchami",
+    "date": "2027-08-01",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Raksha Bandhan",
+    "date": "2027-08-09",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Krishna Janmashtami",
+    "date": "2027-08-15",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ganesh Chaturthi",
+    "date": "2027-08-27",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Onam",
+    "date": "2027-09-05",
+    "type": "Religious",
+    "region": "Kerala"
+  },
+  {
+    "name": "Navratri Begins",
+    "date": "2027-09-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Durga Ashtami",
+    "date": "2027-09-30",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Dussehra",
+    "date": "2027-10-02",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Sharad Purnima",
+    "date": "2027-10-16",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Karwa Chauth",
+    "date": "2027-10-29",
+    "type": "Cultural",
+    "region": "North India"
+  },
+  {
+    "name": "Diwali",
+    "date": "2027-10-20",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Bhai Dooj",
+    "date": "2027-10-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Kartika Purnima",
+    "date": "2027-11-07",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Guru Nanak Jayanti",
+    "date": "2027-11-15",
+    "type": "Jayanti",
+    "region": "Punjab"
+  },
+  {
+    "name": "Geeta Jayanti",
+    "date": "2027-12-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Christmas",
+    "date": "2027-12-25",
+    "type": "Religious",
+    "region": "Christian Community"
+  },
+  {
+    "name": "Makar Sankranti",
+    "date": "2028-01-14",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Swami Vivekananda Jayanti",
+    "date": "2028-01-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Republic Day",
+    "date": "2028-01-26",
+    "type": "National",
+    "region": "All India"
+  },
+  {
+    "name": "Maha Shivaratri",
+    "date": "2028-02-26",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ramkrishna Jayanti",
+    "date": "2028-03-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Holi",
+    "date": "2028-03-14",
+    "type": "Religious",
+    "region": "North India"
+  },
+  {
+    "name": "Gudi Padwa",
+    "date": "2028-03-30",
+    "type": "Religious",
+    "region": "Maharashtra"
+  },
+  {
+    "name": "Ram Navami",
+    "date": "2028-04-06",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Hanuman Jayanti",
+    "date": "2028-04-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Mahavir Jayanti",
+    "date": "2028-04-10",
+    "type": "Jayanti",
+    "region": "Jain Community"
+  },
+  {
+    "name": "Basava Jayanti",
+    "date": "2028-05-03",
+    "type": "Jayanti",
+    "region": "Karnataka"
+  },
+  {
+    "name": "Buddha Purnima",
+    "date": "2028-05-12",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Jagannath Rath Yatra",
+    "date": "2028-06-26",
+    "type": "Religious",
+    "region": "Odisha"
+  },
+  {
+    "name": "Guru Purnima",
+    "date": "2028-07-10",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Nag Panchami",
+    "date": "2028-08-01",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Raksha Bandhan",
+    "date": "2028-08-09",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Krishna Janmashtami",
+    "date": "2028-08-15",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ganesh Chaturthi",
+    "date": "2028-08-27",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Onam",
+    "date": "2028-09-05",
+    "type": "Religious",
+    "region": "Kerala"
+  },
+  {
+    "name": "Navratri Begins",
+    "date": "2028-09-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Durga Ashtami",
+    "date": "2028-09-30",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Dussehra",
+    "date": "2028-10-02",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Sharad Purnima",
+    "date": "2028-10-16",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Karwa Chauth",
+    "date": "2028-10-29",
+    "type": "Cultural",
+    "region": "North India"
+  },
+  {
+    "name": "Diwali",
+    "date": "2028-10-20",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Bhai Dooj",
+    "date": "2028-10-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Kartika Purnima",
+    "date": "2028-11-07",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Guru Nanak Jayanti",
+    "date": "2028-11-15",
+    "type": "Jayanti",
+    "region": "Punjab"
+  },
+  {
+    "name": "Geeta Jayanti",
+    "date": "2028-12-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Christmas",
+    "date": "2028-12-25",
+    "type": "Religious",
+    "region": "Christian Community"
+  },
+  {
+    "name": "Makar Sankranti",
+    "date": "2029-01-14",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Swami Vivekananda Jayanti",
+    "date": "2029-01-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Republic Day",
+    "date": "2029-01-26",
+    "type": "National",
+    "region": "All India"
+  },
+  {
+    "name": "Maha Shivaratri",
+    "date": "2029-02-26",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ramkrishna Jayanti",
+    "date": "2029-03-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Holi",
+    "date": "2029-03-14",
+    "type": "Religious",
+    "region": "North India"
+  },
+  {
+    "name": "Gudi Padwa",
+    "date": "2029-03-30",
+    "type": "Religious",
+    "region": "Maharashtra"
+  },
+  {
+    "name": "Ram Navami",
+    "date": "2029-04-06",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Hanuman Jayanti",
+    "date": "2029-04-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Mahavir Jayanti",
+    "date": "2029-04-10",
+    "type": "Jayanti",
+    "region": "Jain Community"
+  },
+  {
+    "name": "Basava Jayanti",
+    "date": "2029-05-03",
+    "type": "Jayanti",
+    "region": "Karnataka"
+  },
+  {
+    "name": "Buddha Purnima",
+    "date": "2029-05-12",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Jagannath Rath Yatra",
+    "date": "2029-06-26",
+    "type": "Religious",
+    "region": "Odisha"
+  },
+  {
+    "name": "Guru Purnima",
+    "date": "2029-07-10",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Nag Panchami",
+    "date": "2029-08-01",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Raksha Bandhan",
+    "date": "2029-08-09",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Krishna Janmashtami",
+    "date": "2029-08-15",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ganesh Chaturthi",
+    "date": "2029-08-27",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Onam",
+    "date": "2029-09-05",
+    "type": "Religious",
+    "region": "Kerala"
+  },
+  {
+    "name": "Navratri Begins",
+    "date": "2029-09-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Durga Ashtami",
+    "date": "2029-09-30",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Dussehra",
+    "date": "2029-10-02",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Sharad Purnima",
+    "date": "2029-10-16",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Karwa Chauth",
+    "date": "2029-10-29",
+    "type": "Cultural",
+    "region": "North India"
+  },
+  {
+    "name": "Diwali",
+    "date": "2029-10-20",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Bhai Dooj",
+    "date": "2029-10-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Kartika Purnima",
+    "date": "2029-11-07",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Guru Nanak Jayanti",
+    "date": "2029-11-15",
+    "type": "Jayanti",
+    "region": "Punjab"
+  },
+  {
+    "name": "Geeta Jayanti",
+    "date": "2029-12-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Christmas",
+    "date": "2029-12-25",
+    "type": "Religious",
+    "region": "Christian Community"
+  },
+  {
+    "name": "Makar Sankranti",
+    "date": "2030-01-14",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Swami Vivekananda Jayanti",
+    "date": "2030-01-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Republic Day",
+    "date": "2030-01-26",
+    "type": "National",
+    "region": "All India"
+  },
+  {
+    "name": "Maha Shivaratri",
+    "date": "2030-02-26",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ramkrishna Jayanti",
+    "date": "2030-03-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Holi",
+    "date": "2030-03-14",
+    "type": "Religious",
+    "region": "North India"
+  },
+  {
+    "name": "Gudi Padwa",
+    "date": "2030-03-30",
+    "type": "Religious",
+    "region": "Maharashtra"
+  },
+  {
+    "name": "Ram Navami",
+    "date": "2030-04-06",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Hanuman Jayanti",
+    "date": "2030-04-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Mahavir Jayanti",
+    "date": "2030-04-10",
+    "type": "Jayanti",
+    "region": "Jain Community"
+  },
+  {
+    "name": "Basava Jayanti",
+    "date": "2030-05-03",
+    "type": "Jayanti",
+    "region": "Karnataka"
+  },
+  {
+    "name": "Buddha Purnima",
+    "date": "2030-05-12",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Jagannath Rath Yatra",
+    "date": "2030-06-26",
+    "type": "Religious",
+    "region": "Odisha"
+  },
+  {
+    "name": "Guru Purnima",
+    "date": "2030-07-10",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Nag Panchami",
+    "date": "2030-08-01",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Raksha Bandhan",
+    "date": "2030-08-09",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Krishna Janmashtami",
+    "date": "2030-08-15",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ganesh Chaturthi",
+    "date": "2030-08-27",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Onam",
+    "date": "2030-09-05",
+    "type": "Religious",
+    "region": "Kerala"
+  },
+  {
+    "name": "Navratri Begins",
+    "date": "2030-09-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Durga Ashtami",
+    "date": "2030-09-30",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Dussehra",
+    "date": "2030-10-02",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Sharad Purnima",
+    "date": "2030-10-16",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Karwa Chauth",
+    "date": "2030-10-29",
+    "type": "Cultural",
+    "region": "North India"
+  },
+  {
+    "name": "Diwali",
+    "date": "2030-10-20",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Bhai Dooj",
+    "date": "2030-10-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Kartika Purnima",
+    "date": "2030-11-07",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Guru Nanak Jayanti",
+    "date": "2030-11-15",
+    "type": "Jayanti",
+    "region": "Punjab"
+  },
+  {
+    "name": "Geeta Jayanti",
+    "date": "2030-12-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Christmas",
+    "date": "2030-12-25",
+    "type": "Religious",
+    "region": "Christian Community"
+  },
+  {
+    "name": "Makar Sankranti",
+    "date": "2031-01-14",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Swami Vivekananda Jayanti",
+    "date": "2031-01-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Republic Day",
+    "date": "2031-01-26",
+    "type": "National",
+    "region": "All India"
+  },
+  {
+    "name": "Maha Shivaratri",
+    "date": "2031-02-26",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ramkrishna Jayanti",
+    "date": "2031-03-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Holi",
+    "date": "2031-03-14",
+    "type": "Religious",
+    "region": "North India"
+  },
+  {
+    "name": "Gudi Padwa",
+    "date": "2031-03-30",
+    "type": "Religious",
+    "region": "Maharashtra"
+  },
+  {
+    "name": "Ram Navami",
+    "date": "2031-04-06",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Hanuman Jayanti",
+    "date": "2031-04-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Mahavir Jayanti",
+    "date": "2031-04-10",
+    "type": "Jayanti",
+    "region": "Jain Community"
+  },
+  {
+    "name": "Basava Jayanti",
+    "date": "2031-05-03",
+    "type": "Jayanti",
+    "region": "Karnataka"
+  },
+  {
+    "name": "Buddha Purnima",
+    "date": "2031-05-12",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Jagannath Rath Yatra",
+    "date": "2031-06-26",
+    "type": "Religious",
+    "region": "Odisha"
+  },
+  {
+    "name": "Guru Purnima",
+    "date": "2031-07-10",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Nag Panchami",
+    "date": "2031-08-01",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Raksha Bandhan",
+    "date": "2031-08-09",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Krishna Janmashtami",
+    "date": "2031-08-15",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ganesh Chaturthi",
+    "date": "2031-08-27",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Onam",
+    "date": "2031-09-05",
+    "type": "Religious",
+    "region": "Kerala"
+  },
+  {
+    "name": "Navratri Begins",
+    "date": "2031-09-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Durga Ashtami",
+    "date": "2031-09-30",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Dussehra",
+    "date": "2031-10-02",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Sharad Purnima",
+    "date": "2031-10-16",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Karwa Chauth",
+    "date": "2031-10-29",
+    "type": "Cultural",
+    "region": "North India"
+  },
+  {
+    "name": "Diwali",
+    "date": "2031-10-20",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Bhai Dooj",
+    "date": "2031-10-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Kartika Purnima",
+    "date": "2031-11-07",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Guru Nanak Jayanti",
+    "date": "2031-11-15",
+    "type": "Jayanti",
+    "region": "Punjab"
+  },
+  {
+    "name": "Geeta Jayanti",
+    "date": "2031-12-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Christmas",
+    "date": "2031-12-25",
+    "type": "Religious",
+    "region": "Christian Community"
+  },
+  {
+    "name": "Makar Sankranti",
+    "date": "2032-01-14",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Swami Vivekananda Jayanti",
+    "date": "2032-01-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Republic Day",
+    "date": "2032-01-26",
+    "type": "National",
+    "region": "All India"
+  },
+  {
+    "name": "Maha Shivaratri",
+    "date": "2032-02-26",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ramkrishna Jayanti",
+    "date": "2032-03-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Holi",
+    "date": "2032-03-14",
+    "type": "Religious",
+    "region": "North India"
+  },
+  {
+    "name": "Gudi Padwa",
+    "date": "2032-03-30",
+    "type": "Religious",
+    "region": "Maharashtra"
+  },
+  {
+    "name": "Ram Navami",
+    "date": "2032-04-06",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Hanuman Jayanti",
+    "date": "2032-04-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Mahavir Jayanti",
+    "date": "2032-04-10",
+    "type": "Jayanti",
+    "region": "Jain Community"
+  },
+  {
+    "name": "Basava Jayanti",
+    "date": "2032-05-03",
+    "type": "Jayanti",
+    "region": "Karnataka"
+  },
+  {
+    "name": "Buddha Purnima",
+    "date": "2032-05-12",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Jagannath Rath Yatra",
+    "date": "2032-06-26",
+    "type": "Religious",
+    "region": "Odisha"
+  },
+  {
+    "name": "Guru Purnima",
+    "date": "2032-07-10",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Nag Panchami",
+    "date": "2032-08-01",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Raksha Bandhan",
+    "date": "2032-08-09",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Krishna Janmashtami",
+    "date": "2032-08-15",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ganesh Chaturthi",
+    "date": "2032-08-27",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Onam",
+    "date": "2032-09-05",
+    "type": "Religious",
+    "region": "Kerala"
+  },
+  {
+    "name": "Navratri Begins",
+    "date": "2032-09-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Durga Ashtami",
+    "date": "2032-09-30",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Dussehra",
+    "date": "2032-10-02",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Sharad Purnima",
+    "date": "2032-10-16",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Karwa Chauth",
+    "date": "2032-10-29",
+    "type": "Cultural",
+    "region": "North India"
+  },
+  {
+    "name": "Diwali",
+    "date": "2032-10-20",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Bhai Dooj",
+    "date": "2032-10-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Kartika Purnima",
+    "date": "2032-11-07",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Guru Nanak Jayanti",
+    "date": "2032-11-15",
+    "type": "Jayanti",
+    "region": "Punjab"
+  },
+  {
+    "name": "Geeta Jayanti",
+    "date": "2032-12-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Christmas",
+    "date": "2032-12-25",
+    "type": "Religious",
+    "region": "Christian Community"
+  },
+  {
+    "name": "Makar Sankranti",
+    "date": "2033-01-14",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Swami Vivekananda Jayanti",
+    "date": "2033-01-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Republic Day",
+    "date": "2033-01-26",
+    "type": "National",
+    "region": "All India"
+  },
+  {
+    "name": "Maha Shivaratri",
+    "date": "2033-02-26",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ramkrishna Jayanti",
+    "date": "2033-03-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Holi",
+    "date": "2033-03-14",
+    "type": "Religious",
+    "region": "North India"
+  },
+  {
+    "name": "Gudi Padwa",
+    "date": "2033-03-30",
+    "type": "Religious",
+    "region": "Maharashtra"
+  },
+  {
+    "name": "Ram Navami",
+    "date": "2033-04-06",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Hanuman Jayanti",
+    "date": "2033-04-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Mahavir Jayanti",
+    "date": "2033-04-10",
+    "type": "Jayanti",
+    "region": "Jain Community"
+  },
+  {
+    "name": "Basava Jayanti",
+    "date": "2033-05-03",
+    "type": "Jayanti",
+    "region": "Karnataka"
+  },
+  {
+    "name": "Buddha Purnima",
+    "date": "2033-05-12",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Jagannath Rath Yatra",
+    "date": "2033-06-26",
+    "type": "Religious",
+    "region": "Odisha"
+  },
+  {
+    "name": "Guru Purnima",
+    "date": "2033-07-10",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Nag Panchami",
+    "date": "2033-08-01",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Raksha Bandhan",
+    "date": "2033-08-09",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Krishna Janmashtami",
+    "date": "2033-08-15",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ganesh Chaturthi",
+    "date": "2033-08-27",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Onam",
+    "date": "2033-09-05",
+    "type": "Religious",
+    "region": "Kerala"
+  },
+  {
+    "name": "Navratri Begins",
+    "date": "2033-09-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Durga Ashtami",
+    "date": "2033-09-30",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Dussehra",
+    "date": "2033-10-02",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Sharad Purnima",
+    "date": "2033-10-16",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Karwa Chauth",
+    "date": "2033-10-29",
+    "type": "Cultural",
+    "region": "North India"
+  },
+  {
+    "name": "Diwali",
+    "date": "2033-10-20",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Bhai Dooj",
+    "date": "2033-10-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Kartika Purnima",
+    "date": "2033-11-07",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Guru Nanak Jayanti",
+    "date": "2033-11-15",
+    "type": "Jayanti",
+    "region": "Punjab"
+  },
+  {
+    "name": "Geeta Jayanti",
+    "date": "2033-12-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Christmas",
+    "date": "2033-12-25",
+    "type": "Religious",
+    "region": "Christian Community"
+  },
+  {
+    "name": "Makar Sankranti",
+    "date": "2034-01-14",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Swami Vivekananda Jayanti",
+    "date": "2034-01-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Republic Day",
+    "date": "2034-01-26",
+    "type": "National",
+    "region": "All India"
+  },
+  {
+    "name": "Maha Shivaratri",
+    "date": "2034-02-26",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ramkrishna Jayanti",
+    "date": "2034-03-12",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Holi",
+    "date": "2034-03-14",
+    "type": "Religious",
+    "region": "North India"
+  },
+  {
+    "name": "Gudi Padwa",
+    "date": "2034-03-30",
+    "type": "Religious",
+    "region": "Maharashtra"
+  },
+  {
+    "name": "Ram Navami",
+    "date": "2034-04-06",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Hanuman Jayanti",
+    "date": "2034-04-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Mahavir Jayanti",
+    "date": "2034-04-10",
+    "type": "Jayanti",
+    "region": "Jain Community"
+  },
+  {
+    "name": "Basava Jayanti",
+    "date": "2034-05-03",
+    "type": "Jayanti",
+    "region": "Karnataka"
+  },
+  {
+    "name": "Buddha Purnima",
+    "date": "2034-05-12",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Jagannath Rath Yatra",
+    "date": "2034-06-26",
+    "type": "Religious",
+    "region": "Odisha"
+  },
+  {
+    "name": "Guru Purnima",
+    "date": "2034-07-10",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Nag Panchami",
+    "date": "2034-08-01",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Raksha Bandhan",
+    "date": "2034-08-09",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Krishna Janmashtami",
+    "date": "2034-08-15",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Ganesh Chaturthi",
+    "date": "2034-08-27",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Onam",
+    "date": "2034-09-05",
+    "type": "Religious",
+    "region": "Kerala"
+  },
+  {
+    "name": "Navratri Begins",
+    "date": "2034-09-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Durga Ashtami",
+    "date": "2034-09-30",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Dussehra",
+    "date": "2034-10-02",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Sharad Purnima",
+    "date": "2034-10-16",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Karwa Chauth",
+    "date": "2034-10-29",
+    "type": "Cultural",
+    "region": "North India"
+  },
+  {
+    "name": "Diwali",
+    "date": "2034-10-20",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Bhai Dooj",
+    "date": "2034-10-22",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Kartika Purnima",
+    "date": "2034-11-07",
+    "type": "Religious",
+    "region": "All India"
+  },
+  {
+    "name": "Guru Nanak Jayanti",
+    "date": "2034-11-15",
+    "type": "Jayanti",
+    "region": "Punjab"
+  },
+  {
+    "name": "Geeta Jayanti",
+    "date": "2034-12-10",
+    "type": "Jayanti",
+    "region": "All India"
+  },
+  {
+    "name": "Christmas",
+    "date": "2034-12-25",
+    "type": "Religious",
+    "region": "Christian Community"
+  }
+]
