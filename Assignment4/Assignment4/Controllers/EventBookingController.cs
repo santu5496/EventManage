@@ -47,6 +47,7 @@ namespace EventManagement.Controllers
             }
             return Json(new { success = true, message = "Event booking deleted successfully." });
         }
+        [HttpGet]
         public IActionResult GetAllEventBookings()
         {
             var result = _eventBookingSerive.GetAllBookings();

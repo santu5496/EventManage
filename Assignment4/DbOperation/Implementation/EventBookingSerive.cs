@@ -111,9 +111,28 @@ namespace DbOperation.Implementation
 
         public List<Bookings> GetAllBookings()
         {
+            
+
+
+            using (var db = new EventContext(_context))
+            { 
+                var a = db.Bookings.ToList();
+                return db.Bookings.ToList();
+            }
+            
+        }
+        public void DeleteAllBookings()
+        {
             using (var db = new EventContext(_context))
             {
-                return db.Bookings.ToList();
+                // Fetch all bookings
+                var all = db.Bookings.ToList();
+
+                // Remove them in one shot
+                db.Bookings.RemoveRange(all);
+
+                // Persist the delete
+                db.SaveChanges();
             }
         }
 

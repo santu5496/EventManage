@@ -61,6 +61,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=login}/{id?}");
+    pattern: "{controller=EventBooking}/{action=EventBooking}/{id?}");
 
 app.Run();
