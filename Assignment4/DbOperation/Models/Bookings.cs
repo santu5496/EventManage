@@ -40,6 +40,8 @@ public partial class Bookings
     public string alternativeNumber { get; set; }
 
     public string address { get; set; }
+    public string EventName { get; set; }
+
 
     public virtual Events _event { get; set; }
 

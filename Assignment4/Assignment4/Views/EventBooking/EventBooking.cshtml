@@ -27,14 +27,10 @@
                 </div>
                 <div class="form-group">
                     <label>Event</label>
-                    <select id="eventId" class="ClearBookingModalData" required>
-                        <option value="">-- Select Event --</option>
-                        <option value="1">Birthday Party</option>
-                        <option value="2">Wedding</option>
-                        <option value="3">Corporate Event</option>
-                        <option value="4">Family Gathering</option>
-                    </select>
+                    <input type="text" id="EventName" class="form-control ClearBookingModalData" placeholder="Enter event name" required />
                 </div>
+
+
                 <div hidden class="form-group">
                     <label>Booking Date</label>
                     <input type="date" id="bookingDate" class="ClearBookingModalData" required />
@@ -115,7 +111,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" id="save-booking" class="btn btn-primary">Save</button>
-                <button type="button" id="delete-booking" class="btn btn-danger" style="display: none;">Delete</button>
+                <button type="button" hidden id="delete-booking" class="btn btn-danger" style="display: none;">Delete</button>
                 <button type="button" id="close-booking-modal" class="btn btn-secondary">Close</button>
             </div>
         </div>
@@ -161,9 +157,9 @@
 
     <!-- Action Buttons -->
     <div>
-        <button id="fetch-bookings">Refresh Calendar</button>
+        <button hidden id="fetch-bookings">Refresh Calendar</button>
         <button id="open-booking-modal">New Booking</button>
-        <button  id="view-all-bookings">View All Bookings</button>
+        <button hidden  id="view-all-bookings">View All Bookings</button>
     </div>
 
     <div id="spinner" class="spinner"></div>
@@ -208,10 +204,14 @@
     <!-- FullCalendar -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
    <script>
 
         $(document).ready(function () {
+
+                    
 
            
           
@@ -683,7 +683,7 @@
         function validateBookingForm() {
             // Required fields
             const requiredFields = [
-                { id: 'eventId', name: 'Event' },
+                { id: 'EventName', name: 'Event' },
                 { id: 'fromDate', name: 'From Date' },
                 { id: 'toDate', name: 'To Date' },
                 { id: 'bookingStatus', name: 'Booking Status' },
@@ -771,7 +771,7 @@
                 const formData = {
                     bookingId: $('#bookingId').val() || 0, // Use 0 for new bookings
                     userId: $('#userId').val() || 1, // Default to 1 if not set
-                    eventId: $('#eventId').val(),
+                    EventName: $('#EventName').val(),
                     bookingDate: $('#bookingDate').val(),
                     fromDate: $('#fromDate').val(),
                     toDate: $('#toDate').val(),
@@ -787,7 +787,7 @@
                     alternativeNumber: $('#alternativeNumber').val(),
                     address: $('#address').val()
                 };
-
+                debugger
                 // Collect date-wise shifts if not full day, now with time information
                 if (formData.shiftType !== 'fullday') {
                     const dateWiseShifts = {};
@@ -874,7 +874,7 @@
                         tableBody.empty();
 
                         bookings.forEach(booking => {
-                            const eventName = getEventName(booking.eventId);
+                            const eventName = getEventName(booking.EventName);
                             const row = `
                                 <tr data-booking-id="${booking.bookingId}">
                                     <td>${booking.bookingId}</td>
@@ -1046,14 +1046,15 @@
 
             // Function to open booking modal for editing
             function openBookingModalForEdit(bookingData) {
+                debugger
                 resetBookingForm();
                 $('#booking-modal-title').text('Edit Booking');
                 $('#delete-booking').show();
 
-                // Populate form fields with booking data
+                // Populate form fields with booking dataf
                 $('#bookingId').val(bookingData.bookingId);
                 $('#userId').val(bookingData.userId || 1);
-                $('#eventId').val(bookingData.eventId);
+                $('#EventName').val(bookingData.eventName);
                 $('#bookingDate').val(formatDateForInput(bookingData.bookingDate));
                 $('#fromDate').val(formatDateForInput(bookingData.fromDate));
                 $('#toDate').val(formatDateForInput(bookingData.toDate));
@@ -1113,12 +1114,14 @@
                 $('#bookingModal').show();
             }
 
-                function viewBookingDetails(bookingData) {
-            const eventName = getEventName(bookingData.eventId);
+            function viewBookingDetails(bookingData) 
+            {
+                debugger
+           // const eventName = getEventName(bookingData.eventName;
             let detailsHTML = `
                 <div class="detail-row">
                     <div class="detail-label">Event Type:</div>
-                    <div class="detail-value">${eventName}</div>
+                    <div class="detail-value">${bookingData.eventName}</div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Customer:</div>
@@ -1260,7 +1263,7 @@
             }
 
             // Function to get event name (replace with actual implementation)
-            function getEventName(eventId) {
+            function getEventName(EventName) {
                 // This should be replaced with actual event lookup
                 const events = {
                     1: 'Wedding',
@@ -1268,7 +1271,7 @@
                     3: 'Birthday Party',
                     // Add more event types as needed
                 };
-                return events[eventId] || 'Unknown Event';
+                return events[EventName] || 'Unknown Event';
             }
 
             // Function to show messages
@@ -1291,7 +1294,7 @@
             // Function to reset booking form
             function resetBookingForm() {
                 // Clear all form fields
-                $('#bookingId, #userId, #eventId, #bookingDate, #fromDate, #toDate, ' +
+                $('#bookingId, #userId, #EventName, #bookingDate, #fromDate, #toDate, ' +
                   '#shiftType, #bookingStatus, #totalAmount, #advancePayment, ' +
                   '#remainingPayment, #paymentStatus, #createdDate, #customerName, ' +
                   '#phoneNumber, #alternativeNumber, #address').val('');

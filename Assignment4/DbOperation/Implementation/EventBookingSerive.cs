@@ -71,6 +71,42 @@ namespace DbOperation.Implementation
             }
         }
 
+        public bool AddEventNameColumn()
+        {
+            const string alterQuery = @"
+        IF NOT EXISTS (
+            SELECT * 
+            FROM INFORMATION_SCHEMA.COLUMNS 
+            WHERE TABLE_NAME = 'Bookings' 
+              AND COLUMN_NAME = 'EventName'
+        )
+        BEGIN
+            ALTER TABLE Bookings ADD EventName NVARCHAR(100);
+        END";
+
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                using (var command = new SqlCommand(alterQuery, connection))
+                {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+
+                Console.WriteLine("Column 'EventName' checked/added successfully.");
+                return true;
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine($"SQL Error: {ex.Message}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return false;
+            }
+        }
 
         public bool AddDateWiseShiftsColumn()
         {
@@ -79,10 +115,10 @@ namespace DbOperation.Implementation
                     SELECT * 
                     FROM INFORMATION_SCHEMA.COLUMNS 
                     WHERE TABLE_NAME = 'Bookings' 
-                      AND COLUMN_NAME = 'dateWiseShifts'
+                      AND COLUMN_NAME = 'EventName'
                 )
                 BEGIN
-                    ALTER TABLE Bookings ADD dateWiseShifts NVARCHAR(MAX);
+                    ALTER TABLE Bookings ADD dateWiseShifts NVARCHAR(100);
                 END";
 
             try
@@ -111,13 +147,12 @@ namespace DbOperation.Implementation
 
         public List<Bookings> GetAllBookings()
         {
-         
 
 
-
+            
             using (var db = new EventContext(_context))
             { 
-                var a = db.Bookings.ToList();
+               
                 return db.Bookings.ToList();
             }
             

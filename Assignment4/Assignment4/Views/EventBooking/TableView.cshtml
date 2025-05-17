@@ -141,7 +141,7 @@
             const html = `
                 <p><strong>Customer:</strong> ${booking.customerName}</p>
                 <p><strong>Phone:</strong> ${booking.phoneNumber}</p>
-                <p><strong>Event:</strong> ${getEventName(booking.eventId)}</p>
+                <p><strong>Event:</strong> ${booking.eventName}</p>
                 <p><strong>Date Range:</strong> ${formatDate(booking.fromDate)} - ${formatDate(booking.toDate)}</p>
                 <p><strong>Shift:</strong> ${booking.shiftType}</p>
                 <p><strong>Total:</strong> ₹${booking.totalAmount || 0}</p>
@@ -177,7 +177,7 @@
                     b.bookingId,
                     b.customerName,
                     b.phoneNumber || '',
-                    getEventName(b.eventId),
+                    b.eventName,
                     `${formatDate(b.fromDate)} - ${formatDate(b.toDate)}`,
                     b.shiftType,
                     `₹${b.totalAmount || 0}`,
