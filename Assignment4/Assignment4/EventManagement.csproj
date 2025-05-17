@@ -21,4 +21,8 @@
     <ProjectReference Include="..\DbOperation\DbOperation.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\TableView\" />
+  </ItemGroup>
+
 </Project>

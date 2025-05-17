@@ -14,6 +14,15 @@ builder.Services.AddSingleton<IUserService, UsersService>(provider =>
     }
     return new UsersService(connectionString);
 });
+builder.Services.AddSingleton<ITableViewService, TableViewService>(provider =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("Assignment4");
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+        throw new InvalidOperationException("Connection string 'Assignment4' is not configured or is empty.");
+    }
+    return new TableViewService(connectionString);
+});
 builder.Services.AddSingleton<IEventCrudService, EventCrudService>(provider =>
 {
     var connectionString = builder.Configuration.GetConnectionString("Assignment4");
@@ -61,6 +70,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=EventBooking}/{action=EventBooking}/{id?}");
+    pattern: "{controller=Home}/{action=login}/{id?}");
 
 app.Run();

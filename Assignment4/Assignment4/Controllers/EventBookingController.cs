@@ -15,6 +15,11 @@ namespace EventManagement.Controllers
         {
             return View();
         }
+        public IActionResult TableView()
+        {
+            return View("TableView"); // Renders TableView.cshtml
+        }
+
         [HttpPost]
         public IActionResult AddOrUpdateEventBooking(Bookings eventBooking)
         {
