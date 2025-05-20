@@ -260,8 +260,8 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-            $(document).ready(function() {
-              // Helper function to detect click target
+                    $(document).ready(function() {
+            // Helper function to detect click target
             // This determines if the user clicked on a shift block or the empty space
             function isClickOnShiftBlock(e) {
                 // Traverse up to see if we clicked on a shift-block element
@@ -317,6 +317,7 @@
                 // Show modal
                 bookingModal.show();
             }
+
             // ─────────────────────────────────────────────────────────────────────────────
             // 1. GLOBAL VARIABLES & UTILITIES
             // ─────────────────────────────────────────────────────────────────────────────
@@ -378,13 +379,23 @@
                 }, 5000);
             }
 
+            // Function to properly refresh calendar and redraw all cells
+            function refreshCalendar() {
+                // First clear all events and shift blocks
+                calendar.removeAllEvents();
+                $('.shift-block, .empty-shift-area').remove();
+
+                // Then reload events
+                loadEvents();
+            }
+
             // ─────────────────────────────────────────────────────────────────────────────
             // 2. FULLCALENDAR SETUP
             // ─────────────────────────────────────────────────────────────────────────────
             const calendarEl = document.getElementById('calendar');
 
             const calendar = new FullCalendar.Calendar(calendarEl, {
-                 initialView: 'dayGridMonth', // Always month view regardless of device // Responsive initial view
+                initialView: 'dayGridMonth', // Always month view regardless of device // Responsive initial view
                 selectable: true,
                 height: 'auto',
                 headerToolbar: {
@@ -426,101 +437,97 @@
                 },
 
                 // Paint shift blocks and handle partial day availability
-                     // ─────────────────────────────────────────────────────────────────────────────
-        // 1) Updated dayCellDidMount to pass bookingData (for address) into each block
-        // ─────────────────────────────────────────────────────────────────────────────
-        dayCellDidMount(arg) {
-          const dateStr = localYMD(arg.date);
-          const shifts  = shiftMap[dateStr] || [];
+                dayCellDidMount(arg) {
+                    const dateStr = localYMD(arg.date);
+                    const shifts = shiftMap[dateStr] || [];
 
-          arg.el.style.position = 'relative';
-          arg.el.style.overflow  = 'hidden';
+                    arg.el.style.position = 'relative';
+                    arg.el.style.overflow = 'hidden';
 
-          if (!shifts.length) return;
+                    if (!shifts.length) return;
 
-          const COLORS = {
-            'full day': 'rgba(34,197,94,0.85)',
-            'morning' : 'rgba(255,165,0,0.85)',
-            'evening' : 'rgba(0,128,255,0.85)'
-          };
-          const POS = {
-            'full day': { top:'0', bottom:'0', left:'0', right:'0' },
-            'morning' : { top:'0', height:'50%', left:'0', right:'0' },
-            'evening' : { bottom:'0', height:'50%', left:'0', right:'0' }
-          };
+                    const COLORS = {
+                        'full day': 'rgba(34,197,94,0.85)',
+                        'morning': 'rgba(255,165,0,0.85)',
+                        'evening': 'rgba(0,128,255,0.85)'
+                    };
+                    const POS = {
+                        'full day': { top: '0', bottom: '0', left: '0', right: '0' },
+                        'morning': { top: '0', height: '50%', left: '0', right: '0' },
+                        'evening': { bottom: '0', height: '50%', left: '0', right: '0' }
+                    };
 
-          // group by shift type
-          const byType = shifts.reduce((acc, s) => {
-            (acc[s.shift] = acc[s.shift] || []).push(s);
-            return acc;
-          }, {});
+                    // group by shift type
+                    const byType = shifts.reduce((acc, s) => {
+                        (acc[s.shift] = acc[s.shift] || []).push(s);
+                        return acc;
+                    }, {});
 
-          // partial-day empty areas (uses openShiftBookingModal now)
-          const hasFull   = byType['full day'];
-          const hasMorn   = byType['morning'];
-          const hasEven   = byType['evening'];
+                    // partial-day empty areas (uses openShiftBookingModal now)
+                    const hasFull = byType['full day'];
+                    const hasMorn = byType['morning'];
+                    const hasEven = byType['evening'];
 
-          if (!hasFull && (hasMorn || hasEven)) {
-            const emptyArea = document.createElement('div');
-            emptyArea.className = 'empty-shift-area';
-            Object.assign(emptyArea.style, {
-              position: 'absolute',
-              backgroundColor: 'rgba(240,240,240,0.4)',
-              cursor: 'pointer',
-              zIndex: '9998',
-              border: '1px dashed rgba(0,0,0,0.15)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%'
-            });
+                    if (!hasFull && (hasMorn || hasEven)) {
+                        const emptyArea = document.createElement('div');
+                        emptyArea.className = 'empty-shift-area';
+                        Object.assign(emptyArea.style, {
+                            position: 'absolute',
+                            backgroundColor: 'rgba(240,240,240,0.4)',
+                            cursor: 'pointer',
+                            zIndex: '9998',
+                            border: '1px dashed rgba(0,0,0,0.15)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '100%'
+                        });
 
-            if (hasMorn && !hasEven) {
-              Object.assign(emptyArea.style, { bottom:'0', height:'50%' });
-              const t = document.createElement('span');
-              t.innerText = 'BOOK EVENING';
-              Object.assign(t.style, { fontSize:'11px', color:'rgba(0,0,0,0.7)', fontWeight:'500' });
-              emptyArea.appendChild(t);
-              emptyArea.addEventListener('click', e => {
-                e.stopPropagation();
-                openShiftBookingModal(dateStr, ['evening']);
-              });
-            }
-            else if (!hasMorn && hasEven) {
-              Object.assign(emptyArea.style, { top:'0', height:'50%' });
-              const t = document.createElement('span');
-              t.innerText = 'BOOK MORNING';
-              Object.assign(t.style, { fontSize:'11px', color:'rgba(0,0,0,0.7)', fontWeight:'500' });
-              emptyArea.appendChild(t);
-              emptyArea.addEventListener('click', e => {
-                e.stopPropagation();
-                openShiftBookingModal(dateStr, ['morning']);
-              });
-            }
+                        if (hasMorn && !hasEven) {
+                            Object.assign(emptyArea.style, { bottom: '0', height: '50%' });
+                            const t = document.createElement('span');
+                            t.innerText = 'BOOK EVENING';
+                            Object.assign(t.style, { fontSize: '11px', color: 'rgba(0,0,0,0.7)', fontWeight: '500' });
+                            emptyArea.appendChild(t);
+                            emptyArea.addEventListener('click', e => {
+                                e.stopPropagation();
+                                openShiftBookingModal(dateStr, ['evening']);
+                            });
+                        }
+                        else if (!hasMorn && hasEven) {
+                            Object.assign(emptyArea.style, { top: '0', height: '50%' });
+                            const t = document.createElement('span');
+                            t.innerText = 'BOOK MORNING';
+                            Object.assign(t.style, { fontSize: '11px', color: 'rgba(0,0,0,0.7)', fontWeight: '500' });
+                            emptyArea.appendChild(t);
+                            emptyArea.addEventListener('click', e => {
+                                e.stopPropagation();
+                                openShiftBookingModal(dateStr, ['morning']);
+                            });
+                        }
 
-            arg.el.appendChild(emptyArea);
-          }
+                        arg.el.appendChild(emptyArea);
+                    }
 
-          // render each booked shift, passing its booking record so we can show the address
-          Object.entries(byType).forEach(([type, list]) => {
-            const firstBooking = list[0];
-            const block = createShiftBlock(
-              type.toUpperCase(),
-              COLORS[type],
-              () => list.length > 1
-                   ? showMultipleBookingOptions(type.toUpperCase(), list)
-                   : viewBookingDetails(firstBooking.fullBookingData),
-              firstBooking    // <-- bookingData here
-            );
-            Object.assign(block.style, POS[type]);
-            arg.el.appendChild(block);
-          });
-        },
-
+                    // render each booked shift, passing its booking record so we can show the address
+                    Object.entries(byType).forEach(([type, list]) => {
+                        const firstBooking = list[0];
+                        const block = createShiftBlock(
+                            type.toUpperCase(),
+                            COLORS[type],
+                            () => list.length > 1
+                                ? showMultipleBookingOptions(type.toUpperCase(), list)
+                                : viewBookingDetails(firstBooking.fullBookingData),
+                            firstBooking    // <-- bookingData here
+                        );
+                        Object.assign(block.style, POS[type]);
+                        arg.el.appendChild(block);
+                    });
+                },
 
                 // Reload on navigation
                 datesSet() {
-                    loadEvents();
+                    refreshCalendar(); // Use the new refreshCalendar function
                 },
 
                 // Improve mobile handling
@@ -532,8 +539,6 @@
                     }
                 }
             });
-
-            calendar.render();
 
             // ─────────────────────────────────────────────────────────────────────────────
             // 3. HELPER FUNCTIONS FOR SHIFT BLOCKS
@@ -584,11 +589,11 @@
                 modalHtml += `</div>`;
 
                 $('#multiBookingBody').html(modalHtml);
-               // multiBookingModal.show();
+                // multiBookingModal.show();
             }
 
             // Global function to handle shift type selection
-            window.selectShiftType = function(dateStr, shiftType) {
+            window.selectShiftType = function (dateStr, shiftType) {
                 multiBookingModal.hide();
                 const shifts = shiftMap[dateStr].filter(s => s.shift === shiftType);
 
@@ -599,67 +604,62 @@
                 }
             };
 
-                  // ─────────────────────────────────────────────────────────────────────────────
-        // 2) createShiftBlock — now accepts bookingData and renders .address if present
-        // ─────────────────────────────────────────────────────────────────────────────
-        function createShiftBlock(labelText, bgColor, onClick, bookingData) {
-          const div = document.createElement('div');
-          div.className = 'shift-block';
-          Object.assign(div.style, {
-            position: 'absolute',
-            backgroundColor: bgColor,
-            cursor: 'pointer',
-            zIndex: '9999',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            padding: '3px 0'
-          });
+            // Create a shift block with the booking data
+            function createShiftBlock(labelText, bgColor, onClick, bookingData) {
+                const div = document.createElement('div');
+                div.className = 'shift-block';
+                Object.assign(div.style, {
+                    position: 'absolute',
+                    backgroundColor: bgColor,
+                    cursor: 'pointer',
+                    zIndex: '9999',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '100%',
+                    padding: '3px 0'
+                });
 
-          // shift label
-          const lbl = document.createElement('span');
-          lbl.innerText = labelText;
-          Object.assign(lbl.style, {
-            color: 'white',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            pointerEvents: 'none',
-            textAlign: 'center'
-          });
-          div.appendChild(lbl);
+                // shift label
+                const lbl = document.createElement('span');
+                lbl.innerText = labelText;
+                Object.assign(lbl.style, {
+                    color: 'white',
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                    pointerEvents: 'none',
+                    textAlign: 'center'
+                });
+                div.appendChild(lbl);
 
-          // address line (if available)
-          const addrText = bookingData
-            && bookingData.fullBookingData
-            && bookingData.fullBookingData.address;
-          if (addrText) {
-            const addr = document.createElement('span');
-            addr.innerText = addrText;
-            Object.assign(addr.style, {
-              color: 'white',
-              fontSize: '11px',
-              fontWeight: 'bold',
-              pointerEvents: 'none',
-              textAlign: 'center',
-              paddingTop: '2px',
-              maxWidth: '100%',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
-            });
-            div.appendChild(addr);
-          }
+                // address line (if available)
+                const addrText = bookingData && bookingData.fullBookingData && bookingData.fullBookingData.address;
+                if (addrText) {
+                    const addr = document.createElement('span');
+                    addr.innerText = addrText;
+                    Object.assign(addr.style, {
+                        color: 'white',
+                        fontSize: '11px',
+                        fontWeight: 'bold',
+                        pointerEvents: 'none',
+                        textAlign: 'center',
+                        paddingTop: '2px',
+                        maxWidth: '100%',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                    });
+                    div.appendChild(addr);
+                }
 
-          div.addEventListener('click', e => {
-            e.stopPropagation();
-            onClick();
-          });
+                div.addEventListener('click', e => {
+                    e.stopPropagation();
+                    onClick();
+                });
 
-          return div;
-        }
-
+                return div;
+            }
 
             function showMultipleBookingOptions(shiftLabel, bookings) {
                 let modalHtml = `
@@ -687,7 +687,7 @@
             }
 
             // Needs to be global for the onclick handler
-            window.selectBookingFromList = function(index) {
+            window.selectBookingFromList = function (index) {
                 multiBookingModal.hide();
                 const booking = window._bookingListBuffer[index];
                 viewBookingDetails(booking.fullBookingData);
@@ -706,19 +706,15 @@
                 $.ajax({
                     url: '/EventBooking/GetAllEventBookings',
                     type: 'GET'
-                }).done(function(bookings) {
+                }).done(function (bookings) {
                     shiftMap = {};
                     const bgEvents = [];
 
-                    bookings.forEach(function(booking) {
-                        const from = booking.fromDate
-                            ? new Date(booking.fromDate)
-                            : new Date(booking.createdDate);
-                        const to = booking.toDate
-                            ? new Date(booking.toDate)
-                            : booking.fromDate
-                                ? new Date(booking.fromDate)
-                                : new Date(booking.createdDate);
+                    bookings.forEach(function (booking) {
+                        const from = booking.fromDate ? new Date(booking.fromDate) : new Date(booking.createdDate);
+                        const to = booking.toDate ? new Date(booking.toDate) :
+                            booking.fromDate ? new Date(booking.fromDate) :
+                                new Date(booking.createdDate);
 
                         from.setHours(0, 0, 0, 0);
                         to.setHours(0, 0, 0, 0);
@@ -742,14 +738,12 @@
 
                             let dayArray;
                             if (parsedShifts.hasOwnProperty(key)) {
-                                dayArray = parsedShifts[key].length
-                                    ? parsedShifts[key]
-                                    : ['full day'];
+                                dayArray = parsedShifts[key].length ? parsedShifts[key] : ['full day'];
                             } else {
                                 dayArray = defaultShift;
                             }
 
-                            dayArray.forEach(function(item) {
+                            dayArray.forEach(function (item) {
                                 const shiftName = (typeof item === 'string' ? item : item.shift).toLowerCase();
                                 if (['morning', 'evening', 'full day'].includes(shiftName)) {
                                     shiftMap[key] = shiftMap[key] || [];
@@ -780,8 +774,8 @@
                     // Remove loading indicator
                     loadingIndicator.remove();
 
-                    // Load festivals if you're keeping this feature
-                    $.getJSON('/hindu_festivals_2025_2034.json', function(festivals) {
+                    // Load festivals
+                    $.getJSON('/hindu_festivals_2025_2034.json', function (festivals) {
                         const currentYear = calendar.view.currentStart.getFullYear();
                         const nextYear = currentYear + 1;
 
@@ -803,22 +797,148 @@
                             }
                         }));
 
-                        // First remove all current events (both types)
+                        // Clear and add events
                         calendar.removeAllEvents();
-
-                        // Add fresh events
                         [...bgEvents, ...festEvents].forEach(e => calendar.addEvent(e));
+
+                        // Force redraw of all cells
+                        // First remove any existing shift blocks that might be there
+                        $('.shift-block, .empty-shift-area').remove();
+
+                        // Force calendar to redraw all dates
                         calendar.render();
-                    }).fail(function() {
-                        // If festivals JSON fails, still render the bookings
+
+                        // Apply shift blocks manually for all visible dates
+                        applyShiftBlocksToVisibleDates();
+
+                    }).fail(function () {
+                        // Festivals fetch failed, but still show bookings
                         calendar.removeAllEvents();
                         bgEvents.forEach(e => calendar.addEvent(e));
+
+                        // Force calendar to redraw all dates
                         calendar.render();
+
+                        // Apply shift blocks manually for all visible dates
+                        applyShiftBlocksToVisibleDates();
                     });
-                }).fail(function() {
+
+                }).fail(function () {
                     // Remove loading indicator
                     loadingIndicator.remove();
                     showMessage('Failed to load bookings.', 'error');
+                });
+            }
+
+            // New function to manually apply shift blocks to all visible dates
+            function applyShiftBlocksToVisibleDates() {
+                // Get all date cells from the calendar
+                const dateCells = document.querySelectorAll('.fc-daygrid-day');
+
+                // For each cell, find its date and apply the proper shift blocks
+                dateCells.forEach(cell => {
+                    // Get the date from the cell's data attribute
+                    const dateAttr = cell.getAttribute('data-date');
+                    if (!dateAttr) return;
+
+                    // Get shifts for this date
+                    const shifts = shiftMap[dateAttr] || [];
+                    if (!shifts.length) return;
+
+                    // Position the cell properly
+                    cell.style.position = 'relative';
+                    cell.style.overflow = 'hidden';
+
+                    const COLORS = {
+                        'full day': 'rgba(34,197,94,0.85)',
+                        'morning': 'rgba(255,165,0,0.85)',
+                        'evening': 'rgba(0,128,255,0.85)'
+                    };
+                    const POS = {
+                        'full day': { top: '0', bottom: '0', left: '0', right: '0' },
+                        'morning': { top: '0', height: '50%', left: '0', right: '0' },
+                        'evening': { bottom: '0', height: '50%', left: '0', right: '0' }
+                    };
+
+                    // Group by shift type
+                    const byType = shifts.reduce((acc, s) => {
+                        (acc[s.shift] = acc[s.shift] || []).push(s);
+                        return acc;
+                    }, {});
+
+                    // Handle partial-day empty areas
+                    const hasFull = byType['full day'];
+                    const hasMorn = byType['morning'];
+                    const hasEven = byType['evening'];
+
+                    if (!hasFull && (hasMorn || hasEven)) {
+                        const emptyArea = document.createElement('div');
+                        emptyArea.className = 'empty-shift-area';
+                        Object.assign(emptyArea.style, {
+                            position: 'absolute',
+                            backgroundColor: 'rgba(240,240,240,0.4)',
+                            cursor: 'pointer',
+                            zIndex: '9998',
+                            border: '1px dashed rgba(0,0,0,0.15)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '100%'
+                        });
+
+                        if (hasMorn && !hasEven) {
+                            Object.assign(emptyArea.style, { bottom: '0', height: '50%' });
+                            const t = document.createElement('span');
+                            t.innerText = 'BOOK EVENING';
+                            Object.assign(t.style, { fontSize: '11px', color: 'rgba(0,0,0,0.7)', fontWeight: '500' });
+                            emptyArea.appendChild(t);
+                            emptyArea.addEventListener('click', e => {
+                                e.stopPropagation();
+                                openShiftBookingModal(dateAttr, ['evening']);
+                            });
+                        }
+                        else if (!hasMorn && hasEven) {
+                            Object.assign(emptyArea.style, { top: '0', height: '50%' });
+                            const t = document.createElement('span');
+                            t.innerText = 'BOOK MORNING';
+                            Object.assign(t.style, { fontSize: '11px', color: 'rgba(0,0,0,0.7)', fontWeight: '500' });
+                            emptyArea.appendChild(t);
+                            emptyArea.addEventListener('click', e => {
+                                e.stopPropagation();
+                                openShiftBookingModal(dateAttr, ['morning']);
+                            });
+                        }
+
+                        // Find the day-frame element inside the cell
+                        const frame = cell.querySelector('.fc-daygrid-day-frame');
+                        if (frame) {
+                            frame.appendChild(emptyArea);
+                        } else {
+                            cell.appendChild(emptyArea);
+                        }
+                    }
+
+                    // Render each booked shift
+                    Object.entries(byType).forEach(([type, list]) => {
+                        const firstBooking = list[0];
+                        const block = createShiftBlock(
+                            type.toUpperCase(),
+                            COLORS[type],
+                            () => list.length > 1
+                                ? showMultipleBookingOptions(type.toUpperCase(), list)
+                                : viewBookingDetails(firstBooking.fullBookingData),
+                            firstBooking
+                        );
+                        Object.assign(block.style, POS[type]);
+
+                        // Find the day-frame element inside the cell
+                        const frame = cell.querySelector('.fc-daygrid-day-frame');
+                        if (frame) {
+                            frame.appendChild(block);
+                        } else {
+                            cell.appendChild(block);
+                        }
+                    });
                 });
             }
 
@@ -828,6 +948,7 @@
                 /* Calendar cell styling */
                 .fc-daygrid-day-frame {
                     min-height: 100px;
+                    position: relative; /* Add this to ensure proper positioning */
                 }
 
                 /* Festival styling */
@@ -906,9 +1027,20 @@
             `;
             document.head.appendChild(responsiveStyles);
 
-            // Initial load
+            // Render the calendar
+            calendar.render();
+
+            // Initial load events and apply colors
             loadEvents();
-        
+
+            // Ensure shift blocks are applied correctly when calendar is fully loaded
+            $(window).on('load', function() {
+                // Short timeout to ensure calendar is fully rendered
+                setTimeout(function() {
+                    applyShiftBlocksToVisibleDates();
+                }, 100);
+            });
+       
 
         // ─────────────────────────────────────────────────────────────────────────────
         // 5. BOOKING FORM HANDLING
@@ -1661,12 +1793,8 @@
         }
 
         // Function to send WhatsApp confirmation
-        function sendWhatsAppConfirmation(booking) {
-            // Format dates for the message
+                function sendWhatsAppConfirmation(booking) {
             const fromDate = formatDate(booking.fromDate);
-            const toDate = booking.fromDate !== booking.toDate ? ` to ${formatDate(booking.toDate)}` : '';
-
-            // Get the phone number to send to (remove any non-digits)
             const phoneNumber = (booking.phoneNumber || '').replace(/\D/g, '');
 
             if (!phoneNumber) {
@@ -1674,32 +1802,14 @@
                 return;
             }
 
-            // Create the confirmation message
-            const message = `Dear ${booking.customerName || 'Customer'},
+            // Your updated message format
+            const message = `Thank you : ${booking.customerName || 'Customer'} for booking with us. Your booking for "${booking.eventName || 'Event'}" has been confirmed for ${fromDate}.`;
 
-        Thank you for booking with us for ${fromDate}${toDate}. Your booking for "${booking.eventName || 'Event'}" has been confirmed.
-
-        *Booking Details:*
-        - Event: ${booking.eventName || 'Event'}
-        - Date: ${fromDate}${toDate}
-        - Shift: ${capitalizeFirstLetter(booking.shiftType) || 'Full Day'}
-        - Status: ${booking.bookingStatus || 'Confirmed'}
-        - Amount: ₹${(booking.totalAmount || 0).toFixed(2)}
-
-        We look forward to serving you!
-
-        Best regards,
-        [Your Company Name]`;
-
-            // Encode the message for WhatsApp
             const encodedMessage = encodeURIComponent(message);
-
-            // Open WhatsApp with the pre-filled message
             window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
-
-            // Show success toast
             showToast('Confirmation message prepared for WhatsApp', 'success');
         }
+
 
         // Helper function to show toast notifications
         function showToast(message, type = 'info') {
