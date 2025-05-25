@@ -33,7 +33,7 @@ namespace DbOperation.Implementation
                     {
                         bookings.createdDate = DateTime.Now;
                         
-                            bookings.userId = 6; // Default fallback
+                            bookings.userId = 1; // Default fallback
 
                         db.Bookings.Add(bookings);
                     }

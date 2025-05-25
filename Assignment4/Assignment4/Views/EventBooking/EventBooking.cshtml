@@ -400,8 +400,8 @@
                 height: 'auto',
                 headerToolbar: {
                     left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,dayGridWeek'
+                    center: 'title'
+                   
                 },
 
                 // Handle date clicks with partial bookings
@@ -533,7 +533,7 @@
                 // Improve mobile handling
                 windowResize(view) {
                     if (window.innerWidth < 768) {
-                        calendar.changeView('dayGridWeek');
+                        calendar.changeView('dayGridMonth');
                     } else {
                         calendar.changeView('dayGridMonth');
                     }
