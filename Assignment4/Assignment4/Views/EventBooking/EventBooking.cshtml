@@ -78,13 +78,21 @@
 
         <!-- Alert Messages Container -->
         <div id="message-container" class="mb-3"></div>
-
-        <!-- Calendar Container -->
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <div id="calendar"></div>
+        <!-- Loader -->
+        <div id="calendar-loader" class="d-none position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-75" style="z-index: 1050;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
         </div>
+
+
+        <div class="card-body position-relative">
+            <!-- Loader here -->
+            <div id="calendar-loader" ...></div>
+
+            <div id="calendar"></div>
+        </div>
+
     </div>
 
     <!-- New/Edit Booking Modal -->
@@ -274,6 +282,14 @@
                 }
                 return false;
             }
+                    function showCalendarLoader() {
+            $('#calendar-loader').removeClass('d-none');
+        }
+
+        function hideCalendarLoader() {
+            $('#calendar-loader').addClass('d-none');
+        }
+
 
             // Open booking modal with optional available shifts
             function openBookingModal(date, availableShifts = null) {
@@ -697,138 +713,128 @@
             // 4. DATA LOADING
             // ─────────────────────────────────────────────────────────────────────────────
 
-            function loadEvents() {
-                // Show loading indicator
-                const loadingIndicator = $('<div class="text-center my-3"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
-                $('#calendar').append(loadingIndicator);
+                    function loadEvents() {
+            // Show overlay loader (you've already placed the overlay div in the HTML)
+            showCalendarLoader();
 
-                // Fetch bookings
-                $.ajax({
-                    url: '/EventBooking/GetAllEventBookings',
-                    type: 'GET'
-                }).done(function (bookings) {
-                    shiftMap = {};
-                    const bgEvents = [];
+            $.ajax({
+                url: '/EventBooking/GetAllEventBookings',
+                type: 'GET'
+            }).done(function (bookings) {
+                shiftMap = {};
+                const bgEvents = [];
 
-                    bookings.forEach(function (booking) {
-                        const from = booking.fromDate ? new Date(booking.fromDate) : new Date(booking.createdDate);
-                        const to = booking.toDate ? new Date(booking.toDate) :
-                            booking.fromDate ? new Date(booking.fromDate) :
-                                new Date(booking.createdDate);
+                bookings.forEach(function (booking) {
+                    const from = booking.fromDate ? new Date(booking.fromDate) : new Date(booking.createdDate);
+                    const to = booking.toDate ? new Date(booking.toDate) :
+                        booking.fromDate ? new Date(booking.fromDate) :
+                            new Date(booking.createdDate);
 
-                        from.setHours(0, 0, 0, 0);
-                        to.setHours(0, 0, 0, 0);
+                    from.setHours(0, 0, 0, 0);
+                    to.setHours(0, 0, 0, 0);
 
-                        const parsedShifts = booking.dateWiseShifts
-                            ? JSON.parse(booking.dateWiseShifts)
-                            : {};
+                    const parsedShifts = booking.dateWiseShifts
+                        ? JSON.parse(booking.dateWiseShifts)
+                        : {};
 
-                        let defaultShift = [];
-                        if (booking.shiftType) {
-                            const s = booking.shiftType.toLowerCase();
-                            if (['morning', 'evening', 'full day'].includes(s)) {
-                                defaultShift = [s];
-                            }
+                    let defaultShift = [];
+                    if (booking.shiftType) {
+                        const s = booking.shiftType.toLowerCase();
+                        if (['morning', 'evening', 'full day'].includes(s)) {
+                            defaultShift = [s];
+                        }
+                    } else {
+                        defaultShift = ['full day'];
+                    }
+
+                    for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
+                        const key = localYMD(d);
+
+                        let dayArray;
+                        if (parsedShifts.hasOwnProperty(key)) {
+                            dayArray = parsedShifts[key].length ? parsedShifts[key] : ['full day'];
                         } else {
-                            defaultShift = ['full day'];
+                            dayArray = defaultShift;
                         }
 
-                        for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
-                            const key = localYMD(d);
-
-                            let dayArray;
-                            if (parsedShifts.hasOwnProperty(key)) {
-                                dayArray = parsedShifts[key].length ? parsedShifts[key] : ['full day'];
-                            } else {
-                                dayArray = defaultShift;
+                        dayArray.forEach(function (item) {
+                            const shiftName = (typeof item === 'string' ? item : item.shift).toLowerCase();
+                            if (['morning', 'evening', 'full day'].includes(shiftName)) {
+                                shiftMap[key] = shiftMap[key] || [];
+                                shiftMap[key].push({
+                                    shift: shiftName,
+                                    fullBookingData: booking
+                                });
                             }
-
-                            dayArray.forEach(function (item) {
-                                const shiftName = (typeof item === 'string' ? item : item.shift).toLowerCase();
-                                if (['morning', 'evening', 'full day'].includes(shiftName)) {
-                                    shiftMap[key] = shiftMap[key] || [];
-                                    shiftMap[key].push({
-                                        shift: shiftName,
-                                        fullBookingData: booking
-                                    });
-                                }
-                            });
-                        }
-
-                        const bgStart = new Date(from);
-                        const bgEnd = new Date(to);
-                        bgEnd.setDate(bgEnd.getDate() + 1);
-
-                        bgEvents.push({
-                            id: booking.bookingId,
-                            title: booking.customerName || '',
-                            start: localYMD(bgStart),
-                            end: localYMD(bgEnd),
-                            display: 'background',
-                            backgroundColor: 'rgba(0,0,0,0)',
-                            borderColor: 'transparent',
-                            extendedProps: booking
                         });
+                    }
+
+                    const bgStart = new Date(from);
+                    const bgEnd = new Date(to);
+                    bgEnd.setDate(bgEnd.getDate() + 1);
+
+                    bgEvents.push({
+                        id: booking.bookingId,
+                        title: booking.customerName || '',
+                        start: localYMD(bgStart),
+                        end: localYMD(bgEnd),
+                        display: 'background',
+                        backgroundColor: 'rgba(0,0,0,0)',
+                        borderColor: 'transparent',
+                        extendedProps: booking
                     });
-
-                    // Remove loading indicator
-                    loadingIndicator.remove();
-
-                    // Load festivals
-                    $.getJSON('/hindu_festivals_2025_2034.json', function (festivals) {
-                        const currentYear = calendar.view.currentStart.getFullYear();
-                        const nextYear = currentYear + 1;
-
-                        const filteredFestivals = festivals.filter(fest => {
-                            const year = new Date(fest.date).getFullYear();
-                            return year === currentYear || year === nextYear;
-                        });
-
-                        const festEvents = filteredFestivals.map(fest => ({
-                            title: fest.name,
-                            start: fest.date,
-                            allDay: true,
-                            display: 'auto',
-                            backgroundColor: '#FFD700',
-                            textColor: '#000',
-                            extendedProps: {
-                                type: fest.type,
-                                region: fest.region
-                            }
-                        }));
-
-                        // Clear and add events
-                        calendar.removeAllEvents();
-                        [...bgEvents, ...festEvents].forEach(e => calendar.addEvent(e));
-
-                        // Force redraw of all cells
-                        // First remove any existing shift blocks that might be there
-                        $('.shift-block, .empty-shift-area').remove();
-
-                        // Force calendar to redraw all dates
-                        calendar.render();
-
-                        // Apply shift blocks manually for all visible dates
-                        applyShiftBlocksToVisibleDates();
-
-                    }).fail(function () {
-                        // Festivals fetch failed, but still show bookings
-                        calendar.removeAllEvents();
-                        bgEvents.forEach(e => calendar.addEvent(e));
-
-                        // Force calendar to redraw all dates
-                        calendar.render();
-
-                        // Apply shift blocks manually for all visible dates
-                        applyShiftBlocksToVisibleDates();
-                    });
-
-                }).fail(function () {
-                    // Remove loading indicator
-                    loadingIndicator.remove();
-                    showMessage('Failed to load bookings.', 'error');
                 });
-            }
+
+                // Load festivals
+                $.getJSON('/hindu_festivals_2025_2034.json', function (festivals) {
+                    const currentYear = calendar.view.currentStart.getFullYear();
+                    const nextYear = currentYear + 1;
+
+                    const filteredFestivals = festivals.filter(fest => {
+                        const year = new Date(fest.date).getFullYear();
+                        return year === currentYear || year === nextYear;
+                    });
+
+                    const festEvents = filteredFestivals.map(fest => ({
+                        title: fest.name,
+                        start: fest.date,
+                        allDay: true,
+                        display: 'auto',
+                        backgroundColor: '#FFD700',
+                        textColor: '#000',
+                        extendedProps: {
+                            type: fest.type,
+                            region: fest.region
+                        }
+                    }));
+
+                    calendar.removeAllEvents();
+                    [...bgEvents, ...festEvents].forEach(e => calendar.addEvent(e));
+
+                    $('.shift-block, .empty-shift-area').remove();
+                    calendar.render();
+                    applyShiftBlocksToVisibleDates();
+
+                    // Hide loader after everything is rendered
+                    hideCalendarLoader();
+                }).fail(function () {
+                    // Still show bookings if festival load fails
+                    calendar.removeAllEvents();
+                    bgEvents.forEach(e => calendar.addEvent(e));
+
+                    $('.shift-block, .empty-shift-area').remove();
+                    calendar.render();
+                    applyShiftBlocksToVisibleDates();
+
+                    hideCalendarLoader();
+                });
+
+            }).fail(function () {
+                showMessage('Failed to load bookings.', 'error');
+                hideCalendarLoader();
+            });
+        }
+
 
             // New function to manually apply shift blocks to all visible dates
             function applyShiftBlocksToVisibleDates() {
