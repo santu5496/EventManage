@@ -32,10 +32,13 @@ namespace DbOperation.Implementation
                     if (bookings.bookingId == 0)
                     {
                         bookings.createdDate = DateTime.Now;
-                        
-                            bookings.userId = 1; // Default fallback
+                        var existing = db.Users.FirstOrDefault();
+                        var userid = existing.userId;
+
+                        bookings.userId = userid;
 
                         db.Bookings.Add(bookings);
+                        
                     }
                     else
                     {
