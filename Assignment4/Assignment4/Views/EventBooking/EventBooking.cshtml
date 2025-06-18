@@ -265,6 +265,58 @@
             line-height: 1.2;
         }
 
+        /* Enhanced Touch and Click Effects */
+        .touchable-element {
+            transition: all 0.15s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        .touch-pressed {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+
+        .touch-clicked,
+        .click-animation {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .hover-effect:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Enhanced Modal Styles */
+        .modal-dialog-scrollable .modal-content {
+            max-height: 90vh;
+        }
+
+        .date-info {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .shift-action-btn {
+            transition: all 0.2s ease;
+            border-width: 2px;
+        }
+
+            .shift-action-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            .shift-action-btn:active {
+                transform: translateY(0);
+            }
+
+            .shift-action-btn:disabled {
+                transform: none;
+                opacity: 0.6;
+            }
+
         /* Modal Enhancements */
         .modal-dialog {
             margin: 0.5rem;
@@ -1045,7 +1097,7 @@
             }
 
             // ─────────────────────────────────────────────────────────────────────────────
-            // 2. MOBILE TOUCH EVENT HANDLERS (FIXED)
+            // 2. ENHANCED MOBILE TOUCH EVENT HANDLERS
             // ─────────────────────────────────────────────────────────────────────────────
 
             function addMobileTouchEvents(element, clickHandler) {
@@ -1053,60 +1105,139 @@
 
                 let touchStartTime = 0;
                 let touchMoved = false;
+                let touchStartPos = { x: 0, y: 0 };
 
+                // Add visual feedback class
+                element.classList.add('touchable-element');
+
+                // Touch start
                 element.addEventListener('touchstart', function(e) {
                     touchStartTime = Date.now();
                     touchMoved = false;
-                    e.stopPropagation(); // Prevent calendar events
+                    touchStartPos = {
+                        x: e.touches[0].clientX,
+                        y: e.touches[0].clientY
+                    };
+
+                    // Add pressed state
+                    element.classList.add('touch-pressed');
+
+                    // Haptic feedback
+                    if (navigator.vibrate) {
+                        navigator.vibrate(10);
+                    }
+
+                    e.stopPropagation();
                 }, { passive: false });
 
+                // Touch move
                 element.addEventListener('touchmove', function(e) {
-                    touchMoved = true;
+                    const moveThreshold = 10; // pixels
+                    const currentPos = {
+                        x: e.touches[0].clientX,
+                        y: e.touches[0].clientY
+                    };
+
+                    const distance = Math.sqrt(
+                        Math.pow(currentPos.x - touchStartPos.x, 2) +
+                        Math.pow(currentPos.y - touchStartPos.y, 2)
+                    );
+
+                    if (distance > moveThreshold) {
+                        touchMoved = true;
+                        element.classList.remove('touch-pressed');
+                    }
                 }, { passive: true });
 
+                // Touch end
                 element.addEventListener('touchend', function(e) {
                     const touchDuration = Date.now() - touchStartTime;
 
-                    if (!touchMoved && touchDuration < 500) {
+                    // Remove pressed state
+                    element.classList.remove('touch-pressed');
+
+                    if (!touchMoved && touchDuration < 800) {
                         e.preventDefault();
                         e.stopPropagation();
                         e.stopImmediatePropagation();
-                        clickHandler(e);
+
+                        // Add clicked animation
+                        element.classList.add('touch-clicked');
+                        setTimeout(() => {
+                            element.classList.remove('touch-clicked');
+                        }, 150);
+
+                        // Execute click handler with slight delay for visual feedback
+                        setTimeout(() => {
+                            clickHandler(e);
+                        }, 50);
                     }
                 }, { passive: false });
 
-                // Desktop click events
+                // Touch cancel
+                element.addEventListener('touchcancel', function(e) {
+                    element.classList.remove('touch-pressed');
+                    touchMoved = true;
+                }, { passive: true });
+
+                // Desktop click events with enhanced feedback
                 element.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    clickHandler(e);
+                    if (!isMobile) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+
+                        // Add clicked animation for desktop
+                        element.classList.add('click-animation');
+                        setTimeout(() => {
+                            element.classList.remove('click-animation');
+                        }, 150);
+
+                        clickHandler(e);
+                    }
                 });
+
+                // Enhanced hover effects for desktop
+                if (!isMobile) {
+                    element.addEventListener('mouseenter', function() {
+                        element.classList.add('hover-effect');
+                    });
+
+                    element.addEventListener('mouseleave', function() {
+                        element.classList.remove('hover-effect');
+                    });
+                }
             }
 
+            // Enhanced shift selection popup with better UX
             function showShiftSelectionPopup(dateStr) {
-                // First, ensure no other modals are open
+                // Prevent multiple modals
+                if ($('#shiftSelectionModal').length > 0) {
+                    return;
+                }
+
+                // Close any existing modals
                 $('.modal').modal('hide');
-                $('#shiftSelectionModal').remove();
 
                 const shifts = shiftMap[dateStr] || [];
                 const bookedShiftTypes = shifts.map(s => s.shift);
 
                 let popupHtml = `
                     <div class="modal fade" id="shiftSelectionModal" tabindex="-1" data-bs-backdrop="static">
-                        <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title">
                                         <i class="bi bi-calendar-check me-2"></i>Select Action
                                     </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <p class="text-muted mb-3">
-                                        <i class="bi bi-calendar-date me-1"></i>Date: ${formatDate(dateStr)}
-                                    </p>
-                                    <div class="d-grid gap-2">
+                                    <div class="date-info mb-3 p-3 bg-light rounded">
+                                        <i class="bi bi-calendar-date me-2 text-primary"></i>
+                                        <strong>${formatDate(dateStr)}</strong>
+                                    </div>
+                                    <div class="d-grid gap-3">
                 `;
 
                 // Show available shifts for booking
@@ -1123,12 +1254,19 @@
 
                 // Add booking options for available shifts
                 availableShifts.forEach(shift => {
+                    const shiftIcon = shift === 'morning' ? 'sunrise' : shift === 'evening' ? 'sunset' : 'sun';
+                    const shiftColor = shift === 'morning' ? 'warning' : shift === 'evening' ? 'info' : 'success';
+
                     popupHtml += `
-                        <button class="btn btn-success btn-lg shift-action-btn"
+                        <button class="btn btn-outline-${shiftColor} btn-lg shift-action-btn d-flex align-items-center justify-content-center"
                                 data-action="book"
                                 data-date="${dateStr}"
-                                data-shift="${shift}">
-                            <i class="bi bi-plus-circle me-2"></i>Book ${capitalizeFirstLetter(shift)}
+                                data-shift="${shift}"
+                                style="min-height: 60px;">
+                            <div class="text-center">
+                                <i class="bi bi-${shiftIcon} fs-4 mb-1 d-block"></i>
+                                <span class="fw-bold">Book ${capitalizeFirstLetter(shift)}</span>
+                            </div>
                         </button>
                     `;
                 });
@@ -1137,19 +1275,40 @@
                 const bookedShiftTypesUnique = [...new Set(bookedShiftTypes)];
                 bookedShiftTypesUnique.forEach(shift => {
                     const shiftBookings = shifts.filter(s => s.shift === shift);
+                    const firstBooking = shiftBookings[0]?.fullBookingData;
+                    const shiftIcon = shift === 'morning' ? 'sunrise' : shift === 'evening' ? 'sunset' : 'sun';
+                    const shiftColor = shift === 'morning' ? 'warning' : shift === 'evening' ? 'info' : 'success';
+
                     popupHtml += `
-                        <button class="btn btn-primary btn-lg shift-action-btn"
+                        <button class="btn btn-${shiftColor} btn-lg shift-action-btn d-flex align-items-center"
                                 data-action="view"
                                 data-date="${dateStr}"
-                                data-shift="${shift}">
-                            <i class="bi bi-eye me-2"></i>View ${capitalizeFirstLetter(shift)} Booking${shiftBookings.length > 1 ? 's' : ''}
-                            ${shiftBookings.length > 1 ? `<span class="badge bg-light text-dark ms-2">${shiftBookings.length}</span>` : ''}
+                                data-shift="${shift}"
+                                style="min-height: 60px;">
+                            <div class="me-3">
+                                <i class="bi bi-${shiftIcon} fs-4"></i>
+                            </div>
+                            <div class="flex-grow-1 text-start">
+                                <div class="fw-bold">${capitalizeFirstLetter(shift)} Booking${shiftBookings.length > 1 ? 's' : ''}</div>
+                                <small class="opacity-75">
+                                    ${firstBooking?.customerName || 'Customer'}
+                                    ${shiftBookings.length > 1 ? `+ ${shiftBookings.length - 1} more` : ''}
+                                </small>
+                            </div>
+                            <div>
+                                <i class="bi bi-eye fs-5"></i>
+                            </div>
                         </button>
                     `;
                 });
 
                 popupHtml += `
                                     </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        <i class="bi bi-x-circle me-1"></i>Cancel
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1159,52 +1318,71 @@
                 // Add to body
                 $('body').append(popupHtml);
 
-                // Show the modal
+                // Initialize modal with enhanced options
                 const modal = new bootstrap.Modal(document.getElementById('shiftSelectionModal'), {
-                    backdrop: 'static'
+                    backdrop: 'static',
+                    keyboard: true,
+                    focus: true
                 });
 
-                // Add click handlers for action buttons
+                // Enhanced click handlers with loading states
                 $(document).on('click', '.shift-action-btn', function() {
-                    const action = $(this).data('action');
-                    const date = $(this).data('date');
-                    const shift = $(this).data('shift');
+                    const $btn = $(this);
+                    const action = $btn.data('action');
+                    const date = $btn.data('date');
+                    const shift = $btn.data('shift');
 
-                    // Hide the selection modal first
+                    // Add loading state
+                    const originalHtml = $btn.html();
+                    $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Loading...');
+
+                    // Hide modal with callback
                     modal.hide();
 
-                    // Wait for modal to fully hide, then perform action
-                    setTimeout(() => {
-                        if (action === 'book') {
-                            openBookingModalWithShift(date, shift);
-                        } else if (action === 'view') {
-                            viewShiftBookingsForDate(date, shift);
-                        }
-                    }, 300);
+                    $('#shiftSelectionModal').on('hidden.bs.modal', function() {
+                        setTimeout(() => {
+                            if (action === 'book') {
+                                openBookingModalWithShift(date, shift);
+                            } else if (action === 'view') {
+                                viewShiftBookingsForDate(date, shift);
+                            }
+                        }, 100);
+                    });
                 });
 
                 // Clean up when modal is hidden
                 $('#shiftSelectionModal').on('hidden.bs.modal', function() {
                     $(this).remove();
-                    $(document).off('click', '.shift-action-btn'); // Remove event listeners
+                    $(document).off('click', '.shift-action-btn');
                 });
 
+                // Show modal with animation
                 modal.show();
+
+                // Focus first action button for accessibility
+                setTimeout(() => {
+                    $('.shift-action-btn').first().focus();
+                }, 300);
             }
 
             function viewShiftBookingsForDate(dateStr, shiftType) {
+                // Show loading state
+                showToast('Loading booking details...', 'info');
+
                 const shifts = shiftMap[dateStr].filter(s => s.shift === shiftType);
 
-                if (shifts.length === 1) {
-                    // Single booking - show details directly
-                    viewBookingDetails(shifts[0].fullBookingData);
-                } else if (shifts.length > 1) {
-                    // Multiple bookings - show selection list
-                    showMultipleBookingOptions(shiftType.toUpperCase(), shifts);
-                } else {
-                    // No bookings found (shouldn't happen)
-                    showMessage('No bookings found for this shift.', 'error');
-                }
+                setTimeout(() => {
+                    if (shifts.length === 1) {
+                        // Single booking - show details directly
+                        viewBookingDetails(shifts[0].fullBookingData);
+                    } else if (shifts.length > 1) {
+                        // Multiple bookings - show selection list
+                        showMultipleBookingOptions(shiftType.toUpperCase(), shifts);
+                    } else {
+                        // No bookings found (shouldn't happen)
+                        showMessage('No bookings found for this shift.', 'error');
+                    }
+                }, 200);
             }
 
             // ─────────────────────────────────────────────────────────────────────────────
@@ -1320,28 +1498,42 @@
                     center: 'title'
                 },
 
-                // FIXED: Enhanced date click with proper modal handling
+                // FIXED: Enhanced date click with debouncing and better UX
                 dateClick(info) {
-                    const dateStr = info.dateStr;
-                    const shifts = shiftMap[dateStr] || [];
-
-                    // Prevent any other modals from interfering
-                    $('.modal').modal('hide');
-
-                    const bookedShiftTypes = shifts.map(s => s.shift);
-                    const isCompletelyEmpty = bookedShiftTypes.length === 0;
-
-                    // Case 1: Empty date — allow full booking modal
-                    if (isCompletelyEmpty) {
-                        setTimeout(() => {
-                            showShiftSelectionPopup(dateStr);
-                        }, 100);
-                        return;
+                    // Debounce to prevent multiple rapid clicks
+                    if (this.dateClickTimeout) {
+                        clearTimeout(this.dateClickTimeout);
                     }
 
-                    // Case 2: Partially or Fully Booked — show "Select Action" popup only
-                    setTimeout(() => {
-                        showShiftSelectionPopup(dateStr);
+                    this.dateClickTimeout = setTimeout(() => {
+                        const dateStr = info.dateStr;
+                        const shifts = shiftMap[dateStr] || [];
+
+                        // Prevent any other modals from interfering
+                        $('.modal').modal('hide');
+
+                        const bookedShiftTypes = shifts.map(s => s.shift);
+                        const isCompletelyEmpty = bookedShiftTypes.length === 0;
+
+                        // Add visual feedback to the clicked date cell
+                        const dayCell = info.dayEl;
+                        dayCell.classList.add('click-animation');
+                        setTimeout(() => {
+                            dayCell.classList.remove('click-animation');
+                        }, 200);
+
+                        // Case 1: Empty date — show shift selection popup
+                        if (isCompletelyEmpty) {
+                            setTimeout(() => {
+                                showShiftSelectionPopup(dateStr);
+                            }, 150);
+                            return;
+                        }
+
+                        // Case 2: Partially or Fully Booked — show "Select Action" popup
+                        setTimeout(() => {
+                            showShiftSelectionPopup(dateStr);
+                        }, 150);
                     }, 100);
                 },
 
