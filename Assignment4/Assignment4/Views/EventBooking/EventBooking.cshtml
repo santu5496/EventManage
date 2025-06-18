@@ -1242,13 +1242,13 @@
 
                 // Show available shifts for booking
                 const availableShifts = [];
-                if (!bookedShiftTypes.includes('morning') && !bookedShiftTypes.includes('full day')) {
+                if (!bookedShiftTypes.includes('morning') && !bookedShiftTypes.includes('full day') && !bookedShiftTypes.includes('fullday')) {
                     availableShifts.push('morning');
                 }
-                if (!bookedShiftTypes.includes('evening') && !bookedShiftTypes.includes('full day')) {
+                if (!bookedShiftTypes.includes('evening') && !bookedShiftTypes.includes('full day') && !bookedShiftTypes.includes('fullday')) {
                     availableShifts.push('evening');
                 }
-                if (!bookedShiftTypes.includes('full day') && bookedShiftTypes.length === 0) {
+                if (!bookedShiftTypes.includes('full day') && !bookedShiftTypes.includes('fullday') && bookedShiftTypes.length === 0) {
                     availableShifts.push('full day');
                 }
 
@@ -1271,11 +1271,20 @@
                     `;
                 });
 
-                // Add view options for booked shifts
-                const bookedShiftTypesUnique = [...new Set(bookedShiftTypes)];
+                // Normalize booked shift types for display
+                const normalizedBookedTypes = bookedShiftTypes.map(shift =>
+                    shift === 'fullday' ? 'full day' : shift
+                );
+                const bookedShiftTypesUnique = [...new Set(normalizedBookedTypes)];
+
                 bookedShiftTypesUnique.forEach(shift => {
-                    const shiftBookings = shifts.filter(s => s.shift === shift);
-                    const firstBooking = shiftBookings[0]?.fullBookingData;
+                    // Find shifts matching this type (handle both 'fullday' and 'full day')
+                    const matchingShifts = shifts.filter(s => {
+                        const normalizedShift = s.shift === 'fullday' ? 'full day' : s.shift;
+                        return normalizedShift === shift;
+                    });
+
+                    const firstBooking = matchingShifts[0]?.fullBookingData;
                     const shiftIcon = shift === 'morning' ? 'sunrise' : shift === 'evening' ? 'sunset' : 'sun';
                     const shiftColor = shift === 'morning' ? 'warning' : shift === 'evening' ? 'info' : 'success';
 
@@ -1289,10 +1298,10 @@
                                 <i class="bi bi-${shiftIcon} fs-4"></i>
                             </div>
                             <div class="flex-grow-1 text-start">
-                                <div class="fw-bold">${capitalizeFirstLetter(shift)} Booking${shiftBookings.length > 1 ? 's' : ''}</div>
+                                <div class="fw-bold">${capitalizeFirstLetter(shift)} Booking${matchingShifts.length > 1 ? 's' : ''}</div>
                                 <small class="opacity-75">
                                     ${firstBooking?.customerName || 'Customer'}
-                                    ${shiftBookings.length > 1 ? `+ ${shiftBookings.length - 1} more` : ''}
+                                    ${matchingShifts.length > 1 ? `+ ${matchingShifts.length - 1} more` : ''}
                                 </small>
                             </div>
                             <div>
@@ -1369,7 +1378,14 @@
                 // Show loading state
                 showToast('Loading booking details...', 'info');
 
-                const shifts = shiftMap[dateStr].filter(s => s.shift === shiftType);
+                // Handle both 'fullday' and 'full day' variations
+                const normalizedShiftType = shiftType === 'fullday' ? 'full day' : shiftType;
+                const targetShiftType = shiftType === 'full day' ? 'fullday' : shiftType;
+
+                const shifts = shiftMap[dateStr].filter(s => {
+                    const normalizedShift = s.shift === 'fullday' ? 'full day' : s.shift;
+                    return normalizedShift === normalizedShiftType || s.shift === targetShiftType;
+                });
 
                 setTimeout(() => {
                     if (shifts.length === 1) {
@@ -1377,7 +1393,7 @@
                         viewBookingDetails(shifts[0].fullBookingData);
                     } else if (shifts.length > 1) {
                         // Multiple bookings - show selection list
-                        showMultipleBookingOptions(shiftType.toUpperCase(), shifts);
+                        showMultipleBookingOptions(normalizedShiftType.toUpperCase(), shifts);
                     } else {
                         // No bookings found (shouldn't happen)
                         showMessage('No bookings found for this shift.', 'error');
@@ -1549,17 +1565,20 @@
 
                     const COLORS = {
                         'full day': 'rgba(34,197,94,0.85)',
+                        'fullday': 'rgba(34,197,94,0.85)',
                         'morning': 'rgba(255,165,0,0.85)',
                         'evening': 'rgba(0,128,255,0.85)'
                     };
                     const POS = {
                         'full day': { top: '0', bottom: '0', left: '0', right: '0' },
+                        'fullday': { top: '0', bottom: '0', left: '0', right: '0' },
                         'morning': { top: '0', height: '50%', left: '0', right: '0' },
                         'evening': { bottom: '0', height: '50%', left: '0', right: '0' }
                     };
 
                     const byType = shifts.reduce((acc, s) => {
-                        (acc[s.shift] = acc[s.shift] || []).push(s);
+                        const shiftKey = s.shift === 'fullday' ? 'full day' : s.shift;
+                        (acc[shiftKey] = acc[shiftKey] || []).push(s);
                         return acc;
                     }, {});
 
@@ -1607,14 +1626,14 @@
                         arg.el.appendChild(emptyArea);
                     }
 
-                    // Render booked shifts with mobile touch support
                     Object.entries(byType).forEach(([type, list]) => {
                         const firstBooking = list[0];
+                        const displayType = type === 'full day' ? 'full day' : type;
 
                         const block = createShiftBlockWithTouch(
-                            type.toUpperCase(),
+                            displayType.toUpperCase(),
                             COLORS[type],
-                            () => showShiftSelectionPopup(dateStr), // ✅ Fixed: now date is derived safely
+                            () => showShiftSelectionPopup(dateStr),
                             firstBooking
                         );
 
@@ -2045,7 +2064,7 @@
                         const existing = (shiftMap[dateKey] || [])
                             .filter(s => s.fullBookingData.bookingId !== bookingId);
 
-                        if (existing.some(s => s.shift === 'full day')) {
+                        if (existing.some(s => s.shift === 'full day' || s.shift === 'fullday')) {
                             $('#dateWiseShiftContainer').prepend(
                                 `<div class="error-message alert alert-danger mb-3">
                                    <i class="bi bi-exclamation-triangle me-2"></i>
@@ -2394,8 +2413,9 @@
                         let defaultShift = [];
                         if (booking.shiftType) {
                             const s = booking.shiftType.toLowerCase();
-                            if (['morning', 'evening', 'full day'].includes(s)) {
-                                defaultShift = [s];
+                            if (['morning', 'evening', 'fullday'].includes(s)) {
+                                // Normalize fullday to 'full day' for consistency
+                                defaultShift = [s === 'fullday' ? 'full day' : s];
                             }
                         } else {
                             defaultShift = ['full day'];
@@ -2413,10 +2433,12 @@
 
                             dayArray.forEach(function (item) {
                                 const shiftName = (typeof item === 'string' ? item : item.shift).toLowerCase();
-                                if (['morning', 'evening', 'full day'].includes(shiftName)) {
+                                // Normalize both 'fullday' and 'full day' to 'full day'
+                                const normalizedShift = shiftName === 'fullday' ? 'full day' : shiftName;
+                                if (['morning', 'evening', 'full day'].includes(normalizedShift)) {
                                     shiftMap[key] = shiftMap[key] || [];
                                     shiftMap[key].push({
-                                        shift: shiftName,
+                                        shift: normalizedShift,
                                         fullBookingData: booking
                                     });
                                 }
@@ -2500,17 +2522,20 @@
 
                     const COLORS = {
                         'full day': 'rgba(34,197,94,0.85)',
+                        'fullday': 'rgba(34,197,94,0.85)',
                         'morning': 'rgba(255,165,0,0.85)',
                         'evening': 'rgba(0,128,255,0.85)'
                     };
                     const POS = {
                         'full day': { top: '0', bottom: '0', left: '0', right: '0' },
+                        'fullday': { top: '0', bottom: '0', left: '0', right: '0' },
                         'morning': { top: '0', height: '50%', left: '0', right: '0' },
                         'evening': { bottom: '0', height: '50%', left: '0', right: '0' }
                     };
 
                     const byType = shifts.reduce((acc, s) => {
-                        (acc[s.shift] = acc[s.shift] || []).push(s);
+                        const shiftKey = s.shift === 'fullday' ? 'full day' : s.shift;
+                        (acc[shiftKey] = acc[shiftKey] || []).push(s);
                         return acc;
                     }, {});
 
