@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Event Booking Calendar</title>
 
     <!-- Bootstrap CSS -->
@@ -13,95 +13,777 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
     <!-- FullCalendar CSS -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-    <!-- Custom styles -->
+    <!-- Enhanced Mobile-Responsive Styles -->
     <style>
+        :root {
+            --primary-color: #007bff;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --border-radius: 8px;
+            --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .container-fluid {
+            padding: 0 !important;
+        }
+
+        /* Header Section - Mobile Optimized */
+        .header-section {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 1rem;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+            .header-section h1 {
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+                text-align: center;
+            }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+            .action-buttons .btn {
+                flex: 1;
+                min-width: 140px;
+                font-size: 0.9rem;
+                padding: 0.75rem 1rem;
+                border-radius: var(--border-radius);
+                border: 2px solid transparent;
+                transition: var(--transition);
+                font-weight: 500;
+            }
+
+            .action-buttons .btn-primary {
+                background: white;
+                color: var(--primary-color);
+                border-color: white;
+            }
+
+                .action-buttons .btn-primary:hover {
+                    background: var(--light-color);
+                    transform: translateY(-2px);
+                }
+
+            .action-buttons .btn-outline-secondary {
+                border-color: white;
+                color: white;
+            }
+
+                .action-buttons .btn-outline-secondary:hover {
+                    background: white;
+                    color: var(--primary-color);
+                    transform: translateY(-2px);
+                }
+
+        /* Calendar Container */
+        .calendar-container {
+            padding: 1rem;
+            background: var(--light-color);
+            min-height: calc(100vh - 140px);
+        }
+
+        .calendar-wrapper {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* FullCalendar Mobile Optimizations */
+        .fc {
+            font-size: 0.85rem;
+        }
+
+        .fc-header-toolbar {
+            flex-direction: column;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+        }
+
+        .fc-toolbar-chunk {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .fc-button {
+            padding: 0.5rem 0.75rem !important;
+            font-size: 0.8rem !important;
+            border-radius: 6px !important;
+            border: none !important;
+            box-shadow: var(--shadow-sm) !important;
+            transition: var(--transition) !important;
+        }
+
+            .fc-button:hover {
+                transform: translateY(-1px) !important;
+                box-shadow: var(--shadow-md) !important;
+            }
+
+        .fc-button-primary {
+            background-color: var(--primary-color) !important;
+        }
+
+        .fc-today-button {
+            background-color: var(--success-color) !important;
+        }
+
+        .fc-title-center h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .fc-daygrid-event {
+            font-size: 0.7rem;
+            padding: 2px 4px;
+            border-radius: 4px;
+            margin: 1px 0;
+        }
+
+        .fc-daygrid-day {
+            min-height: 120px;
+        }
+
+        .fc-daygrid-day-number {
+            padding: 4px;
+            font-weight: 500;
+        }
+
+        /* Enhanced Shift Blocks - Improved for better visibility */
         .shift-block {
             position: absolute;
             cursor: pointer;
-            z-index: 9;
+            z-index: 10;
+            border-radius: 6px;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 35px;
+            box-shadow: var(--shadow-sm);
+            padding: 4px 6px;
+            font-size: 0.75rem;
+            line-height: 1.2;
         }
 
+            .shift-block:hover {
+                transform: scale(1.02);
+                box-shadow: var(--shadow-md);
+            }
+
         .shift-label {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             color: white;
-            font-size: 10px;
-            font-weight: bold;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-align: center;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
             pointer-events: none;
+            line-height: 1.1;
+            margin-bottom: 2px;
+        }
+
+        .shift-customer {
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 500;
+            text-align: center;
+            pointer-events: none;
+            line-height: 1.1;
+            margin-bottom: 1px;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .shift-address {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.6rem;
+            font-weight: 400;
+            text-align: center;
+            pointer-events: none;
+            line-height: 1.1;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .empty-shift-area {
+            transition: var(--transition);
+            font-size: 0.7rem;
+            border-radius: 4px;
+        }
+
+            .empty-shift-area:hover {
+                background-color: rgba(240,240,240,0.7) !important;
+                border-color: var(--primary-color) !important;
+            }
+
+        .empty-shift-text {
+            font-size: 0.65rem;
+            color: rgba(0,0,0,0.6);
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* Modal Enhancements */
+        .modal-dialog {
+            margin: 0.5rem;
+            max-width: calc(100vw - 1rem);
+        }
+
+        .modal-content {
+            border-radius: var(--border-radius);
+            border: none;
+            box-shadow: var(--shadow-md);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
+            color: white;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            padding: 1rem 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .btn-close {
+            filter: invert(1);
+            opacity: 0.8;
+        }
+
+            .btn-close:hover {
+                opacity: 1;
+            }
+
+        .modal-body {
+            padding: 1.5rem;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #dee2e6;
+            background: var(--light-color);
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+        }
+
+        /* Form Enhancements */
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 6px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            min-height: 44px; /* Touch-friendly */
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+                transform: translateY(-1px);
+            }
+
+            .form-control:invalid {
+                border-color: var(--danger-color);
+            }
+
+        /* Enhanced Button Styles */
+        .btn {
+            border-radius: 6px;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            transition: var(--transition);
+            min-height: 44px;
+            border: 2px solid transparent;
+        }
+
+            .btn:hover {
+                transform: translateY(-1px);
+                box-shadow: var(--shadow-md);
+            }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
+            border-color: var(--primary-color);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color) 0%, #1e7e34 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #c82333 100%);
+        }
+
+        /* Card Enhancements */
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1rem;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
+            color: white;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            padding: 0.75rem 1rem;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        /* Alert Enhancements */
+        .alert {
+            border-radius: 6px;
+            border: none;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1rem;
+        }
+
+        /* Shift Selection and Time Inputs */
+        .shifts-container {
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .shift-row {
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 10px;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 0.5rem;
         }
 
         .shift-container {
-            display: inline-block;
-            margin-right: 15px;
-            vertical-align: top;
+            margin-bottom: 1rem;
         }
 
         .time-selection {
-            margin-top: 5px;
-            margin-left: 20px;
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            background: var(--light-color);
+            border-radius: 6px;
         }
 
-        .time-inputs label {
-            display: inline-block;
-            margin-right: 10px;
+        .time-inputs {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
-        .time-inputs input[type="time"] {
-            width: 100px;
+            .time-inputs .input-group {
+                min-width: 120px;
+                flex: 1;
+            }
+
+        .input-group-text {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            font-size: 0.8rem;
+            font-weight: 500;
         }
+
+        /* Booking Details List */
+        .booking-details .list-group-item {
+            border: none;
+            border-bottom: 1px solid #e9ecef;
+            padding: 0.75rem 0;
+        }
+
+        .booking-details .row {
+            align-items: center;
+        }
+
+        .booking-details .fw-bold {
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+
+        /* Loading Spinner */
+        #calendar-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+            #calendar-loader.show {
+                display: flex;
+            }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 1055;
+        }
+
+        .toast {
+            border-radius: 6px;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Error Messages */
+        .error-message {
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Badge Enhancements */
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 4px;
+        }
+
+        /* Responsive Breakpoints */
+        @@media (max-width: 576px) {
+            .header-section
+
+        {
+            padding: 0.75rem;
+        }
+
+        .header-section h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+            .action-buttons .btn {
+                min-width: unset;
+                flex: none;
+            }
+
+        .calendar-container {
+            padding: 0.75rem;
+        }
+
+        .calendar-wrapper {
+            padding: 0.75rem;
+        }
+
+        .fc-header-toolbar {
+            padding: 0.25rem 0;
+        }
+
+        .fc-title-center h2 {
+            font-size: 1rem;
+        }
+
+        .fc-button {
+            padding: 0.4rem 0.6rem !important;
+            font-size: 0.75rem !important;
+        }
+
+        .fc-daygrid-day {
+            min-height: 100px;
+        }
+
+        .modal-dialog {
+            margin: 0;
+            max-width: 100vw;
+            height: 100vh;
+            max-height: 100vh;
+        }
+
+        .modal-content {
+            height: 100vh;
+            border-radius: 0;
+        }
+
+        .modal-header,
+        .modal-footer {
+            border-radius: 0;
+        }
+
+        .modal-body {
+            padding: 1rem;
+            max-height: calc(100vh - 160px);
+        }
+
+        .modal-footer {
+            padding: 1rem;
+            gap: 0.5rem;
+        }
+
+            .modal-footer .btn {
+                flex: 1;
+                min-width: 0;
+            }
+
+        .time-inputs {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+            .time-inputs .input-group {
+                min-width: unset;
+            }
+
+        }
+
+        @@media (min-width: 577px) and (max-width: 768px) {
+            .action-buttons
+
+        {
+            justify-content: center;
+        }
+
+        .action-buttons .btn {
+            flex: 0 1 auto;
+            min-width: 140px;
+        }
+
+        .modal-dialog {
+            max-width: 90vw;
+        }
+
+        }
+
+        @@media (min-width: 769px) {
+            .header-section h1
+
+        {
+            text-align: left;
+        }
+
+        .action-buttons {
+            justify-content: flex-start;
+        }
+
+            .action-buttons .btn {
+                flex: 0 1 auto;
+            }
+
+        .modal-dialog {
+            max-width: 800px;
+            margin: 1.75rem auto;
+        }
+
+        .time-inputs {
+            justify-content: flex-start;
+        }
+
+        .fc-daygrid-day {
+            min-height: 140px;
+        }
+
+        }
+
+        /* Dark mode support */
+        @@media (prefers-color-scheme: dark) {
+            : root
+
+        {
+            --light-color: #2c3e50;
+            --dark-color: #ecf0f1;
+        }
+
+        body {
+            background-color: #34495e;
+            color: #ecf0f1;
+        }
+
+        .calendar-wrapper,
+        .modal-content,
+        .card {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+        }
+
+        }
+
+        /* High contrast mode */
+        @@media (prefers-contrast: high) {
+            .btn, .form-control, .form-select
+
+        {
+            border-width: 3px;
+        }
+
+        }
+
+        /* Reduced motion */
+        @@media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after
+
+        {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+
+        }
+
+        /* Print styles */
+        @@media print {
+            .header-section, .action-buttons, .modal, #calendar-loader
+
+        {
+            display: none !important;
+        }
+
+        .calendar-container {
+            padding: 0;
+        }
+
+        .calendar-wrapper {
+            box-shadow: none;
+            border: 1px solid #000;
+        }
+
+        }
+
+        /* Focus improvements for accessibility */
+        .btn:focus,
+        .form-control:focus,
+        .form-select:focus {
+            outline: 3px solid rgba(0, 123, 255, 0.5);
+            outline-offset: 2px;
+        }
+
+        /* Prevent iOS zoom on input focus */
+        @@supports (-webkit-overflow-scrolling: touch) {
+            input [type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], input[type="time"], select, textarea
+
+        {
+            font-size: 16px;
+        }
+
+        }
+
+        /* Custom scrollbar for webkit browsers */
+        .modal-body::-webkit-scrollbar,
+        .shifts-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-body::-webkit-scrollbar-track,
+        .shifts-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb,
+        .shifts-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+            .modal-body::-webkit-scrollbar-thumb:hover,
+            .shifts-container::-webkit-scrollbar-thumb:hover {
+                background: #a8a8a8;
+            }
     </style>
 </head>
 <body>
-    <div class="container py-4">
-        <!-- Header -->
-        <div class="row mb-4">
-            <div class="col">
-                <h1 class="mb-3">Event Booking Calendar</h1>
+    <div class="container-fluid">
+        <!-- Enhanced Header -->
+        <div class="header-section">
+            <h1><i class="bi bi-calendar-event me-2"></i>Event Booking Calendar</h1>
 
-                <!-- Action Buttons -->
-                <div class="d-flex flex-wrap gap-2">
-                    <button id="open-booking-modal"
-                            class="btn btn-primary"
-                            data-bs-toggle="modal"
-                            data-bs-target="#bookingModal">
-                        <i class="bi bi-plus-circle me-1"></i> New Booking
-                    </button>
-                    <button id="fetch-bookings" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-clockwise me-1"></i> Refresh Calendar
-                    </button>
-                </div>
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button id="open-booking-modal"
+                        class="btn btn-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#bookingModal">
+                    <i class="bi bi-plus-circle me-2"></i>New Booking
+                </button>
+                <button id="fetch-bookings" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-clockwise me-2"></i>Refresh Calendar
+                </button>
             </div>
         </div>
 
         <!-- Alert Messages Container -->
-        <div id="message-container" class="mb-3"></div>
-        <!-- Loader -->
-        <div id="calendar-loader" class="d-none position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-75" style="z-index: 1050;">
+        <div id="message-container"></div>
+
+        <!-- Loading Spinner -->
+        <div id="calendar-loader" class="d-none">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
 
-
-        <div class="card-body position-relative">
-            <!-- Loader here -->
-            <div id="calendar-loader" ...></div>
-
-            <div id="calendar"></div>
+        <!-- Enhanced Calendar Container -->
+        <div class="calendar-container">
+            <div class="calendar-wrapper">
+                <div id="calendar"></div>
+            </div>
         </div>
-
     </div>
 
-    <!-- New/Edit Booking Modal -->
+    <!-- Enhanced New/Edit Booking Modal -->
     <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
@@ -120,60 +802,84 @@
                         <input type="hidden" id="createdDate">
 
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="EventName" class="form-label">Event</label>
+                            <div class="col-12 col-md-6">
+                                <label for="EventName" class="form-label">
+                                    <i class="bi bi-calendar-event me-1"></i>Event Name
+                                </label>
                                 <input type="text" id="EventName" class="form-control" placeholder="Enter event name" required>
                             </div>
-                            <div class="col-md-6">
-                                <label for="customerName" class="form-label">Customer Name</label>
-                                <input type="text" id="customerName" class="form-control" required>
+                            <div class="col-12 col-md-6">
+                                <label for="customerName" class="form-label">
+                                    <i class="bi bi-person me-1"></i>Customer Name
+                                </label>
+                                <input type="text" id="customerName" class="form-control" placeholder="Enter customer name" required>
                             </div>
-                            <div class="col-md-6">
-                                <label for="phoneNumber" class="form-label">Phone Number</label>
-                                <input type="tel" id="phoneNumber" class="form-control" required>
+                            <div class="col-12 col-md-6">
+                                <label for="phoneNumber" class="form-label">
+                                    <i class="bi bi-telephone me-1"></i>Phone Number
+                                </label>
+                                <input type="tel" id="phoneNumber" class="form-control" placeholder="Enter phone number" required>
                             </div>
-                            <div class="col-md-6">
-                                <label for="alternativeNumber" class="form-label">Alternative Number</label>
-                                <input type="tel" id="alternativeNumber" class="form-control">
+                            <div class="col-12 col-md-6">
+                                <label for="alternativeNumber" class="form-label">
+                                    <i class="bi bi-telephone-plus me-1"></i>Alternative Number
+                                </label>
+                                <input type="tel" id="alternativeNumber" class="form-control" placeholder="Enter alternative number">
                             </div>
-                            <div class="col-md-6">
-                                <label for="fromDate" class="form-label">From Date</label>
+                            <div class="col-12 col-md-6">
+                                <label for="fromDate" class="form-label">
+                                    <i class="bi bi-calendar-date me-1"></i>From Date
+                                </label>
                                 <input type="date" id="fromDate" class="form-control" required>
                             </div>
-                            <div class="col-md-6">
-                                <label for="toDate" class="form-label">To Date</label>
+                            <div class="col-12 col-md-6">
+                                <label for="toDate" class="form-label">
+                                    <i class="bi bi-calendar-date me-1"></i>To Date
+                                </label>
                                 <input type="date" id="toDate" class="form-control" required>
                             </div>
-                            <div class="col-md-6">
-                                <label for="shiftType" class="form-label">Shift Type</label>
+                            <div class="col-12 col-md-6">
+                                <label for="shiftType" class="form-label">
+                                    <i class="bi bi-clock me-1"></i>Shift Type
+                                </label>
                                 <select id="shiftType" class="form-select" required>
                                     <option value="morning" selected>Morning</option>
                                     <option value="evening">Evening</option>
                                     <option value="fullday">Full Day</option>
                                 </select>
                             </div>
-                            <div class="col-md-6">
-                                <label for="bookingStatus" class="form-label">Booking Status</label>
+                            <div class="col-12 col-md-6">
+                                <label for="bookingStatus" class="form-label">
+                                    <i class="bi bi-check-circle me-1"></i>Booking Status
+                                </label>
                                 <select id="bookingStatus" class="form-select" required>
                                     <option value="Confirmed" selected>Confirmed</option>
                                     <option value="Pending">Pending</option>
                                     <option value="Cancelled">Cancelled</option>
                                 </select>
                             </div>
-                            <div class="col-md-4">
-                                <label for="totalAmount" class="form-label">Total Amount</label>
-                                <input type="number" id="totalAmount" class="form-control" required>
+                            <div class="col-12 col-md-4">
+                                <label for="totalAmount" class="form-label">
+                                    <i class="bi bi-currency-rupee me-1"></i>Total Amount
+                                </label>
+                                <input type="number" id="totalAmount" class="form-control" placeholder="0.00" required>
                             </div>
-                            <div class="col-md-4">
-                                <label for="advancePayment" class="form-label">Advance Payment</label>
-                                <input type="number" id="advancePayment" class="form-control">
+                            <div class="col-12 col-md-4">
+                                <label for="advancePayment" class="form-label">
+                                    <i class="bi bi-credit-card me-1"></i>Advance Payment
+                                </label>
+                                <input type="number" id="advancePayment" class="form-control" placeholder="0.00">
                             </div>
-                            <div class="col-md-4">
-                                <label for="remainingPayment" class="form-label">Remaining Payment</label>
+                            <div class="col-12 col-md-4">
+                                <label for="remainingPayment" class="form-label">
+                                    <i class="bi bi-cash me-1"></i>Remaining Payment
+                                </label>
                                 <input type="number" id="remainingPayment" class="form-control" readonly>
                             </div>
-                            <div class="col-md-6">
-                                <label for="paymentStatus" class="form-label">Payment Status</label>
+                            <div class="col-12 col-md-6">
+                                <label for="paymentStatus" class="form-label">
+                                    <i class="bi bi-credit-card-2-front me-1"></i>Payment Status
+                                </label>
                                 <select id="paymentStatus" class="form-select" required>
                                     <option value="Paid">Paid</option>
                                     <option value="Partially Paid">Partially Paid</option>
@@ -181,8 +887,10 @@
                                 </select>
                             </div>
                             <div class="col-12">
-                                <label for="address" class="form-label">Address</label>
-                                <textarea id="address" class="form-control" rows="2"></textarea>
+                                <label for="address" class="form-label">
+                                    <i class="bi bi-geo-alt me-1"></i>Address
+                                </label>
+                                <textarea id="address" class="form-control" rows="3" placeholder="Enter event address"></textarea>
                             </div>
                             <div class="col-12" id="dateWiseShiftContainer">
                                 <!-- Dynamic shift fields will be added here -->
@@ -192,20 +900,20 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" onclick="saveBooking()" id="save-booking" class="btn btn-primary">
-                        <i class="bi bi-save me-1"></i> Save
+                        <i class="bi bi-save me-1"></i>Save Booking
                     </button>
                     <button type="button" id="delete-booking" class="btn btn-danger d-none">
-                        <i class="bi bi-trash me-1"></i> Delete
+                        <i class="bi bi-trash me-1"></i>Delete
                     </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Close
+                        <i class="bi bi-x-circle me-1"></i>Close
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Booking Details Modal -->
+    <!-- Enhanced Booking Details Modal -->
     <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
@@ -217,35 +925,39 @@
                 </div>
                 <div class="modal-body">
                     <div id="detailError" class="alert alert-danger d-none"></div>
-                    <ul class="list-group list-group-flush booking-details">
+                    <div class="booking-details">
                         <!-- Details will be injected here by JS -->
-                    </ul>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" id="edit-from-details" class="btn btn-primary">
-                        <i class="bi bi-pencil me-1"></i> Edit
+                        <i class="bi bi-pencil me-1"></i>Edit
                     </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Close
+                        <i class="bi bi-x-circle me-1"></i>Close
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Multi-Booking Selection Modal -->
-    <div hidden class="modal fade" id="multiBookingModal" tabindex="-1" aria-labelledby="multiBookingModalLabel" aria-hidden="true">
+    <!-- Enhanced Multi-Booking Selection Modal -->
+    <div class="modal fade" id="multiBookingModal" tabindex="-1" aria-labelledby="multiBookingModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="multiBookingModalLabel">Multiple Bookings Found</h5>
+                    <h5 class="modal-title" id="multiBookingModalLabel">
+                        <i class="bi bi-list me-2"></i>Multiple Bookings Found
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="multiBookingBody">
                     <!-- Dynamically injected list of bookings -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>Close
+                    </button>
                 </div>
             </div>
         </div>
@@ -260,22 +972,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- FullCalendar -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-    <!-- jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
-    <!-- jQuery UI -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-
-    <!-- FullCalendar -->
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Select2 -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-
-
         $(document).ready(function() {
             // ─────────────────────────────────────────────────────────────────────────────
             // 1. GLOBAL VARIABLES & UTILITIES
@@ -332,16 +1032,16 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 `);
 
-                $('.container').prepend(alertDiv);
+                $('#message-container').html(alertDiv);
                 setTimeout(() => alertDiv.alert('close'), 5000);
             }
 
             function showCalendarLoader() {
-                $('#calendar-loader').removeClass('d-none');
+                $('#calendar-loader').removeClass('d-none').addClass('show');
             }
 
             function hideCalendarLoader() {
-                $('#calendar-loader').addClass('d-none');
+                $('#calendar-loader').addClass('d-none').removeClass('show');
             }
 
             // ─────────────────────────────────────────────────────────────────────────────
@@ -384,10 +1084,6 @@
                 });
             }
 
-            // ─────────────────────────────────────────────────────────────────────────────
-            // 3. SHIFT SELECTION POPUP FUNCTIONS (FIXED)
-            // ─────────────────────────────────────────────────────────────────────────────
-
             function showShiftSelectionPopup(dateStr) {
                 // First, ensure no other modals are open
                 $('.modal').modal('hide');
@@ -401,11 +1097,15 @@
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title">Select Action</h5>
+                                    <h5 class="modal-title">
+                                        <i class="bi bi-calendar-check me-2"></i>Select Action
+                                    </h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <p class="text-muted mb-3">Date: ${formatDate(dateStr)}</p>
+                                    <p class="text-muted mb-3">
+                                        <i class="bi bi-calendar-date me-1"></i>Date: ${formatDate(dateStr)}
+                                    </p>
                                     <div class="d-grid gap-2">
                 `;
 
@@ -625,18 +1325,21 @@
                     const dateStr = info.dateStr;
                     const shifts = shiftMap[dateStr] || [];
 
-                    // IMPORTANT: Prevent any other modals from opening
+                    // Prevent any other modals from interfering
                     $('.modal').modal('hide');
 
-                    // Case 1: No bookings - direct booking modal
-                    if (shifts.length === 0) {
+                    const bookedShiftTypes = shifts.map(s => s.shift);
+                    const isCompletelyEmpty = bookedShiftTypes.length === 0;
+
+                    // Case 1: Empty date — allow full booking modal
+                    if (isCompletelyEmpty) {
                         setTimeout(() => {
-                            openBookingModal(dateStr);
+                            showShiftSelectionPopup(dateStr);
                         }, 100);
                         return;
                     }
 
-                    // Case 2: Has bookings - show selection popup ONLY
+                    // Case 2: Partially or Fully Booked — show "Select Action" popup only
                     setTimeout(() => {
                         showShiftSelectionPopup(dateStr);
                     }, 100);
@@ -691,10 +1394,9 @@
                         if (hasMorn && !hasEven) {
                             Object.assign(emptyArea.style, { bottom: '0', height: '50%' });
                             const t = document.createElement('span');
-                            t.innerText = 'BOOK EVENING';
-                            Object.assign(t.style, { fontSize: '11px', color: 'rgba(0,0,0,0.7)', fontWeight: '500' });
+                            t.className = 'empty-shift-text';
+                            t.innerText = 'Book Evening';
                             emptyArea.appendChild(t);
-
                             addMobileTouchEvents(emptyArea, (e) => {
                                 openBookingModalWithShift(dateStr, 'evening');
                             });
@@ -702,10 +1404,9 @@
                         else if (!hasMorn && hasEven) {
                             Object.assign(emptyArea.style, { top: '0', height: '50%' });
                             const t = document.createElement('span');
-                            t.innerText = 'BOOK MORNING';
-                            Object.assign(t.style, { fontSize: '11px', color: 'rgba(0,0,0,0.7)', fontWeight: '500' });
+                            t.className = 'empty-shift-text';
+                            t.innerText = 'Book Morning';
                             emptyArea.appendChild(t);
-
                             addMobileTouchEvents(emptyArea, (e) => {
                                 openBookingModalWithShift(dateStr, 'morning');
                             });
@@ -717,17 +1418,24 @@
                     // Render booked shifts with mobile touch support
                     Object.entries(byType).forEach(([type, list]) => {
                         const firstBooking = list[0];
+
                         const block = createShiftBlockWithTouch(
                             type.toUpperCase(),
                             COLORS[type],
-                            () => list.length > 1
-                                ? showMultipleBookingOptions(type.toUpperCase(), list)
-                                : viewBookingDetails(firstBooking.fullBookingData),
+                            () => showShiftSelectionPopup(dateStr), // ✅ Fixed: now date is derived safely
                             firstBooking
                         );
+
                         Object.assign(block.style, POS[type]);
-                        arg.el.appendChild(block);
+
+                        const frame = arg.el.querySelector('.fc-daygrid-day-frame');
+                        if (frame) {
+                            frame.appendChild(block);
+                        } else {
+                            arg.el.appendChild(block);
+                        }
                     });
+
                 },
 
                 datesSet() {
@@ -756,39 +1464,38 @@
                     alignItems: 'center',
                     justifyContent: 'center',
                     width: '100%',
-                    padding: '3px 0'
+                    padding: '4px 6px',
+                    borderRadius: '6px',
+                    minHeight: '35px'
                 });
 
-                // Shift label
-                const lbl = document.createElement('span');
-                lbl.innerText = labelText;
-                Object.assign(lbl.style, {
-                    color: 'white',
-                    fontSize: '12px',
-                    fontWeight: 'bold',
-                    pointerEvents: 'none',
-                    textAlign: 'center'
-                });
-                div.appendChild(lbl);
+                // Customer name (instead of shift type)
+                const customerText = bookingData && bookingData.fullBookingData && bookingData.fullBookingData.customerName;
+                if (customerText) {
+                    const customer = document.createElement('div');
+                    customer.className = 'shift-customer';
+                    customer.innerText = customerText.length > 12 ? customerText.substring(0, 12) + '...' : customerText;
+                    div.appendChild(customer);
+                }
 
                 // Address line
                 const addrText = bookingData && bookingData.fullBookingData && bookingData.fullBookingData.address;
                 if (addrText) {
-                    const addr = document.createElement('span');
-                    addr.innerText = addrText;
-                    Object.assign(addr.style, {
-                        color: 'white',
-                        fontSize: '11px',
-                        fontWeight: 'bold',
-                        pointerEvents: 'none',
-                        textAlign: 'center',
-                        paddingTop: '2px',
-                        maxWidth: '100%',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
-                    });
+                    const addr = document.createElement('div');
+                    addr.className = 'shift-address';
+                    addr.innerText = addrText.length > 15 ? addrText.substring(0, 15) + '...' : addrText;
                     div.appendChild(addr);
+                }
+
+                // Event name if no customer or address
+                if (!customerText && !addrText) {
+                    const eventText = bookingData && bookingData.fullBookingData && bookingData.fullBookingData.eventName;
+                    if (eventText) {
+                        const event = document.createElement('div');
+                        event.className = 'shift-customer';
+                        event.innerText = eventText.length > 12 ? eventText.substring(0, 12) + '...' : eventText;
+                        div.appendChild(event);
+                    }
                 }
 
                 // FIXED: Add mobile touch events that prevent calendar date click
@@ -841,8 +1548,8 @@
 
                 let detailsHtml = `
                     <div class="card mb-3">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Event Details</h5>
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Event Details</h5>
                         </div>
                         <div class="card-body">
                             <div class="row mb-2">
@@ -871,8 +1578,8 @@
                     </div>
 
                     <div class="card mb-3">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Customer Information</h5>
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-person me-2"></i>Customer Information</h5>
                         </div>
                         <div class="card-body">
                             <div class="row mb-2">
@@ -881,11 +1588,15 @@
                             </div>
                             <div class="row mb-2">
                                 <div class="col-4 fw-bold">Phone:</div>
-                                <div class="col-8">${booking.phoneNumber || '—'}</div>
+                                <div class="col-8">
+                                    ${booking.phoneNumber ? `<a href="tel:${booking.phoneNumber}" class="text-decoration-none">${booking.phoneNumber}</a>` : '—'}
+                                </div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-4 fw-bold">Alt. Phone:</div>
-                                <div class="col-8">${booking.alternativeNumber || '—'}</div>
+                                <div class="col-8">
+                                    ${booking.alternativeNumber ? `<a href="tel:${booking.alternativeNumber}" class="text-decoration-none">${booking.alternativeNumber}</a>` : '—'}
+                                </div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-4 fw-bold">Address:</div>
@@ -895,21 +1606,21 @@
                     </div>
 
                     <div class="card">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Payment Details</h5>
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-credit-card me-2"></i>Payment Details</h5>
                         </div>
                         <div class="card-body">
                             <div class="row mb-2">
                                 <div class="col-4 fw-bold">Total Amount:</div>
-                                <div class="col-8">₹${(booking.totalAmount || 0).toFixed(2)}</div>
+                                <div class="col-8">₹${(booking.totalAmount || 0).toLocaleString('en-IN')}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-4 fw-bold">Advance Paid:</div>
-                                <div class="col-8">₹${(booking.advancePayment || 0).toFixed(2)}</div>
+                                <div class="col-8">₹${(booking.advancePayment || 0).toLocaleString('en-IN')}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-4 fw-bold">Balance Due:</div>
-                                <div class="col-8">₹${(booking.remainingPayment || 0).toFixed(2)}</div>
+                                <div class="col-8">₹${(booking.remainingPayment || 0).toLocaleString('en-IN')}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-4 fw-bold">Payment Status:</div>
@@ -924,11 +1635,11 @@
                         </div>
                     </div>
 
-                    <div class="mt-4 d-flex justify-content-between">
-                        <button id="edit-from-details" class="btn btn-primary">
+                    <div class="mt-4 d-flex flex-wrap gap-2 justify-content-between">
+                        <button id="edit-from-details" class="btn btn-primary flex-fill">
                             <i class="bi bi-pencil-fill me-1"></i> Edit Booking
                         </button>
-                        <button id="send-whatsapp-confirm" class="btn btn-success">
+                        <button id="send-whatsapp-confirm" class="btn btn-success flex-fill">
                             <i class="bi bi-whatsapp me-1"></i> Send Confirmation
                         </button>
                     </div>
@@ -960,11 +1671,11 @@
                 const phoneNumber = (booking.phoneNumber || '').replace(/\D/g, '');
 
                 if (!phoneNumber) {
-                    alert("No phone number available for this booking.");
+                    showToast("No phone number available for this booking.", 'warning');
                     return;
                 }
 
-                const message = `Thank you : ${booking.customerName || 'Customer'} for booking with us. Your booking for "${booking.eventName || 'Event'}" has been confirmed for ${fromDate}.`;
+                const message = `Thank you ${booking.customerName || 'Customer'} for booking with us. Your booking for "${booking.eventName || 'Event'}" has been confirmed for ${fromDate}.`;
                 const encodedMessage = encodeURIComponent(message);
                 window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
                 showToast('Confirmation message prepared for WhatsApp', 'success');
@@ -975,7 +1686,7 @@
                 if (!toastContainer) {
                     toastContainer = document.createElement('div');
                     toastContainer.id = 'toast-container';
-                    toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+                    toastContainer.className = 'toast-container';
                     document.body.appendChild(toastContainer);
                 }
 
@@ -1013,6 +1724,8 @@
                 $('#shiftType').val('morning');
                 $('#dateWiseShiftContainer').empty();
                 $('#modal-message').removeClass('alert-success alert-danger').addClass('d-none').text('');
+                $('.error-message').remove();
+                $('.was-validated').removeClass('was-validated');
             }
 
             function validateBookingForm() {
@@ -1031,9 +1744,13 @@
 
                 requiredFields.forEach(field => {
                     const $f = $(`#${field.id}`);
+                    const $parent = $f.parent();
                     if (!$f.val().trim()) {
-                        $f.after(`<div class="error-message text-danger small mt-1">* ${field.name} is required</div>`);
+                        $parent.append(`<div class="error-message text-danger small mt-1"><i class="bi bi-exclamation-triangle me-1"></i>${field.name} is required</div>`);
+                        $f.addClass('is-invalid');
                         isValid = false;
+                    } else {
+                        $f.removeClass('is-invalid').addClass('is-valid');
                     }
                 });
 
@@ -1043,14 +1760,23 @@
                     const fromD = new Date(fromDateStr);
                     const toD = new Date(toDateStr);
                     if (fromD > toD) {
-                        $('#fromDate').after('<div class="error-message text-danger small mt-1">* From Date must be before or equal to To Date</div>');
+                        $('#fromDate').parent().append('<div class="error-message text-danger small mt-1"><i class="bi bi-exclamation-triangle me-1"></i>From Date must be before or equal to To Date</div>');
+                        $('#fromDate, #toDate').addClass('is-invalid');
                         isValid = false;
                     }
                 }
 
                 const phone = $('#phoneNumber').val().trim();
                 if (phone && !/^[0-9]{10}$/.test(phone)) {
-                    $('#phoneNumber').after('<div class="error-message text-danger small mt-1">* Please enter a valid 10-digit phone number</div>');
+                    $('#phoneNumber').parent().append('<div class="error-message text-danger small mt-1"><i class="bi bi-exclamation-triangle me-1"></i>Please enter a valid 10-digit phone number</div>');
+                    $('#phoneNumber').addClass('is-invalid');
+                    isValid = false;
+                }
+
+                const totalAmount = parseFloat($('#totalAmount').val());
+                if (totalAmount && totalAmount < 0) {
+                    $('#totalAmount').parent().append('<div class="error-message text-danger small mt-1"><i class="bi bi-exclamation-triangle me-1"></i>Total amount cannot be negative</div>');
+                    $('#totalAmount').addClass('is-invalid');
                     isValid = false;
                 }
 
@@ -1067,13 +1793,24 @@
                     }
                     if (missingDates.length) {
                         $('#dateWiseShiftContainer').prepend(
-                            `<div class="error-message alert alert-warning mb-3">* Please select at least one shift for: ${missingDates.join(', ')}</div>`
+                            `<div class="error-message alert alert-warning mb-3">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                Please select at least one shift for: ${missingDates.join(', ')}
+                            </div>`
                         );
                         isValid = false;
                     }
                 }
 
-                if (!isValid) return false;
+                if (!isValid) {
+                    // Focus first invalid field and scroll to it
+                    const firstInvalid = $('.is-invalid').first();
+                    if (firstInvalid.length) {
+                        firstInvalid.focus();
+                        firstInvalid[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    return false;
+                }
 
                 // Conflict detection
                 const bookingId = parseInt($('#bookingId').val()) || 0;
@@ -1093,9 +1830,9 @@
                         const existing = (shiftMap[dateKey] || [])
                             .filter(s => s.fullBookingData.bookingId !== bookingId);
                         if (existing.length) {
-                            $('#fromDate').after(
+                            $('#fromDate').parent().append(
                                 `<div class="error-message text-danger small mt-1">
-                                   * Cannot book full day on ${dateKey}: existing booking(s) present
+                                   <i class="bi bi-exclamation-triangle me-1"></i>Cannot book full day on ${dateKey}: existing booking(s) present
                                  </div>`
                             );
                             isValid = false;
@@ -1119,7 +1856,8 @@
                         if (existing.some(s => s.shift === 'full day')) {
                             $('#dateWiseShiftContainer').prepend(
                                 `<div class="error-message alert alert-danger mb-3">
-                                   * Cannot book any shift on ${dateKey}: full day already booked
+                                   <i class="bi bi-exclamation-triangle me-2"></i>
+                                   Cannot book any shift on ${dateKey}: full day already booked
                                  </div>`
                             );
                             isValid = false;
@@ -1129,7 +1867,8 @@
                             if (existing.some(s => s.shift === ns.shift)) {
                                 $('#dateWiseShiftContainer').prepend(
                                     `<div class="error-message alert alert-danger mb-3">
-                                       * Shift conflict: ${capitalizeFirstLetter(ns.shift)} on ${dateKey}
+                                       <i class="bi bi-exclamation-triangle me-2"></i>
+                                       Shift conflict: ${capitalizeFirstLetter(ns.shift)} on ${dateKey}
                                      </div>`
                                 );
                                 isValid = false;
@@ -1150,7 +1889,8 @@
                                         if (!(ns.endTime <= eStart || ns.startTime >= eEnd)) {
                                             $('#dateWiseShiftContainer').prepend(
                                                 `<div class="error-message alert alert-danger mb-3">
-                                                   * Time overlap on ${dateKey} (${ns.startTime}-${ns.endTime})
+                                                   <i class="bi bi-exclamation-triangle me-2"></i>
+                                                   Time overlap on ${dateKey} (${ns.startTime}-${ns.endTime})
                                                      conflicts with existing (${eStart}-${eEnd})
                                                  </div>`
                                             );
@@ -1211,7 +1951,9 @@
                 $('#modal-message')
                     .removeClass('d-none alert-danger')
                     .addClass('alert-info')
-                    .text('Processing your request...');
+                    .html('<i class="bi bi-hourglass-split me-2"></i>Processing your request...');
+
+                $('#save-booking').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Saving...');
 
                 $.ajax({
                     url: '/EventBooking/AddOrUpdateEventBooking',
@@ -1222,17 +1964,18 @@
                             $('#modal-message')
                                 .removeClass('alert-info alert-danger')
                                 .addClass('alert-success')
-                                .text(response.message);
+                                .html('<i class="bi bi-check-circle me-2"></i>' + response.message);
 
                             setTimeout(() => {
                                 bookingModal.hide();
                                 loadEvents();
+                                showToast('Booking saved successfully!', 'success');
                             }, 1500);
                         } else {
                             $('#modal-message')
                                 .removeClass('alert-info alert-success')
                                 .addClass('alert-danger')
-                                .text(response.message || 'Error saving booking.');
+                                .html('<i class="bi bi-exclamation-triangle me-2"></i>' + (response.message || 'Error saving booking.'));
                         }
                     },
                     error: function(xhr) {
@@ -1243,16 +1986,25 @@
                         $('#modal-message')
                             .removeClass('alert-info alert-success')
                             .addClass('alert-danger')
-                            .text(errorMsg);
+                            .html('<i class="bi bi-exclamation-triangle me-2"></i>' + errorMsg);
+                    },
+                    complete: function() {
+                        $('#save-booking').prop('disabled', false).html('<i class="bi bi-save me-1"></i>Save Booking');
                     }
                 });
             }
 
             function deleteBooking(bookingId) {
+                if (!confirm('Are you sure you want to delete this booking? This action cannot be undone.')) {
+                    return;
+                }
+
                 $('#modal-message')
                     .removeClass('d-none alert-success alert-danger')
                     .addClass('alert-info')
-                    .text('Deleting booking...');
+                    .html('<i class="bi bi-hourglass-split me-2"></i>Deleting booking...');
+
+                $('#delete-booking').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Deleting...');
 
                 $.ajax({
                     url: `/EventBooking/Delete/${bookingId}`,
@@ -1262,17 +2014,18 @@
                             $('#modal-message')
                                 .removeClass('alert-info alert-danger')
                                 .addClass('alert-success')
-                                .text(response.message);
+                                .html('<i class="bi bi-check-circle me-2"></i>' + response.message);
 
                             setTimeout(() => {
                                 bookingModal.hide();
                                 loadEvents();
+                                showToast('Booking deleted successfully!', 'success');
                             }, 1500);
                         } else {
                             $('#modal-message')
                                 .removeClass('alert-info alert-success')
                                 .addClass('alert-danger')
-                                .text(response.message || 'Error deleting booking.');
+                                .html('<i class="bi bi-exclamation-triangle me-2"></i>' + (response.message || 'Error deleting booking.'));
                         }
                     },
                     error: function(xhr) {
@@ -1283,7 +2036,10 @@
                         $('#modal-message')
                             .removeClass('alert-info alert-success')
                             .addClass('alert-danger')
-                            .text(errorMsg);
+                            .html('<i class="bi bi-exclamation-triangle me-2"></i>' + errorMsg);
+                    },
+                    complete: function() {
+                        $('#delete-booking').prop('disabled', false).html('<i class="bi bi-trash me-1"></i>Delete');
                     }
                 });
             }
@@ -1304,9 +2060,9 @@
                 }
 
                 container.empty().append(`
-                    <div class="card mb-3">
+                    <div class="card">
                         <div class="card-header">
-                            <h5 class="mb-0">Select Shifts and Times for Each Date</h5>
+                            <h5 class="mb-0"><i class="bi bi-clock me-2"></i>Select Shifts and Times for Each Date</h5>
                         </div>
                         <div class="card-body shifts-container"></div>
                     </div>
@@ -1318,16 +2074,19 @@
 
                 while (currentDate <= toDate) {
                     const dateStr = currentDate.toISOString().split('T')[0];
-                    const formattedDate = `${String(currentDate.getDate()).padStart(2, '0')}/` +
-                                        `${String(currentDate.getMonth() + 1).padStart(2, '0')}/` +
-                                        `${currentDate.getFullYear()}`;
+                    const formattedDate = currentDate.toLocaleDateString('en-US', {
+                        weekday: 'short',
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
 
                     const dateRow = $(`
-                        <div class="row border-bottom py-2 mb-2">
-                            <div class="col-md-3 col-sm-12">
-                                <strong>${formattedDate}</strong>
+                        <div class="row border-bottom py-3 mb-3">
+                            <div class="col-12 col-md-3 mb-2">
+                                <strong class="text-primary">${formattedDate}</strong>
                             </div>
-                            <div class="col-md-9 col-sm-12 shift-options-${dateStr}"></div>
+                            <div class="col-12 col-md-9 shift-options-${dateStr}"></div>
                         </div>
                     `);
 
@@ -1338,19 +2097,23 @@
                         const timeContainerId = `time-container-${dateStr}-${shift.toLowerCase()}`;
 
                         const shiftOption = $(`
-                            <div class="form-check form-check-inline mb-2">
-                                <input class="form-check-input" type="checkbox"
-                                       id="${shiftId}"
-                                       name="shifts[${dateStr}]"
-                                       value="${shift.toLowerCase()}"
-                                       onchange="toggleTimeSelection('${timeContainerId}', this.checked)">
-                                <label class="form-check-label" for="${shiftId}">
-                                    ${shift}
-                                </label>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           id="${shiftId}"
+                                           name="shifts[${dateStr}]"
+                                           value="${shift.toLowerCase()}"
+                                           onchange="toggleTimeSelection('${timeContainerId}', this.checked)">
+                                    <label class="form-check-label fw-bold" for="${shiftId}">
+                                        <i class="bi bi-${shift === 'Morning' ? 'sunrise' : 'sunset'} me-1"></i>
+                                        ${shift}
+                                    </label>
+                                </div>
                                 <div id="${timeContainerId}" class="time-selection mt-2" style="display:none;">
                                     <div class="row g-2">
                                         <div class="col-6">
                                             <div class="input-group input-group-sm">
+                                                <span class="input-group-text"><i class="bi bi-clock"></i></span>
                                                 <span class="input-group-text">Start</span>
                                                 <input type="time" class="form-control"
                                                        name="shift-start[${dateStr}][${shift.toLowerCase()}]"
@@ -1359,6 +2122,7 @@
                                         </div>
                                         <div class="col-6">
                                             <div class="input-group input-group-sm">
+                                                <span class="input-group-text"><i class="bi bi-clock"></i></span>
                                                 <span class="input-group-text">End</span>
                                                 <input type="time" class="form-control"
                                                        name="shift-end[${dateStr}][${shift.toLowerCase()}]"
@@ -1387,7 +2151,7 @@
             function calculateRemainingPayment() {
                 const total = parseFloat($('#totalAmount').val()) || 0;
                 const advance = parseFloat($('#advancePayment').val()) || 0;
-                const remaining = total - advance;
+                const remaining = Math.max(0, total - advance);
 
                 $('#remainingPayment').val(remaining.toFixed(2));
 
@@ -1398,7 +2162,7 @@
                 } else if (advance > 0) {
                     $('#paymentStatus').val('Partially Paid');
                 } else {
-                    $('#paymentStatus').val('Unpaid');
+                    $('#paymentStatus').val('Pending');
                 }
             }
 
@@ -1500,6 +2264,7 @@
                             display: 'auto',
                             backgroundColor: '#FFD700',
                             textColor: '#000',
+                            borderColor: '#FFA500',
                             extendedProps: {
                                 type: fest.type,
                                 region: fest.region
@@ -1579,8 +2344,8 @@
                         if (hasMorn && !hasEven) {
                             Object.assign(emptyArea.style, { bottom: '0', height: '50%' });
                             const t = document.createElement('span');
-                            t.innerText = 'BOOK EVENING';
-                            Object.assign(t.style, { fontSize: '11px', color: 'rgba(0,0,0,0.7)', fontWeight: '500' });
+                            t.className = 'empty-shift-text';
+                            t.innerText = 'Book Evening';
                             emptyArea.appendChild(t);
                             addMobileTouchEvents(emptyArea, (e) => {
                                 openBookingModalWithShift(dateAttr, 'evening');
@@ -1589,8 +2354,8 @@
                         else if (!hasMorn && hasEven) {
                             Object.assign(emptyArea.style, { top: '0', height: '50%' });
                             const t = document.createElement('span');
-                            t.innerText = 'BOOK MORNING';
-                            Object.assign(t.style, { fontSize: '11px', color: 'rgba(0,0,0,0.7)', fontWeight: '500' });
+                            t.className = 'empty-shift-text';
+                            t.innerText = 'Book Morning';
                             emptyArea.appendChild(t);
                             addMobileTouchEvents(emptyArea, (e) => {
                                 openBookingModalWithShift(dateAttr, 'morning');
@@ -1607,14 +2372,14 @@
 
                     Object.entries(byType).forEach(([type, list]) => {
                         const firstBooking = list[0];
+
                         const block = createShiftBlockWithTouch(
                             type.toUpperCase(),
                             COLORS[type],
-                            () => list.length > 1
-                                ? showMultipleBookingOptions(type.toUpperCase(), list)
-                                : viewBookingDetails(firstBooking.fullBookingData),
+                            () => showShiftSelectionPopup(dateAttr), // ✅ Always opens the modal
                             firstBooking
                         );
+
                         Object.assign(block.style, POS[type]);
 
                         const frame = cell.querySelector('.fc-daygrid-day-frame');
@@ -1624,6 +2389,7 @@
                             cell.appendChild(block);
                         }
                     });
+
                 });
             }
 
@@ -1660,34 +2426,246 @@
             $('#delete-booking').on('click', function() {
                 const bookingId = $('#bookingId').val();
                 if (bookingId) {
-                    if (confirm('Are you sure you want to delete this booking? This action cannot be undone.')) {
-                        deleteBooking(bookingId);
-                    }
+                    deleteBooking(bookingId);
                 }
             });
 
             $('#fetch-bookings').on('click', function() {
                 loadEvents();
+                showToast('Calendar refreshed!', 'info');
             });
 
             $('#open-booking-modal').on('click', function() {
                 openBookingModal();
             });
 
+            // Enhanced form validation on input
+            $('#bookingFormFields input, #bookingFormFields select, #bookingFormFields textarea').on('blur', function() {
+                const $this = $(this);
+                const $parent = $this.parent();
+                $parent.find('.error-message').remove();
+
+                if ($this.prop('required') && !$this.val().trim()) {
+                    $this.removeClass('is-valid').addClass('is-invalid');
+                } else if ($this.attr('type') === 'tel' && $this.val() && !/^[0-9]{10}$/.test($this.val())) {
+                    $this.removeClass('is-valid').addClass('is-invalid');
+                } else if ($this.attr('type') === 'number' && $this.val() && parseFloat($this.val()) < 0) {
+                    $this.removeClass('is-valid').addClass('is-invalid');
+                } else {
+                    $this.removeClass('is-invalid').addClass('is-valid');
+                }
+            });
+
+            // Prevent form submission on Enter key (mobile keyboards)
+            $('#bookingFormFields').on('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const inputs = $(this).find('input, select, textarea').not(':hidden');
+                    const currentIndex = inputs.index(document.activeElement);
+                    if (currentIndex < inputs.length - 1) {
+                        inputs.eq(currentIndex + 1).focus();
+                    } else {
+                        document.activeElement.blur();
+                    }
+                }
+            });
+
+            // Mobile-specific enhancements
+            if (isMobile) {
+                // Prevent zoom on input focus for iOS
+                $('input[type="text"], input[type="tel"], input[type="number"], input[type="date"], input[type="time"], select, textarea').attr('readonly', true);
+
+                setTimeout(() => {
+                    $('input[type="text"], input[type="tel"], input[type="number"], input[type="date"], input[type="time"], select, textarea').removeAttr('readonly');
+                }, 100);
+
+                // Enhanced touch interactions for calendar
+                calendar.setOption('eventClick', function(info) {
+                    info.jsEvent.preventDefault();
+                    const booking = info.event.extendedProps;
+                    if (booking.bookingId) {
+                        viewBookingDetails(booking);
+                    }
+                });
+
+                // Add haptic feedback for touch interactions (iOS)
+                if (navigator.vibrate) {
+                    $(document).on('touchstart', '.shift-block, .empty-shift-area, .btn', function() {
+                        navigator.vibrate(10);
+                    });
+                }
+            }
+
+            // Handle orientation change
+            window.addEventListener('orientationchange', function() {
+                setTimeout(function() {
+                    calendar.updateSize();
+                    // Adjust modal heights
+                    $('.modal-body').css('max-height', window.innerHeight - 200);
+                }, 500);
+            });
+
+            // Auto-save form data to prevent loss (sessionStorage fallback)
+            let formAutoSaveInterval;
+            $('#bookingModal').on('shown.bs.modal', function() {
+                formAutoSaveInterval = setInterval(function() {
+                    const formData = {};
+                    $('#bookingFormFields').find('input, select, textarea').each(function() {
+                        if ($(this).attr('type') !== 'hidden') {
+                            formData[$(this).attr('id')] = $(this).val();
+                        }
+                    });
+                    try {
+                        sessionStorage.setItem('bookingFormDraft', JSON.stringify(formData));
+                    } catch (e) {
+                        // Silent fail if sessionStorage is not available
+                    }
+                }, 5000);
+            });
+
+            $('#bookingModal').on('hidden.bs.modal', function() {
+                if (formAutoSaveInterval) {
+                    clearInterval(formAutoSaveInterval);
+                }
+                try {
+                    sessionStorage.removeItem('bookingFormDraft');
+                } catch (e) {
+                    // Silent fail
+                }
+            });
+
+            // Restore form data if available
+            function restoreFormDraft() {
+                try {
+                    const draft = sessionStorage.getItem('bookingFormDraft');
+                    if (draft) {
+                        const formData = JSON.parse(draft);
+                        Object.entries(formData).forEach(([key, value]) => {
+                            const $field = $(`#${key}`);
+                            if ($field.length && value) {
+                                $field.val(value);
+                            }
+                        });
+                        calculateRemainingPayment();
+                        showToast('Form data restored from previous session', 'info');
+                    }
+                } catch (e) {
+                    // Silent fail
+                }
+            }
+
+            // Initialize Select2 for better mobile experience (if needed)
+            if (typeof $.fn.select2 !== 'undefined') {
+                $('.form-select').select2({
+                    theme: 'bootstrap-5',
+                    width: '100%',
+                    dropdownParent: $('.modal-body')
+                });
+            }
+
             // Render calendar and load initial data
             calendar.render();
             loadEvents();
+
+            // Show loading message initially
+            showToast('Loading calendar data...', 'info');
 
             // Ensure proper initialization on window load
             $(window).on('load', function() {
                 setTimeout(function() {
                     applyShiftBlocksToVisibleDates();
+                    hideCalendarLoader();
                 }, 100);
             });
 
+            // Global error handler for AJAX requests
+            $(document).ajaxError(function(event, xhr, settings, error) {
+                console.error('AJAX Error:', error, xhr.responseText);
+                showToast('Network error occurred. Please check your connection.', 'error');
+                hideCalendarLoader();
+            });
+
+            // Keyboard shortcuts
+            $(document).on('keydown', function(e) {
+                // Ctrl/Cmd + N for new booking
+                if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                    e.preventDefault();
+                    openBookingModal();
+                }
+
+                // Escape to close modals
+                if (e.key === 'Escape') {
+                    $('.modal').modal('hide');
+                }
+
+                // Ctrl/Cmd + S to save (when modal is open)
+                if ((e.ctrlKey || e.metaKey) && e.key === 's' && $('#bookingModal').hasClass('show')) {
+                    e.preventDefault();
+                    if (validateBookingForm()) {
+                        saveBooking();
+                    }
+                }
+            });
+
+            // Add swipe gestures for mobile calendar navigation
+            if (isMobile) {
+                let startX = 0;
+                let startY = 0;
+
+                $('#calendar').on('touchstart', function(e) {
+                    startX = e.originalEvent.touches[0].clientX;
+                    startY = e.originalEvent.touches[0].clientY;
+                });
+
+                $('#calendar').on('touchend', function(e) {
+                    if (!startX || !startY) return;
+
+                    const endX = e.originalEvent.changedTouches[0].clientX;
+                    const endY = e.originalEvent.changedTouches[0].clientY;
+
+                    const diffX = startX - endX;
+                    const diffY = startY - endY;
+
+                    // Only process horizontal swipes that are significant
+                    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                        if (diffX > 0) {
+                            // Swipe left - next month
+                            calendar.next();
+                        } else {
+                            // Swipe right - previous month
+                            calendar.prev();
+                        }
+                    }
+
+                    startX = 0;
+                    startY = 0;
+                });
+            }
+
+        });
+
+        // Make saveBooking globally accessible for onclick handler
+        window.saveBooking = function() {
+            if (typeof $ !== 'undefined') {
+                const validateFunc = $('#bookingFormFields')[0] ?
+                    () => $('#bookingFormFields')[0].checkValidity() :
+                    () => true;
+
+                if (validateFunc()) {
+                    // Call the saveBooking function defined in the jQuery document ready
+                    $(document).trigger('saveBooking');
+                }
+            }
+        };
+
+        // Trigger save from global function
+        $(document).on('saveBooking', function() {
+            if (typeof validateBookingForm === 'function' && validateBookingForm()) {
+                // The actual save logic is handled in the saveBooking function above
+                $('#save-booking').trigger('click');
+            }
         });
     </script>
 
 </body>
 </html>
-
