@@ -25,7 +25,7 @@ namespace EventManagement.Controllers
         {
             if (eventBooking.bookingId != 0)
             {
-                var result = _eventBookingSerive.UpdateBooking(eventBooking);
+                var result = _eventBookingSerive.AddBooking(eventBooking);
                 if (!result)
                 {
                     return Json(new { success = false, message = "Failed to update event booking." });

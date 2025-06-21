@@ -252,22 +252,23 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 700;
+            font-size: 0.7rem;
+            font-weight: 600;
             color: white;
             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             min-height: 24px;
-            line-height: 1.2;
+            line-height: 1.1;
             text-align: center;
             box-shadow: var(--shadow-sm);
-            padding: 4px;
+            padding: 4px 6px;
             overflow: hidden;
             backdrop-filter: blur(10px);
+            width: calc(100% - 4px);
         }
 
             .shift-block:hover {
-                transform: scale(1.05);
+                transform: scale(1.02);
                 box-shadow: var(--shadow-md);
             }
 
@@ -287,26 +288,42 @@
             background: var(--secondary-gradient);
         }
 
-        .shift-text {
-            font-size: 0.75rem;
+        .shift-customer-name {
+            font-size: 0.65rem;
             font-weight: 700;
-            line-height: 1.2;
-            margin: 0;
+            line-height: 1.1;
+            margin: 0 0 2px 0;
             padding: 0;
-            white-space: nowrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            text-align: center;
+            max-width: 100%;
         }
 
         .shift-address {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             font-weight: 500;
-            line-height: 1.2;
-            margin-top: 2px;
-            opacity: 0.95;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            line-height: 1.1;
+            margin: 0;
+            padding: 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            text-align: center;
             max-width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            flex-wrap: wrap;
         }
+
+            .shift-address i {
+                font-size: 0.55rem;
+                opacity: 0.9;
+                flex-shrink: 0;
+            }
 
         /* Enhanced Empty Shift Areas */
         .empty-shift-area {
@@ -317,13 +334,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.65rem;
-            font-weight: 600;
             color: var(--primary-color);
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            line-height: 1.2;
             text-align: center;
+            width: calc(100% - 4px);
         }
 
             .empty-shift-area:hover {
@@ -708,7 +723,7 @@
     </div>
 
     <!-- Enhanced Floating Action Button -->
-    <button class="fab" onclick="openBookingModal()" aria-label="Add new booking">
+    <button class="fab" onclick="openBookingModal() ,generateDateWiseShifts()" aria-label="Add new booking">
         <i class="bi bi-plus"></i>
     </button>
 
@@ -779,17 +794,6 @@
                                 </label>
                                 <input type="date" id="toDate" class="form-control" required>
                             </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="shiftType" class="form-label">
-                                <i class="bi bi-clock me-1"></i>Shift Type *
-                            </label>
-                            <select id="shiftType" class="form-select" required>
-                                <option value="morning">🌅 Morning Shift</option>
-                                <option value="evening">🌆 Evening Shift</option>
-                                <option value="fullday">🌟 Full Day</option>
-                            </select>
                         </div>
 
                         <div class="row mb-3">
@@ -991,31 +995,43 @@
             const div = document.createElement('div');
             div.className = `shift-block shift-${shiftType.replace(' ', '')}`;
 
-            const label = document.createElement('div');
-            label.className = 'shift-text';
-
-            // Enhanced shift labels with emojis
-            const shiftLabels = {
-                'morning': '🌅 MORN',
-                'evening': '🌆 EVE',
-                'full day': '🌟 FULL'
+            // Add shift icon based on type
+            const shiftIcons = {
+                'morning': '🌅',
+                'evening': '🌆',
+                'full day': '🌟'
             };
 
-            label.textContent = shiftLabels[shiftType] || shiftType.toUpperCase();
-            div.appendChild(label);
-
-            // Show customer name or address
+            // Show customer name AND address with shift icon
             if (bookings[0] && bookings[0].fullBookingData) {
                 const data = bookings[0].fullBookingData;
-                const addr = document.createElement('div');
-                addr.className = 'shift-address';
 
-                // Prioritize customer name, then address
-                let displayText = data.customerName || data.address || '';
-                if (displayText) {
-                    const shortText = displayText.split(' ')[0];
-                    addr.textContent = shortText.length > 10 ? shortText.substring(0, 10) + '...' : shortText;
-                    div.appendChild(addr);
+                // Customer name with shift icon (first priority)
+                if (data.customerName && data.customerName.trim()) {
+                    const customerDiv = document.createElement('div');
+                    customerDiv.className = 'shift-customer-name';
+                    customerDiv.innerHTML = `${shiftIcons[shiftType] || '📅'} ${data.customerName.trim()}`;
+                    div.appendChild(customerDiv);
+                }
+
+                // Address (second priority)
+                if (data.address && data.address.trim()) {
+                    const addressDiv = document.createElement('div');
+                    addressDiv.className = 'shift-address';
+
+                    // Clean up address - remove extra spaces and get first meaningful part
+                    let cleanAddress = data.address.split(',')[0].trim();
+
+                    addressDiv.innerHTML = `<i class="bi bi-geo-alt-fill"></i> ${cleanAddress}`;
+                    div.appendChild(addressDiv);
+                }
+
+                // If no customer name, show event name as fallback with icon
+                if ((!data.customerName || !data.customerName.trim()) && data.eventName && data.eventName.trim()) {
+                    const eventDiv = document.createElement('div');
+                    eventDiv.className = 'shift-customer-name';
+                    eventDiv.innerHTML = `${shiftIcons[shiftType] || '📅'} ${data.eventName.trim()}`;
+                    div.appendChild(eventDiv);
                 }
             }
 
@@ -1025,7 +1041,7 @@
             };
 
             // Add hover effect for better UX
-            div.setAttribute('title', `${capitalizeFirstLetter(shiftType)} shift - Click to view details`);
+            div.setAttribute('title', `${shiftIcons[shiftType]} ${capitalizeFirstLetter(shiftType)} shift - Click to view details`);
 
             return div;
         }
@@ -1035,25 +1051,28 @@
             area.className = 'empty-shift-area';
 
             const position = shiftType === 'morning' ?
-                { top: '32px', height: '28%', left: '4px', right: '4px' } :
-                { bottom: '4px', height: '28%', left: '4px', right: '4px' };
+                { top: '32px', height: '50%', left: '2px', right: '2px' } :
+                { bottom: '2px', height: '50%', left: '2px', right: '2px' };
 
             Object.assign(area.style, position);
 
-            const text = document.createElement('span');
-            const emptyLabels = {
-                'morning': '➕ MORN',
-                'evening': '➕ EVE'
+            // Show shift icon with plus
+            const shiftIcons = {
+                'morning': '🌅',
+                'evening': '🌆'
             };
-            text.textContent = emptyLabels[shiftType] || '➕ ADD';
-            area.appendChild(text);
+
+            const content = document.createElement('div');
+            content.innerHTML = `${shiftIcons[shiftType]} <i class="bi bi-plus-circle ms-1"></i>`;
+            content.style.fontSize = '1rem';
+            area.appendChild(content);
 
             area.onclick = function(e) {
                 e.stopPropagation();
                 openBookingModal(dateStr, [shiftType]);
             };
 
-            area.setAttribute('title', `Add ${shiftType} shift`);
+            area.setAttribute('title', `${shiftIcons[shiftType]} Add ${shiftType} shift`);
             return area;
         }
 
@@ -1068,9 +1087,9 @@
             cell.style.position = 'relative';
 
             const POSITIONS = {
-                'full day': { top: '32px', height: 'calc(100% - 36px)', left: '4px', right: '4px' },
-                'morning': { top: '32px', height: '28%', left: '4px', right: '4px' },
-                'evening': { bottom: '4px', height: '28%', left: '4px', right: '4px' }
+                'full day': { top: '32px', height: 'calc(100% - 36px)', left: '2px', right: '2px' },
+                'morning': { top: '-2px', height: '50%', left: '2px', right: '2px' },
+                'evening': { bottom: '2px', height: '50%', left: '2px', right: '2px' }
             };
 
             const byType = shifts.reduce((acc, s) => {
@@ -1105,6 +1124,7 @@
 
         // Enhanced date click handling
         function handleDateClick(dateStr) {
+            generateDateWiseShifts();
             const shifts = shiftMap[dateStr] || [];
             const bookedShiftTypes = shifts.map(s => s.shift);
             const hasMorning = bookedShiftTypes.includes('morning');
@@ -1479,7 +1499,7 @@
 
                     bgEvents.push({
                         id: booking.bookingId,
-                        title: booking.customerName || '',
+                       
                         start: localYMD(bgStart),
                         end: localYMD(bgEnd),
                         display: 'background',
@@ -1580,12 +1600,6 @@
             document.getElementById('userId').value = '1';
             document.querySelectorAll('.error-message').forEach(el => el.remove());
             document.getElementById('modal-message').classList.add('d-none');
-
-            // Reset shift type options
-            const shiftSelect = document.getElementById('shiftType');
-            Array.from(shiftSelect.options).forEach(option => {
-                option.disabled = false;
-            });
         }
 
         function calculateRemainingPayment() {
@@ -1615,6 +1629,31 @@
             saveBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Saving...';
             saveBtn.disabled = true;
 
+            // Collect dynamic date-wise shift data (only for checked shifts)
+            const dateWiseShifts = {};
+            const container = document.getElementById('dateWiseShiftContainer');
+            const checkedBoxes = container.querySelectorAll('.shift-checkbox:checked');
+
+            checkedBoxes.forEach(checkbox => {
+                const dateStr = checkbox.dataset.date;
+                const shiftType = checkbox.dataset.shift;
+
+                const startInput = container.querySelector(`input[name="shift-${dateStr}-${shiftType}-start"]`);
+                const endInput = container.querySelector(`input[name="shift-${dateStr}-${shiftType}-end"]`);
+
+                if (startInput && endInput && startInput.value && endInput.value) {
+                    if (!dateWiseShifts[dateStr]) {
+                        dateWiseShifts[dateStr] = [];
+                    }
+
+                    dateWiseShifts[dateStr].push({
+                        shift: shiftType,
+                        startTime: startInput.value,
+                        endTime: endInput.value
+                    });
+                }
+            });
+
             const formData = {
                 bookingId: document.getElementById('bookingId').value || 0,
                 userId: document.getElementById('userId').value || 1,
@@ -1624,13 +1663,13 @@
                 alternativeNumber: document.getElementById('alternativeNumber').value,
                 fromDate: document.getElementById('fromDate').value,
                 toDate: document.getElementById('toDate').value,
-                shiftType: document.getElementById('shiftType').value,
                 bookingStatus: document.getElementById('bookingStatus').value,
                 paymentStatus: document.getElementById('paymentStatus').value,
                 totalAmount: parseFloat(document.getElementById('totalAmount').value) || 0,
                 advancePayment: parseFloat(document.getElementById('advancePayment').value) || 0,
                 remainingPayment: parseFloat(document.getElementById('remainingPayment').value) || 0,
-                address: document.getElementById('address').value
+                address: document.getElementById('address').value,
+                dateWiseShifts: JSON.stringify(dateWiseShifts) // Add selected shifts only
             };
 
             const messageEl = document.getElementById('modal-message');
@@ -1642,7 +1681,7 @@
                 url: '/EventBooking/AddOrUpdateEventBooking',
                 type: 'POST',
                 data: { eventBooking: formData },
-                timeout: 15000,
+               
                 success: function(response) {
                     if (response.success) {
                         showToast('🎉 Booking saved successfully!', 'success');
@@ -1732,6 +1771,11 @@
 
         function openBookingModalForEdit(bookingData) {
             resetBookingForm();
+       
+             //generateDateWiseShifts(bookingData.bookingId);
+                     // From edit mode:
+        generateDateWiseShifts(bookingData.bookingId, bookingData.shiftDetailsArray);
+
 
             document.getElementById('modal-title-text').textContent = 'Edit Booking';
             document.getElementById('delete-booking').style.display = 'block';
@@ -1744,7 +1788,6 @@
             document.getElementById('alternativeNumber').value = bookingData.alternativeNumber || '';
             document.getElementById('fromDate').value = bookingData.fromDate ? bookingData.fromDate.split('T')[0] : '';
             document.getElementById('toDate').value = bookingData.toDate ? bookingData.toDate.split('T')[0] : '';
-            document.getElementById('shiftType').value = bookingData.shiftType || 'morning';
             document.getElementById('bookingStatus').value = bookingData.bookingStatus || 'Confirmed';
             document.getElementById('paymentStatus').value = bookingData.paymentStatus || 'Pending';
             document.getElementById('totalAmount').value = bookingData.totalAmount || '';
@@ -1752,8 +1795,60 @@
             document.getElementById('address').value = bookingData.address || '';
 
             calculateRemainingPayment();
+
+            // Generate date-wise shifts first
+                    // From edit mode:
+        generateDateWiseShifts(bookingData.bookingId, bookingData.shiftDetailsArray);
+
+
+            // Then populate existing shift times if available
+            setTimeout(() => {
+                populateExistingShiftTimes(bookingData);
+            }, 100);
+
             bookingModal.show();
         }
+                function populateExistingShiftTimes(bookingData) {
+            if (bookingData.dateWiseShifts) {
+                try {
+                    const existingShifts = JSON.parse(bookingData.dateWiseShifts);
+
+                    Object.keys(existingShifts).forEach(dateStr => {
+                        const dayShifts = existingShifts[dateStr];
+
+                        dayShifts.forEach(shiftData => {
+                            const shiftType = shiftData.shift;
+
+                            // 1. ✅ Check the shift checkbox
+                            const checkbox = document.getElementById(`checkbox-${shiftType}-${dateStr}`);
+                            if (checkbox) {
+                                checkbox.checked = true;
+
+                                // 2. ✅ Show the shift time section
+                                const timesContainer = document.getElementById(`${shiftType}-times-${dateStr}`);
+                                if (timesContainer) {
+                                    timesContainer.style.display = 'block';
+                                }
+
+                                // 3. ✅ Fill in start/end times
+                                const startInput = document.querySelector(`input[name="shift-${dateStr}-${shiftType}-start"]`);
+                                const endInput = document.querySelector(`input[name="shift-${dateStr}-${shiftType}-end"]`);
+
+                                if (startInput && shiftData.startTime) {
+                                    startInput.value = shiftData.startTime;
+                                }
+                                if (endInput && shiftData.endTime) {
+                                    endInput.value = shiftData.endTime;
+                                }
+                            }
+                        });
+                    });
+                } catch (error) {
+                    console.error('Error parsing shift times:', error);
+                }
+            }
+        }
+
 
         function sendWhatsAppMessage(booking) {
             const phone = booking.phoneNumber?.replace(/\D/g, '');
@@ -1859,8 +1954,8 @@
         document.getElementById('fromDate').addEventListener('change', generateDateWiseShifts);
         document.getElementById('toDate').addEventListener('change', generateDateWiseShifts);
 
-        // Enhanced date-wise shift generation
-        function generateDateWiseShifts() {
+
+                  function generateDateWiseShifts(editBookingId = null, editBookingData = []) {
             const fromDateInput = document.getElementById('fromDate');
             const toDateInput = document.getElementById('toDate');
             const container = document.getElementById('dateWiseShiftContainer');
@@ -1884,101 +1979,167 @@
             }
 
             let html = `
-                <div class="alert alert-info d-flex align-items-center mb-3">
-                    <i class="bi bi-clock me-2"></i>
-                    <strong>Shift Time Configuration</strong>
+                <div class="alert alert-primary mb-3">
+                    <i class="bi bi-calendar-check me-2"></i>
+                    <strong>Select your preferred shifts and set times:</strong>
                 </div>
             `;
 
             let dayCount = 0;
             for (let d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
                 dayCount++;
-                if (dayCount > 31) break; // Prevent excessive rendering
+                if (dayCount > 31) break;
 
                 const dateStr = localYMD(d);
-                const bookedShifts = (shiftMap[dateStr] || []).map(b => b.shift);
+                const allShifts = shiftMap[dateStr] || [];
+
+                const editableShifts = editBookingData.filter(b => b.date === dateStr).map(b => b.shift);
+                const shiftTimeMap = {};
+                editBookingData.forEach(entry => {
+                    if (entry.date === dateStr) {
+                        shiftTimeMap[entry.shift] = {
+                            start: entry.startTime,
+                            end: entry.endTime
+                        };
+                    }
+                });
+
                 const dayName = d.toLocaleDateString('en-US', { weekday: 'long' });
 
-                // Skip if both shifts are booked
-                if (bookedShifts.includes('morning') && bookedShifts.includes('evening')) continue;
+                const shiftTemplate = (shiftType, icon, label, colorClass) => {
+                    const shiftBookedByOthers = allShifts.find(s => s.shift === shiftType && (!editBookingId || s.fullBookingData.bookingId !== editBookingId));
+                    const isDisabled = !!shiftBookedByOthers;
+                    const isChecked = editableShifts.includes(shiftType);
+                    const times = shiftTimeMap[shiftType] || { start: '', end: '' };
+
+                    const inputId = `checkbox-${shiftType}-${dateStr}`;
+                    const labelMessage = isDisabled
+                        ? '<small class="text-muted text-danger">Booked by someone else</small>'
+                        : '<small class="text-muted">Available</small>';
+
+                    return {
+                        checkboxHTML: `
+                            <div class="col-md-6">
+                                <label class="d-flex align-items-center p-3 border rounded cursor-pointer ${isDisabled ? 'bg-light opacity-50' : 'bg-white'}"
+                                       for="${inputId}">
+                                    <input type="checkbox"
+                                           id="${inputId}"
+                                           class="form-check-input me-3 shift-checkbox"
+                                           data-date="${dateStr}"
+                                           data-shift="${shiftType}"
+                                           ${isDisabled ? 'disabled' : ''}
+                                           ${isChecked && !isDisabled ? 'checked' : ''}
+                                           style="transform: scale(1.5);">
+                                    <div>
+                                        <div class="fw-bold ${colorClass}">
+                                            <i class="bi ${icon} me-2"></i>${label}
+                                        </div>
+                                        ${labelMessage}
+                                    </div>
+                                </label>
+                            </div>
+                        `,
+                        timesHTML: `
+                            <div id="${shiftType}-times-${dateStr}" class="shift-times-section" style="display: ${isChecked && !isDisabled ? 'block' : 'none'};">
+                                <div class="alert alert-${shiftType === 'morning' ? 'warning' : 'info'}">
+                                    <h6 class="alert-heading">
+                                        <i class="bi ${icon} me-2"></i>${label} Configuration
+                                    </h6>
+                                    <div class="row g-3">
+                                        <div class="col-6">
+                                            <label class="form-label fw-bold">Start Time</label>
+                                            <input type="time"
+                                                   class="form-control form-control-lg"
+                                                   name="shift-${dateStr}-${shiftType}-start"
+                                                   value="${times.start || (shiftType === 'morning' ? '09:00' : '17:00')}">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label fw-bold">End Time</label>
+                                            <input type="time"
+                                                   class="form-control form-control-lg"
+                                                   name="shift-${dateStr}-${shiftType}-end"
+                                                   value="${times.end || (shiftType === 'morning' ? '13:00' : '21:00')}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `
+                    };
+                };
+
+                const morning = shiftTemplate('morning', 'bi-sunrise', 'Morning Shift', 'text-warning');
+                const evening = shiftTemplate('evening', 'bi-sunset', 'Evening Shift', 'text-info');
 
                 html += `
-                    <div class="detail-card mb-3">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <div>
-                                <div class="fw-bold">${formatDate(dateStr)}</div>
-                                <small class="text-muted">${dayName}</small>
-                            </div>
-                            ${bookedShifts.length > 0 ? `
-                                <div class="badge bg-warning">
-                                    ${bookedShifts.map(s => capitalizeFirstLetter(s)).join(', ')} Booked
-                                </div>
-                            ` : ''}
-                        </div>`;
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0">
+                                <i class="bi bi-calendar-event me-2"></i>
+                                ${formatDate(dateStr)} - ${dayName}
+                            </h6>
+                        </div>
+                        <div class="card-body">
 
-                // Morning shift inputs
-                if (!bookedShifts.includes('morning')) {
-                    html += `
-                        <div class="row mb-3">
-                            <div class="col-12 mb-2">
-                                <div class="fw-medium text-primary">
-                                    <i class="bi bi-sunrise me-1"></i>Morning Shift
+                            <div class="mb-4">
+                                <h6 class="text-primary mb-3">
+                                    <i class="bi bi-check-square me-2"></i>Choose your shifts:
+                                </h6>
+                                <div class="row g-3">
+                                    ${morning.checkboxHTML}
+                                    ${evening.checkboxHTML}
                                 </div>
                             </div>
-                            <div class="col-6">
-                                <label class="form-label small">Start Time</label>
-                                <input type="time" class="form-control"
-                                       name="shift-${dateStr}-morning-start"
-                                       value="09:00">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label small">End Time</label>
-                                <input type="time" class="form-control"
-                                       name="shift-${dateStr}-morning-end"
-                                       value="13:00">
-                            </div>
-                        </div>`;
-                }
 
-                // Evening shift inputs
-                if (!bookedShifts.includes('evening')) {
-                    html += `
-                        <div class="row">
-                            <div class="col-12 mb-2">
-                                <div class="fw-medium text-success">
-                                    <i class="bi bi-sunset me-1"></i>Evening Shift
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label small">Start Time</label>
-                                <input type="time" class="form-control"
-                                       name="shift-${dateStr}-evening-start"
-                                       value="17:00">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label small">End Time</label>
-                                <input type="time" class="form-control"
-                                       name="shift-${dateStr}-evening-end"
-                                       value="21:00">
-                            </div>
-                        </div>`;
-                }
-
-                html += `</div>`;
-            }
-
-            if (dayCount === 0) {
-                html += `
-                    <div class="alert alert-info d-flex align-items-center">
-                        <i class="bi bi-info-circle me-2"></i>
-                        All selected dates are fully booked
+                            ${morning.timesHTML}
+                            ${evening.timesHTML}
+                        </div>
                     </div>
                 `;
             }
 
             container.innerHTML = html;
+            addShiftCheckboxListeners();
         }
 
+
+
+                function addShiftCheckboxListeners() {
+            // 🔍 Find all checkboxes with class 'shift-checkbox'
+            const allCheckboxes = document.querySelectorAll('.shift-checkbox');
+            console.log('Found checkboxes:', allCheckboxes.length); // Debug log
+
+            allCheckboxes.forEach((checkbox, index) => {
+                console.log(`Setting up checkbox ${index}:`, checkbox.id); // Debug log
+
+                // 🎯 Add change event listener to each checkbox
+                checkbox.addEventListener('change', function() {
+                    const dateStr = this.getAttribute('data-date');
+                    const shiftType = this.getAttribute('data-shift');
+                    const timesContainer = document.getElementById(`${shiftType}-times-${dateStr}`);
+
+                    console.log(`Checkbox changed: ${shiftType} for ${dateStr}, checked: ${this.checked}`);
+
+                    if (this.checked) {
+                        // ✅ SHOW time configuration when checked
+                        if (timesContainer) {
+                            timesContainer.style.display = 'block';
+                            timesContainer.style.animation = 'fadeInUp 0.3s ease-out';
+                        }
+                    } else {
+                        // ❌ HIDE time configuration when unchecked
+                        if (timesContainer) {
+                            timesContainer.style.display = 'none';
+
+                            // Clear the time values
+                            const startInput = timesContainer.querySelector(`input[name="shift-${dateStr}-${shiftType}-start"]`);
+                            const endInput = timesContainer.querySelector(`input[name="shift-${dateStr}-${shiftType}-end"]`);
+                            if (startInput) startInput.value = '';
+                            if (endInput) endInput.value = '';
+                        }
+                    }
+                });
+            });
+        }
         // Add CSS animations
         const style = document.createElement('style');
         style.textContent = `

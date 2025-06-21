@@ -61,6 +61,7 @@ namespace DbOperation.Implementation
                             existing.alternativeNumber = bookings.alternativeNumber;
                             existing.address = bookings.address;
                             existing.dateWiseShifts = bookings.dateWiseShifts;
+                            db.Bookings.Update(existing);
                         }
                     }
 
