@@ -722,8 +722,8 @@
         <div id="calendar"></div>
     </div>
 
-    <!-- Enhanced Floating Action Button -->
-    <button class="fab" onclick="openBookingModal() ,generateDateWiseShifts()" aria-label="Add new booking">
+    <!-- 🔥 FIXED: Removed generateDateWiseShifts() from FAB button -->
+    <button class="fab" onclick="openBookingModal()" aria-label="Add new booking">
         <i class="bi bi-plus"></i>
     </button>
 
@@ -832,6 +832,17 @@
                                 <label for="remainingPayment" class="form-label">Balance ₹</label>
                                 <input type="number" id="remainingPayment" class="form-control" readonly>
                             </div>
+                        </div>
+                        <div class="row mb-5">
+                            <div class="col-4">
+                                <label for="diesel" class="form-label">Diesel ₹ *</label>
+                                <input type="text" id="diesel" class="form-control" placeholder="0" required>
+                            </div>
+                            <div class="col-8">
+                                <label for="bandType" class="form-label">BandType </label>
+                                <input type="text" id="bandType" class="form-control">
+                            </div>
+
                         </div>
 
                         <div class="mb-3">
@@ -1122,14 +1133,34 @@
             });
         }
 
+        function openNewBookingModal() {
+            document.getElementById('bookingForm').reset();
+            document.getElementById('bookingId').value = 0;
+            document.getElementById('userId').value = 1;
+            document.getElementById('modal-title-text').textContent = 'New Booking';
+
+            // Set today's date if no specific date is provided
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('fromDate').value = today;
+            document.getElementById('toDate').value = today;
+
+            // Generate shifts for default dates
+            generateDateWiseShifts();
+
+            bookingModal.show();
+        }
+
         // Enhanced date click handling
         function handleDateClick(dateStr) {
-            generateDateWiseShifts();
             const shifts = shiftMap[dateStr] || [];
             const bookedShiftTypes = shifts.map(s => s.shift);
             const hasMorning = bookedShiftTypes.includes('morning');
             const hasEvening = bookedShiftTypes.includes('evening');
             const hasFullDay = bookedShiftTypes.includes('full day');
+
+            // Set the clicked date in the form
+            document.getElementById('fromDate').value = dateStr;
+            document.getElementById('toDate').value = dateStr;
 
             if (hasFullDay || (hasMorning && hasEvening) || shifts.length > 1) {
                 showMultipleBookings(dateStr, shifts);
@@ -1322,6 +1353,62 @@
                 'Pending': '⏰'
             };
 
+            // 🔥 FIXED: Extract shift details from dateWiseShifts
+            let shiftDetailsHTML = '';
+            if (booking.dateWiseShifts) {
+                try {
+                    const shiftsData = JSON.parse(booking.dateWiseShifts);
+                    const shiftIcons = {
+                        'morning': '🌅',
+                        'evening': '🌆',
+                        'full day': '🌟'
+                    };
+
+                    shiftDetailsHTML = `
+                        <div class="col-12">
+                            <div class="fw-medium text-muted mb-2">Shift Details</div>
+                            <div class="bg-light p-3 rounded">`;
+
+                    Object.keys(shiftsData).forEach(dateStr => {
+                        const dayShifts = shiftsData[dateStr];
+                        const formattedDate = formatDate(dateStr);
+
+                        shiftDetailsHTML += `<div class="mb-2"><strong>${formattedDate}:</strong><br>`;
+
+                        dayShifts.forEach(shift => {
+                            const icon = shiftIcons[shift.shift] || '📅';
+                            const shiftName = capitalizeFirstLetter(shift.shift);
+                            shiftDetailsHTML += `
+                                <span class="badge bg-primary me-2 mb-1">
+                                    ${icon} ${shiftName}: ${shift.startTime} - ${shift.endTime}
+                                </span>
+                            `;
+                        });
+
+                        shiftDetailsHTML += `</div>`;
+                    });
+
+                    shiftDetailsHTML += `</div></div>`;
+                } catch (error) {
+                    console.error('Error parsing shift details:', error);
+                    // Fallback to basic shift type if dateWiseShifts parsing fails
+                    shiftDetailsHTML = `
+                        <div class="col-12">
+                            <div class="fw-medium text-muted mb-1">Shift Type</div>
+                            <div class="fw-bold">${capitalizeFirstLetter(booking.shiftType || 'Not specified')}</div>
+                        </div>
+                    `;
+                }
+            } else if (booking.shiftType) {
+                // Fallback for older bookings without dateWiseShifts
+                shiftDetailsHTML = `
+                    <div class="col-12">
+                        <div class="fw-medium text-muted mb-1">Shift Type</div>
+                        <div class="fw-bold">${capitalizeFirstLetter(booking.shiftType)}</div>
+                    </div>
+                `;
+            }
+
             const content = `
                 <div class="detail-card">
                     <div class="detail-header">
@@ -1346,9 +1433,16 @@
                             <div class="fw-bold">${formatDate(booking.toDate)}</div>
                         </div>
 
+                        ${shiftDetailsHTML}
+
                         <div class="col-6">
-                            <div class="fw-medium text-muted mb-1">Shift Type</div>
-                            <div class="fw-bold">${capitalizeFirstLetter(booking.shiftType)}</div>
+                            <div class="fw-medium text-muted mb-1">Band Type</div>
+                            <div class="fw-bold">${booking.bandType || '—'}</div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="fw-medium text-muted mb-1">Diesel</div>
+                            <div class="fw-bold">${booking.diesel || '—'}</div>
                         </div>
 
                         <div class="col-6">
@@ -1443,19 +1537,19 @@
             document.getElementById('booking-details-content').innerHTML = content;
             document.getElementById('details-title').textContent = booking.eventName || 'Booking Details';
 
-            document.getElementById('edit-booking-btn').onclick = function() {
+            document.getElementById('edit-booking-btn').onclick = function () {
                 detailsModal.hide();
                 openBookingModalForEdit(booking);
             };
 
-            document.getElementById('whatsapp-btn').onclick = function() {
+            document.getElementById('whatsapp-btn').onclick = function () {
                 sendWhatsAppMessage(booking);
             };
 
             detailsModal.show();
         }
 
-        // Load events from server (unchanged core logic but with enhanced error handling)
+        // Load events from server with enhanced filtering for edit conflicts
         function loadEvents() {
             showLoader();
 
@@ -1499,7 +1593,6 @@
 
                     bgEvents.push({
                         id: booking.bookingId,
-                       
                         start: localYMD(bgStart),
                         end: localYMD(bgEnd),
                         display: 'background',
@@ -1571,7 +1664,7 @@
             calendar.render();
         }
 
-        // Enhanced booking modal functions
+        // 🔥 FIXED: Enhanced booking modal functions with generateDateWiseShifts() inside
         window.openBookingModal = function(dateStr = '', availableShifts = null) {
             resetBookingForm();
 
@@ -1581,16 +1674,22 @@
 
             if (availableShifts) {
                 const shiftSelect = document.getElementById('shiftType');
-                Array.from(shiftSelect.options).forEach(option => {
-                    option.disabled = !availableShifts.includes(option.value);
-                });
-                if (availableShifts.length > 0) {
-                    shiftSelect.value = availableShifts[0];
+                if (shiftSelect) {
+                    Array.from(shiftSelect.options).forEach(option => {
+                        option.disabled = !availableShifts.includes(option.value);
+                    });
+                    if (availableShifts.length > 0) {
+                        shiftSelect.value = availableShifts[0];
+                    }
                 }
             }
 
             document.getElementById('modal-title-text').textContent = 'New Booking';
             document.getElementById('delete-booking').style.display = 'none';
+
+            // 🔥 KEY FIX: Generate shifts IMMEDIATELY when modal opens
+            generateDateWiseShifts();
+
             bookingModal.show();
         };
 
@@ -1669,7 +1768,9 @@
                 advancePayment: parseFloat(document.getElementById('advancePayment').value) || 0,
                 remainingPayment: parseFloat(document.getElementById('remainingPayment').value) || 0,
                 address: document.getElementById('address').value,
-                dateWiseShifts: JSON.stringify(dateWiseShifts) // Add selected shifts only
+                dateWiseShifts: JSON.stringify(dateWiseShifts),
+                bandType: document.getElementById('bandType').value,
+                diesel: document.getElementById('diesel').value
             };
 
             const messageEl = document.getElementById('modal-message');
@@ -1681,7 +1782,6 @@
                 url: '/EventBooking/AddOrUpdateEventBooking',
                 type: 'POST',
                 data: { eventBooking: formData },
-               
                 success: function(response) {
                     if (response.success) {
                         showToast('🎉 Booking saved successfully!', 'success');
@@ -1766,16 +1866,56 @@
                 isValid = false;
             }
 
+            // 🔥 NEW: Shift selection validation
+            const container = document.getElementById('dateWiseShiftContainer');
+            const checkedBoxes = container.querySelectorAll('.shift-checkbox:checked');
+
+            if (checkedBoxes.length === 0) {
+                const error = document.createElement('div');
+                error.className = 'error-message d-flex align-items-center mt-3';
+                error.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i>Please select at least one shift for your booking dates';
+                container.appendChild(error);
+
+                // Scroll to the shift container to show the error
+                container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                isValid = false;
+            } else {
+                // Validate that each selected shift has start and end times
+                let hasTimeError = false;
+                checkedBoxes.forEach(checkbox => {
+                    const dateStr = checkbox.dataset.date;
+                    const shiftType = checkbox.dataset.shift;
+
+                    const startInput = container.querySelector(`input[name="shift-${dateStr}-${shiftType}-start"]`);
+                    const endInput = container.querySelector(`input[name="shift-${dateStr}-${shiftType}-end"]`);
+
+                    if (!startInput?.value || !endInput?.value) {
+                        if (!hasTimeError) {
+                            const error = document.createElement('div');
+                            error.className = 'error-message d-flex align-items-center mt-3';
+                            error.innerHTML = '<i class="bi bi-clock me-2"></i>Please set start and end times for all selected shifts';
+                            container.appendChild(error);
+                            hasTimeError = true;
+                            isValid = false;
+                        }
+                    } else if (startInput.value >= endInput.value) {
+                        if (!hasTimeError) {
+                            const error = document.createElement('div');
+                            error.className = 'error-message d-flex align-items-center mt-3';
+                            error.innerHTML = '<i class="bi bi-clock-history me-2"></i>End time must be after start time for all shifts';
+                            container.appendChild(error);
+                            hasTimeError = true;
+                            isValid = false;
+                        }
+                    }
+                });
+            }
+
             return isValid;
         }
 
         function openBookingModalForEdit(bookingData) {
             resetBookingForm();
-       
-             //generateDateWiseShifts(bookingData.bookingId);
-                     // From edit mode:
-        generateDateWiseShifts(bookingData.bookingId, bookingData.shiftDetailsArray);
-
 
             document.getElementById('modal-title-text').textContent = 'Edit Booking';
             document.getElementById('delete-booking').style.display = 'block';
@@ -1793,13 +1933,13 @@
             document.getElementById('totalAmount').value = bookingData.totalAmount || '';
             document.getElementById('advancePayment').value = bookingData.advancePayment || '';
             document.getElementById('address').value = bookingData.address || '';
+            document.getElementById('bandType').value = bookingData.bandType || '';
+            document.getElementById('diesel').value = bookingData.diesel || '';
 
             calculateRemainingPayment();
 
             // Generate date-wise shifts first
-                    // From edit mode:
-        generateDateWiseShifts(bookingData.bookingId, bookingData.shiftDetailsArray);
-
+            generateDateWiseShifts(bookingData.bookingId, bookingData.shiftDetailsArray);
 
             // Then populate existing shift times if available
             setTimeout(() => {
@@ -1808,7 +1948,8 @@
 
             bookingModal.show();
         }
-                function populateExistingShiftTimes(bookingData) {
+
+        function populateExistingShiftTimes(bookingData) {
             if (bookingData.dateWiseShifts) {
                 try {
                     const existingShifts = JSON.parse(bookingData.dateWiseShifts);
@@ -1848,7 +1989,6 @@
                 }
             }
         }
-
 
         function sendWhatsAppMessage(booking) {
             const phone = booking.phoneNumber?.replace(/\D/g, '');
@@ -1951,11 +2091,11 @@
             saveBooking();
         });
 
+        // 🔥 FIXED: Date change listeners will regenerate shifts when dates change
         document.getElementById('fromDate').addEventListener('change', generateDateWiseShifts);
         document.getElementById('toDate').addEventListener('change', generateDateWiseShifts);
 
-
-                  function generateDateWiseShifts(editBookingId = null, editBookingData = []) {
+        function generateDateWiseShifts(editBookingId = null, editBookingData = []) {
             const fromDateInput = document.getElementById('fromDate');
             const toDateInput = document.getElementById('toDate');
             const container = document.getElementById('dateWiseShiftContainer');
@@ -2007,20 +2147,30 @@
                 const dayName = d.toLocaleDateString('en-US', { weekday: 'long' });
 
                 const shiftTemplate = (shiftType, icon, label, colorClass) => {
-                    const shiftBookedByOthers = allShifts.find(s => s.shift === shiftType && (!editBookingId || s.fullBookingData.bookingId !== editBookingId));
+                    // 🔥 FIXED: Only consider shifts from OTHER bookings (exclude current booking being edited)
+                    const shiftBookedByOthers = allShifts.find(s =>
+                        s.shift === shiftType &&
+                        (!editBookingId || s.fullBookingData.bookingId !== parseInt(editBookingId))
+                    );
+
                     const isDisabled = !!shiftBookedByOthers;
                     const isChecked = editableShifts.includes(shiftType);
                     const times = shiftTimeMap[shiftType] || { start: '', end: '' };
 
                     const inputId = `checkbox-${shiftType}-${dateStr}`;
-                    const labelMessage = isDisabled
-                        ? '<small class="text-muted text-danger">Booked by someone else</small>'
-                        : '<small class="text-muted">Available</small>';
+
+                    let labelMessage = '<small class="text-muted">Available</small>';
+                    if (isDisabled) {
+                        const bookedByName = shiftBookedByOthers.fullBookingData.customerName || 'Another customer';
+                        labelMessage = `<small class="text-danger">⚠️ Booked by ${bookedByName}</small>`;
+                    } else if (isChecked) {
+                        labelMessage = '<small class="text-success">✅ Selected for this booking</small>';
+                    }
 
                     return {
                         checkboxHTML: `
                             <div class="col-md-6">
-                                <label class="d-flex align-items-center p-3 border rounded cursor-pointer ${isDisabled ? 'bg-light opacity-50' : 'bg-white'}"
+                                <label class="d-flex align-items-center p-3 border rounded cursor-pointer ${isDisabled ? 'bg-light opacity-50' : isChecked ? 'bg-success bg-opacity-10 border-success' : 'bg-white'}"
                                        for="${inputId}">
                                     <input type="checkbox"
                                            id="${inputId}"
@@ -2051,14 +2201,16 @@
                                             <input type="time"
                                                    class="form-control form-control-lg"
                                                    name="shift-${dateStr}-${shiftType}-start"
-                                                   value="${times.start || (shiftType === 'morning' ? '09:00' : '17:00')}">
+                                                   value="${times.start || (shiftType === 'morning' ? '09:00' : '17:00')}"
+                                                   required>
                                         </div>
                                         <div class="col-6">
                                             <label class="form-label fw-bold">End Time</label>
                                             <input type="time"
                                                    class="form-control form-control-lg"
                                                    name="shift-${dateStr}-${shiftType}-end"
-                                                   value="${times.end || (shiftType === 'morning' ? '13:00' : '21:00')}">
+                                                   value="${times.end || (shiftType === 'morning' ? '13:00' : '21:00')}"
+                                                   required>
                                         </div>
                                     </div>
                                 </div>
@@ -2101,9 +2253,7 @@
             addShiftCheckboxListeners();
         }
 
-
-
-                function addShiftCheckboxListeners() {
+        function addShiftCheckboxListeners() {
             // 🔍 Find all checkboxes with class 'shift-checkbox'
             const allCheckboxes = document.querySelectorAll('.shift-checkbox');
             console.log('Found checkboxes:', allCheckboxes.length); // Debug log
@@ -2140,6 +2290,7 @@
                 });
             });
         }
+
         // Add CSS animations
         const style = document.createElement('style');
         style.textContent = `

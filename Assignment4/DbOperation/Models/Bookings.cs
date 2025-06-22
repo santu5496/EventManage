@@ -42,7 +42,9 @@ public partial class Bookings
     public string address { get; set; }
     public string EventName { get; set; }
 
-
+    // ✅ New columns added
+    public decimal? diesel { get; set; }  // For diesel/fuel costs
+    public string bandType { get; set; }  // For band type (Full Band, Sada Band, etc.)
     public virtual Events _event { get; set; }
 
     public virtual Users user { get; set; }

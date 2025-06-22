@@ -19,9 +19,97 @@ namespace DbOperation.Implementation
             _context = new DbContextOptionsBuilder<EventContext>()
                             .UseSqlServer(connectionString).Options;
             //var a = AddDateWiseShiftsColumn();
+            AddNewBookingColumns();
+
 
 
         }
+        // Add these methods to your EventBookingService class
+
+        public bool AddDieselColumn()
+        {
+            const string alterQuery = @"
+        IF NOT EXISTS (
+            SELECT * 
+            FROM INFORMATION_SCHEMA.COLUMNS 
+            WHERE TABLE_NAME = 'Bookings' 
+              AND COLUMN_NAME = 'diesel'
+        )
+        BEGIN
+            ALTER TABLE Bookings ADD diesel DECIMAL(18,2) NULL;
+        END";
+
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                using (var command = new SqlCommand(alterQuery, connection))
+                {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+
+                Console.WriteLine("Column 'diesel' checked/added successfully.");
+                return true;
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine($"SQL Error: {ex.Message}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return false;
+            }
+        }
+
+        public bool AddBandTypeColumn()
+        {
+            const string alterQuery = @"
+        IF NOT EXISTS (
+            SELECT * 
+            FROM INFORMATION_SCHEMA.COLUMNS 
+            WHERE TABLE_NAME = 'Bookings' 
+              AND COLUMN_NAME = 'bandType'
+        )
+        BEGIN
+            ALTER TABLE Bookings ADD bandType NVARCHAR(50) NULL;
+        END";
+
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                using (var command = new SqlCommand(alterQuery, connection))
+                {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+
+                Console.WriteLine("Column 'bandType' checked/added successfully.");
+                return true;
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine($"SQL Error: {ex.Message}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return false;
+            }
+        }
+
+        // Method to add both columns at once
+        public bool AddNewBookingColumns()
+        {
+            bool dieselAdded = AddDieselColumn();
+            bool bandTypeAdded = AddBandTypeColumn();
+
+            return dieselAdded && bandTypeAdded;
+        }
+
+   
 
         public bool AddBooking(Bookings bookings)
         {
