@@ -2,285 +2,3021 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Login Form</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r148/three.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Event Booking Pro</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body, html {
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-color: #667eea;
+            --primary-dark: #5a6fd8;
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%);
+            --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            --surface-color: #ffffff;
+            --background-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #718096;
+            --text-muted: #a0aec0;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --border-radius: 16px;
+            --border-radius-sm: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--background-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             margin: 0;
             padding: 0;
-            font-family: 'Poppins', sans-serif;
-            height: 100%;
+            overflow-x: hidden;
+            color: var(--text-primary);
+            font-weight: 400;
+        }
+
+        /* Enhanced App Bar - More Compact for Mobile */
+        .app-bar {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1rem; /* Reduced from 1.5rem */
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .app-title {
+            font-size: 1.25rem; /* Reduced from 1.5rem */
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem; /* Reduced gap */
+        }
+
+        .app-subtitle {
+            font-size: 0.8rem; /* Reduced from 0.875rem */
+            opacity: 0.9;
+            font-weight: 400;
+            margin-top: 0.15rem; /* Reduced margin */
+        }
+
+        /* More Compact Quick Actions */
+        .quick-actions-container {
+            padding: 0.75rem 1rem; /* Reduced from 1rem */
+            margin-bottom: 0.25rem; /* Reduced from 0.5rem */
+        }
+
+        .quick-action {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1rem; /* Reduced from 1.25rem */
+            margin-bottom: 0.5rem; /* Reduced from 0.75rem */
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .quick-action-icon {
+            width: 48px; /* Reduced from 56px */
+            height: 48px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem; /* Reduced from 1.5rem */
+            margin-right: 0.75rem; /* Reduced from 1rem */
+            box-shadow: var(--shadow-sm);
+        }
+
+        .quick-action-content h6 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 0.9rem; /* Reduced from 1rem */
+        }
+
+        .quick-action-content small {
+            color: var(--text-secondary);
+            font-size: 0.8rem; /* Reduced from 0.875rem */
+        }
+
+        /* Optimized Calendar Container */
+        .calendar-container {
+            margin: 0 0.75rem 0.75rem 0.75rem; /* Reduced margins */
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            /* Make calendar take remaining height */
+            height: calc(100vh - 240px); /* Adjust based on header + quick actions */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Compact Calendar Toolbar */
+        .fc-toolbar {
+            padding: 1rem; /* Reduced from 1.5rem */
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            flex-shrink: 0; /* Don't shrink */
+        }
+
+        .fc-toolbar-title {
+            font-size: 1.1rem; /* Reduced from 1.25rem */
+            font-weight: 700;
+            color: var(--text-primary);
+            flex: 1;
+            text-align: center;
+        }
+
+        .fc-button {
+            background: var(--primary-gradient) !important;
+            border: none !important;
+            border-radius: 50% !important;
+            width: 40px !important; /* Reduced from 44px */
+            height: 40px !important;
+            padding: 0 !important;
+            font-size: 1rem !important; /* Reduced from 1.1rem */
+            box-shadow: var(--shadow-sm) !important;
+            margin: 0 0.5rem !important;
+            transition: all 0.3s ease !important;
+        }
+
+        /* Calendar takes remaining space */
+        .fc-view-harness {
+            flex: 1;
             overflow: hidden;
         }
 
-            body:before {
-                content: '';
-                position: fixed;
-                width: 100vw;
-                height: 100vh;
-                background-image: url(https://i.postimg.cc/8cf6v1rk/1.jpg);
-                background-position: center center;
-                background-repeat: no-repeat;
-                background-attachment: fixed;
-                background-size: cover;
-                filter: blur(10px);
-                z-index: -2;
+        /* More compact calendar cells */
+        .fc-daygrid-day {
+            min-height: 75px !important; /* Reduced from 90px */
+            position: relative;
+            border: 1px solid var(--border-color) !important;
+            transition: background-color 0.2s ease;
+        }
+
+        .fc-daygrid-day-number {
+            padding: 6px !important; /* Reduced from 8px */
+            font-weight: 600 !important;
+            color: var(--text-primary) !important;
+            font-size: 0.85rem !important; /* Reduced from 0.9rem */
+        }
+
+        .fc-day-today .fc-daygrid-day-number {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 50%;
+            width: 28px; /* Reduced from 32px */
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem; /* Reduced from 0.875rem */
+            font-weight: 700;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Compact shift blocks */
+        .shift-block {
+            position: absolute;
+            cursor: pointer;
+            z-index: 10;
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem; /* Reduced from 0.75rem */
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 24px; /* Reduced from 28px */
+            line-height: 1.1;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            padding: 3px 5px; /* Reduced padding */
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            width: calc(100% - 4px);
+        }
+
+        .shift-customer-name {
+            font-size: 0.6rem; /* Reduced from 0.7rem */
+            font-weight: 700;
+            line-height: 1.1;
+            margin: 0 0 1px 0;
+            padding: 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            text-align: center;
+            max-width: 100%;
+        }
+
+        .shift-address {
+            font-size: 0.55rem; /* Reduced from 0.65rem */
+            font-weight: 500;
+            line-height: 1.1;
+            margin: 0;
+            padding: 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            text-align: center;
+            max-width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1px;
+            flex-wrap: wrap;
+        }
+
+            .shift-address i {
+                font-size: 0.5rem; /* Reduced from 0.55rem */
+                opacity: 0.9;
+                flex-shrink: 0;
             }
 
-        #canvas-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-
-        .contact-form {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            max-width: 400px;
-            padding: 40px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            animation: fadeIn 0.5s forwards;
-        }
-
-        @@keyframes fadeIn {
-            to
+        /* Mobile-specific calendar optimizations */
+        @@media (max-width: 480px) {
+            .app-bar
 
         {
-            opacity: 1;
+            padding: 0.75rem 1rem;
+        }
+
+        .app-title {
+            font-size: 1.1rem;
+        }
+
+        .app-subtitle {
+            font-size: 0.75rem;
+        }
+
+        .quick-actions-container {
+            padding: 0.5rem 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .quick-action {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .quick-action-icon {
+            width: 44px;
+            height: 44px;
+            font-size: 1.1rem;
+            margin-right: 0.5rem;
+        }
+
+        .calendar-container {
+            margin: 0 0.5rem 0.5rem 0.5rem;
+            height: calc(100vh - 200px); /* Optimized for smaller screens */
+        }
+
+        .fc-toolbar {
+            padding: 0.75rem;
+        }
+
+        .fc-toolbar-title {
+            font-size: 1rem;
+        }
+
+        .fc-button {
+            width: 36px !important;
+            height: 36px !important;
+            font-size: 0.9rem !important;
+        }
+
+        .fc-daygrid-day {
+            min-height: 70px !important;
+        }
+
+        .fc-daygrid-day-number {
+            padding: 4px !important;
+            font-size: 0.8rem !important;
+        }
+
+        .fc-day-today .fc-daygrid-day-number {
+            width: 24px;
+            height: 24px;
+            font-size: 0.75rem;
+        }
+
+        .shift-block {
+            font-size: 0.6rem;
+            min-height: 20px;
+            padding: 2px 4px;
+        }
+
+        .shift-customer-name {
+            font-size: 0.55rem;
+        }
+
+        .shift-address {
+            font-size: 0.5rem;
         }
 
         }
 
-        .contact-form h2 {
-            margin-bottom: 20px;
-            color: #fff;
+        /* Extra small screens */
+        @@media (max-width: 360px) {
+            .calendar-container
+
+        {
+            height: calc(100vh - 180px);
+            margin: 0 0.25rem 0.25rem 0.25rem;
+        }
+
+        .fc-daygrid-day {
+            min-height: 65px !important;
+        }
+
+        .shift-block {
+            font-size: 0.55rem;
+            min-height: 18px;
+            padding: 2px 3px;
+        }
+
+        }
+
+        /* Landscape mobile optimizations */
+        @@media (max-width: 896px) and (orientation: landscape) {
+            .app-bar
+
+        {
+            padding: 0.5rem 1rem;
+        }
+
+        .app-subtitle {
+            display: none; /* Hide subtitle in landscape to save space */
+        }
+
+        .quick-actions-container {
+            padding: 0.5rem 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .calendar-container {
+            height: calc(100vh - 140px); /* More space for calendar in landscape */
+        }
+
+        .fc-daygrid-day {
+            min-height: 60px !important;
+        }
+
+        }
+
+        /* Enhanced Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 1.5rem;
+            width: 64px;
+            height: 64px;
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.75rem;
+            box-shadow: var(--shadow-xl);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+            .fab:hover, .fab:active {
+                transform: scale(1.1) rotate(90deg);
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            }
+
+        /* Enhanced Quick Actions */
+        .quick-actions-container {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .quick-action {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.25rem;
+            margin-bottom: 0.75rem;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+            .quick-action:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+                color: var(--text-primary);
+                text-decoration: none;
+            }
+
+            .quick-action:active {
+                transform: translateY(0);
+                box-shadow: var(--shadow-sm);
+            }
+
+        .quick-action-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .quick-action-content h6 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .quick-action-content small {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Enhanced Calendar Container */
+        .calendar-container {
+            margin: 0 1rem 1rem 1rem;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Enhanced FullCalendar Styles */
+        .fc {
+            font-size: 0.875rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .fc-toolbar {
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .fc-toolbar-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            flex: 1;
             text-align: center;
         }
 
-        .contact-form p {
-            margin: 0;
-            font-weight: bold;
-            color: #fff;
+        .fc-button {
+            background: var(--primary-gradient) !important;
+            border: none !important;
+            border-radius: 50% !important;
+            width: 44px !important;
+            height: 44px !important;
+            padding: 0 !important;
+            font-size: 1.1rem !important;
+            box-shadow: var(--shadow-sm) !important;
+            margin: 0 0.5rem !important;
+            transition: all 0.3s ease !important;
         }
 
-        .contact-form input[type=text],
-        .contact-form input[type=password] {
-            width: 100%;
-            border: none;
-            border-bottom: 1px solid #fff;
-            background: transparent;
-            outline: none;
-            height: 40px;
-            color: #fff;
-            font-size: 16px;
-            margin-bottom: 20px;
-            transition: border-color 0.3s;
-        }
-
-            .contact-form input[type=text]:focus,
-            .contact-form input[type=password]:focus {
-                border-bottom: 1px solid #6366f1;
+            .fc-button:hover, .fc-button:focus {
+                transform: scale(1.05) !important;
+                box-shadow: var(--shadow-md) !important;
             }
 
-        .contact-form input[type=submit] {
-            width: 100%;
-            height: 40px;
-            color: #fff;
-            font-size: 16px;
-            background: red;
+        .fc-daygrid-day {
+            min-height: 80px !important;
+            position: relative;
+            border: 1px solid var(--border-color) !important;
+            transition: background-color 0.2s ease;
+        }
+
+            .fc-daygrid-day:hover {
+                background-color: rgba(102, 126, 234, 0.05);
+            }
+
+        .fc-daygrid-day-number {
+            padding: 8px !important;
+            font-weight: 600 !important;
+            color: var(--text-primary) !important;
+            font-size: 0.9rem !important;
+        }
+
+        .fc-day-today .fc-daygrid-day-number {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 700;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Enhanced Shift Blocks */
+        .shift-block {
+            position: absolute;
             cursor: pointer;
-            border-radius: 25px;
-            border: none;
-            outline: none;
-            margin-top: 10px;
-            transition: background 0.3s;
+            z-index: 10;
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 24px;
+            line-height: 1.1;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            padding: 4px 6px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            width: calc(100% - 4px);
         }
 
-            .contact-form input[type=submit]:hover {
-                background: darkred;
+            .shift-block:hover {
+                transform: scale(1.02);
+                box-shadow: var(--shadow-md);
             }
 
+            .shift-block:active {
+                transform: scale(0.98);
+            }
+
+        .shift-morning {
+            background: var(--warning-gradient);
+        }
+
+        .shift-evening {
+            background: var(--success-gradient);
+        }
+
+        .shift-fullday {
+            background: var(--secondary-gradient);
+        }
+
+        .shift-customer-name {
+            font-size: 0.65rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin: 0 0 2px 0;
+            padding: 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            text-align: center;
+            max-width: 100%;
+        }
+
+        .shift-address {
+            font-size: 0.6rem;
+            font-weight: 500;
+            line-height: 1.1;
+            margin: 0;
+            padding: 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            text-align: center;
+            max-width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            flex-wrap: wrap;
+        }
+
+            .shift-address i {
+                font-size: 0.55rem;
+                opacity: 0.9;
+                flex-shrink: 0;
+            }
+
+        /* Enhanced Empty Shift Areas */
+        .empty-shift-area {
+            position: absolute;
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px dashed rgba(102, 126, 234, 0.3);
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            width: calc(100% - 4px);
+        }
+
+            .empty-shift-area:hover {
+                background: rgba(102, 126, 234, 0.15);
+                border-color: var(--primary-color);
+                transform: scale(1.02);
+            }
+
+            .empty-shift-area:active {
+                background: rgba(102, 126, 234, 0.2);
+                transform: scale(0.98);
+            }
+
+        /* Enhanced Modal Styles */
+        .modal-dialog {
+            margin: 0;
+            height: 100vh;
+            max-width: 100%;
+        }
+
+        .modal-content {
+            height: 100vh;
+            border-radius: 0;
+            border: none;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .modal-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1.5rem;
+            border-bottom: none;
+        }
+
+        .modal-title {
+            font-size: 1.375rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-close {
+            filter: invert(1);
+            opacity: 0.8;
+            font-size: 1.25rem;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+            background: var(--background-color);
+        }
+
+        .modal-footer {
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem;
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Enhanced Form Styles */
+        .form-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: var(--border-radius-sm);
+            border: 2px solid var(--border-color);
+            padding: 0.875rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--card-bg);
+            font-weight: 500;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+                transform: translateY(-1px);
+            }
+
+        /* Enhanced Button Styles */
+        .btn {
+            border-radius: var(--border-radius);
+            padding: 0.875rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: none;
+            letter-spacing: 0.025em;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .btn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                transition: left 0.5s;
+            }
+
+            .btn:hover::before {
+                left: 100%;
+            }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            box-shadow: var(--shadow-sm);
+        }
+
+            .btn-primary:hover, .btn-primary:active {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+        .btn-success {
+            background: var(--success-gradient);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-danger {
+            background: var(--danger-gradient);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-outline-success {
+            border: 2px solid #4facfe;
+            color: #4facfe;
+            background: transparent;
+        }
+
+            .btn-outline-success:hover {
+                background: var(--success-gradient);
+                border-color: transparent;
+            }
+
+        /* Enhanced Detail Cards */
+        .detail-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+            .detail-card:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+        .detail-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1rem 1.25rem;
+            border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
+            margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Enhanced Status Badges */
+        .badge {
+            font-weight: 600;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--border-radius-sm);
+            font-size: 0.75rem;
+        }
+
+        .bg-primary {
+            background: var(--primary-gradient) !important;
+        }
+
+        /* Enhanced Loader */
+        .loader-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(248, 250, 252, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(4px);
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @@keyframes spin {
+            0%
+
+        {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+
+        }
+
+        /* Enhanced Error Messages */
         .error-message {
-            color: red;
-            font-size: 14px;
-            margin-top: -15px;
-            margin-bottom: 15px;
+            background: rgba(255, 107, 107, 0.1);
+            color: #ee5a24;
+            padding: 0.75rem;
+            border-radius: var(--border-radius-sm);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            border-left: 4px solid #ee5a24;
+            font-weight: 500;
+        }
+
+        /* Enhanced Toast Styling */
+        .toast-container {
+            position: fixed;
+            bottom: 100px;
+            left: 1rem;
+            right: 1rem;
+            z-index: 1100;
+        }
+
+        .toast {
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 0.75rem;
+            border: none;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Enhanced Alert Styles */
+        .alert {
+            border-radius: var(--border-radius);
+            border: none;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .alert-info {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary-color);
+        }
+
+        .alert-danger {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ee5a24;
+        }
+
+        .alert-success {
+            background: rgba(79, 172, 254, 0.1);
+            color: #0891b2;
+        }
+
+        /* Mobile-First Optimizations */
+
+        /* Touch-friendly interactions */
+        .quick-action, .shift-block, .empty-shift-area, .btn, .detail-card {
+            min-height: 48px; /* Minimum touch target size */
+            touch-action: manipulation; /* Prevents zoom on double-tap */
+        }
+
+        /* Enhanced Mobile Calendar */
+        .fc-daygrid-day {
+            min-height: 90px !important; /* Taller for better touch targets */
+            position: relative;
+            border: 1px solid var(--border-color) !important;
+            transition: background-color 0.2s ease;
+        }
+
+        /* Better mobile shift blocks */
+        .shift-block {
+            position: absolute;
+            cursor: pointer;
+            z-index: 10;
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem; /* Slightly larger for mobile */
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 28px; /* Taller for touch */
+            line-height: 1.2;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            padding: 6px 8px; /* More padding */
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            width: calc(100% - 4px);
+        }
+
+        .shift-customer-name {
+            font-size: 0.7rem; /* Larger for mobile readability */
+            font-weight: 700;
+            line-height: 1.2;
+            margin: 0 0 2px 0;
+            padding: 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            text-align: center;
+            max-width: 100%;
+        }
+
+        .shift-address {
+            font-size: 0.65rem; /* Larger for mobile */
+            font-weight: 500;
+            line-height: 1.2;
+            margin: 0;
+            padding: 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            text-align: center;
+            max-width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            flex-wrap: wrap;
+        }
+
+        /* Mobile FAB optimization */
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 1.5rem;
+            width: 64px;
+            height: 64px;
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.75rem;
+            box-shadow: var(--shadow-xl);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        /* Mobile Modal Enhancements */
+        .modal-dialog {
+            margin: 0;
+            height: 100vh;
+            max-width: 100%;
+            padding: 0;
+        }
+
+        .modal-content {
+            height: 100vh;
+            border-radius: 0;
+            border: none;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .modal-body {
+            padding: 1rem; /* Reduced padding for mobile */
+            overflow-y: auto;
+            flex: 1;
+            background: var(--background-color);
+            -webkit-overflow-scrolling: touch; /* Smooth iOS scrolling */
+        }
+
+        /* Mobile Form Optimizations */
+        .form-control, .form-select {
+            border-radius: var(--border-radius-sm);
+            border: 2px solid var(--border-color);
+            padding: 1rem; /* Larger padding for touch */
+            font-size: 16px; /* Prevents zoom on iOS */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--card-bg);
+            font-weight: 500;
+            touch-action: manipulation;
+        }
+
+        /* Mobile Button Enhancements */
+        .btn {
+            border-radius: var(--border-radius);
+            padding: 1rem 1.5rem; /* Larger padding for touch */
+            font-weight: 600;
+            font-size: 1rem; /* Larger text */
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: none;
+            letter-spacing: 0.025em;
+            position: relative;
+            overflow: hidden;
+            min-height: 48px; /* Touch target */
+            touch-action: manipulation;
+        }
+
+        /* Mobile-specific spacing */
+        .mb-3 {
+            margin-bottom: 1.5rem !important; /* More spacing on mobile */
+        }
+
+        /* Mobile Date Picker Enhancements */
+        input[type="date"], input[type="time"] {
+            font-size: 16px; /* Prevents zoom on iOS */
+            padding: 1rem;
+            touch-action: manipulation;
+        }
+
+        /* Mobile Checkbox Styling */
+        .shift-checkbox {
+            transform: scale(1.8) !important; /* Larger checkboxes for touch */
+            margin-right: 1rem !important;
+        }
+
+        /* Mobile Alert Styling */
+        .alert {
+            border-radius: var(--border-radius);
+            border: none;
+            padding: 1.25rem; /* More padding for mobile */
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            font-size: 0.95rem; /* Slightly larger text */
+        }
+
+        /* Mobile Card Enhancements */
+        .card {
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            padding: 1.25rem;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        /* Mobile Detail Cards */
+        .detail-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.25rem; /* More padding for mobile */
+            margin-bottom: 1.25rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            touch-action: manipulation;
+        }
+
+        /* Mobile Toast Positioning */
+        .toast-container {
+            position: fixed;
+            bottom: 120px; /* Higher to avoid FAB */
+            left: 1rem;
+            right: 1rem;
+            z-index: 1100;
+        }
+
+        /* Mobile-specific media queries */
+        @@media (max-width: 480px) {
+            .fc-daygrid-day
+
+        {
+            min-height: 85px !important;
+        }
+
+        .shift-block {
+            font-size: 0.7rem;
+            min-height: 26px;
+            padding: 5px 6px;
+        }
+
+        .quick-action-icon {
+            width: 52px;
+            height: 52px;
+            font-size: 1.4rem;
+        }
+
+        .fab {
+            width: 60px;
+            height: 60px;
+            font-size: 1.6rem;
+            bottom: 1.5rem;
+            right: 1rem;
+        }
+
+        .modal-body {
+            padding: 0.75rem;
+        }
+
+        .form-control, .form-select {
+            padding: 0.875rem;
+            font-size: 16px;
+        }
+
+        .btn {
+            padding: 0.875rem 1.25rem;
+            font-size: 0.95rem;
+        }
+
+        .app-bar {
+            padding: 1.25rem 1rem;
+        }
+
+        .app-title {
+            font-size: 1.375rem;
+        }
+
+        /* Smaller spacing for very small screens */
+        .mb-3 {
+            margin-bottom: 1.25rem !important;
+        }
+
+        .card-body, .card-header {
+            padding: 1rem;
+        }
+
+        .detail-card {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        }
+
+        /* Landscape mobile optimizations */
+        @@media (max-width: 896px) and (orientation: landscape) {
+            .modal-body
+
+        {
+            padding: 0.75rem;
+        }
+
+        .fc-daygrid-day {
+            min-height: 75px !important;
+        }
+
+        .app-bar {
+            padding: 1rem;
+        }
+
+        }
+
+        /* Prevent zoom on form focus (iOS Safari) */
+        @@media (max-width: 768px) {
+            input [type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], input[type="time"], textarea, select
+
+        {
+            font-size: 16px !important;
+        }
+
+        }
+
+        /* Mobile swipe indicators */
+        .swipe-indicator {
             display: none;
         }
 
-        .contact-form a {
-            color: #fff;
-            font-size: 14px;
-            font-weight: bold;
-            text-decoration: none;
-            display: block;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .contact-form input[type=checkbox] {
-            width: auto;
-            margin-right: 5px;
-        }
-
-        /* Responsive Styles */
-        @@media (max-width: 600px) {
-            .contact-form
+        @@media (max-width: 768px) {
+            .swipe-indicator
 
         {
-            padding: 30px;
-        }
-
-        .contact-form h2 {
-            font-size: 24px;
-        }
-
-        .contact-form input[type=submit] {
-            height: 45px;
-            font-size: 18px;
+            display: block;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            padding: 0.5rem;
+            border-top: 1px solid var(--border-color);
         }
 
         }
+
+        /* Enhanced focus states for mobile */
+        *:focus {
+            outline: 3px solid var(--primary-color); /* Thicker outline for mobile */
+            outline-offset: 2px;
+        }
+
+        /* Remove hover effects on touch devices */
+        @@media (hover: none) and (pointer: coarse) {
+            .quick-action:hover, .shift-block:hover, .detail-card:hover, .btn:hover
+
+        {
+            transform: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .fab:hover {
+            transform: none;
+        }
+
+        }
+
+        /* Accessibility improvements */
+        .sr-only {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
+        /* Enhanced focus states */
+        *:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Smooth transitions for all interactive elements */
+        .quick-action, .shift-block, .empty-shift-area, .btn, .form-control, .form-select {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Enhanced row styling */
+        .row.mb-3 .col-6 .form-label,
+        .row.mb-3 .col-4 .form-label,
+        .row.mb-3 .col-8 .form-label {
+            font-size: 0.8rem;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Better spacing for form groups */
+        .mb-3 {
+            margin-bottom: 1.25rem !important;
+        }
+
+        /* Enhanced multi-booking modal content */
+        #multi-booking-content .detail-card {
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+            #multi-booking-content .detail-card:hover {
+                border-color: var(--primary-color);
+                background: rgba(102, 126, 234, 0.05);
+            }
     </style>
 </head>
 <body>
-    <div id="canvas-container"></div>
-
-    <div class="contact-form">
-        <h2>Login</h2>
-        <form onsubmit="event.preventDefault(); login();">
-            <p>UserName</p>
-            <input type="text" id="username" placeholder="Enter UserName" required>
-            <p>Password</p>
-            <input type="password" id="password" placeholder="Enter Password" required>
-            <div class="error-message" id="error-message"></div>
-            <input type="submit" value="Sign in">
-            <p><input type="checkbox">Remember Me</p>
-            <a href="#">Forgot Password?</a>
-        </form>
+    <!-- Enhanced App Bar -->
+    <div class="app-bar">
+        <h1 class="app-title">
+            <i class="bi bi-calendar-event"></i>
+            Event Booking Pro
+        </h1>
+        <div class="app-subtitle">Manage your events seamlessly</div>
     </div>
 
+    <!-- Enhanced Quick Actions -->
+    <div class="quick-actions-container">
+        <div class="quick-action" onclick="refreshCalendar()">
+            <div class="quick-action-icon">
+                <i class="bi bi-arrow-clockwise"></i>
+            </div>
+            <div class="quick-action-content">
+                <h6>Refresh Calendar</h6>
+                <small>Update and sync all events</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Calendar -->
+    <div class="calendar-container position-relative">
+        <div id="calendar-loader" class="loader-overlay d-none">
+            <div class="spinner"></div>
+        </div>
+        <div id="calendar"></div>
+    </div>
+
+    <!-- 🔥 FIXED: Removed generateDateWiseShifts() from FAB button -->
+    <button class="fab" onclick="openBookingModal()" aria-label="Add new booking">
+        <i class="bi bi-plus"></i>
+    </button>
+
+    <!-- Enhanced Booking Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="modal-title-text" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-calendar-plus"></i>
+                        <span id="modal-title-text">New Booking</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="modal-message" class="alert d-none"></div>
+
+                    <form id="bookingForm" novalidate>
+                        <input type="hidden" id="bookingId">
+                        <input type="hidden" id="userId" value="1">
+
+                        <div class="mb-3">
+                            <label for="EventName" class="form-label">
+                                <i class="bi bi-star me-1"></i>Event Name *
+                            </label>
+                            <input type="text" id="EventName" class="form-control" placeholder="Wedding, Birthday, Corporate Event..." required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="customerName" class="form-label">
+                                <i class="bi bi-person me-1"></i>Customer Name *
+                            </label>
+                            <input type="text" id="customerName" class="form-control" placeholder="Enter customer name" required>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-8">
+                                <label for="phoneNumber" class="form-label">
+                                    <i class="bi bi-telephone me-1"></i>Phone Number *
+                                </label>
+                                <input type="tel" id="phoneNumber" class="form-control" placeholder="10 digit number" required>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="button" class="btn btn-outline-success w-100" onclick="openWhatsApp()">
+                                    <i class="bi bi-whatsapp"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="alternativeNumber" class="form-label">
+                                <i class="bi bi-telephone-plus me-1"></i>Alternative Number
+                            </label>
+                            <input type="tel" id="alternativeNumber" class="form-control" placeholder="Optional backup number">
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label for="fromDate" class="form-label">
+                                    <i class="bi bi-calendar-date me-1"></i>From Date *
+                                </label>
+                                <input type="date" id="fromDate" class="form-control" required>
+                            </div>
+                            <div class="col-6">
+                                <label for="toDate" class="form-label">
+                                    <i class="bi bi-calendar-check me-1"></i>To Date *
+                                </label>
+                                <input type="date" id="toDate" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label for="bookingStatus" class="form-label">
+                                    <i class="bi bi-check-circle me-1"></i>Status *
+                                </label>
+                                <select id="bookingStatus" class="form-select" required>
+                                    <option value="Confirmed">✅ Confirmed</option>
+                                    <option value="Pending">⏳ Pending</option>
+                                    <option value="Cancelled">❌ Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label for="paymentStatus" class="form-label">
+                                    <i class="bi bi-currency-rupee me-1"></i>Payment *
+                                </label>
+                                <select id="paymentStatus" class="form-select" required>
+                                    <option value="Paid">💰 Paid</option>
+                                    <option value="Partially Paid">💳 Partial</option>
+                                    <option value="Pending">⏰ Pending</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-4">
+                                <label for="totalAmount" class="form-label">Total ₹ *</label>
+                                <input type="number" id="totalAmount" class="form-control" placeholder="0" required>
+                            </div>
+                            <div class="col-4">
+                                <label for="advancePayment" class="form-label">Advance ₹</label>
+                                <input type="number" id="advancePayment" class="form-control" placeholder="0">
+                            </div>
+                            <div class="col-4">
+                                <label for="remainingPayment" class="form-label">Balance ₹</label>
+                                <input type="number" id="remainingPayment" class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="row mb-5">
+                            <div class="col-4">
+                                <label for="diesel" class="form-label">Diesel ₹ *</label>
+                                <input type="text" id="diesel" class="form-control" placeholder="0" required>
+                            </div>
+                            <div class="col-8">
+                                <label for="bandType" class="form-label">BandType </label>
+                                <input type="text" id="bandType" class="form-control">
+                            </div>
+
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label">
+                                <i class="bi bi-geo-alt me-1"></i>Event Address
+                            </label>
+                            <textarea id="address" class="form-control" rows="3" placeholder="Enter complete event location with landmarks..."></textarea>
+                        </div>
+
+                        <div id="dateWiseShiftContainer">
+                            <!-- Dynamic shift selection will appear here -->
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="delete-booking" style="display:none;">
+                        <i class="bi bi-trash me-1"></i> Delete
+                    </button>
+                    <button type="button" class="btn btn-primary flex-fill" onclick="saveBooking()">
+                        <i class="bi bi-save me-1"></i> Save Booking
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Details Modal -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="details-title" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-info-circle"></i>
+                        <span id="details-title">Booking Details</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="booking-details-content">
+                    <!-- Booking details will be populated here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success me-2" id="whatsapp-btn">
+                        <i class="bi bi-whatsapp me-1"></i> WhatsApp
+                    </button>
+                    <button type="button" class="btn btn-primary flex-fill" id="edit-booking-btn">
+                        <i class="bi bi-pencil me-1"></i> Edit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Multi-booking Modal -->
+    <div class="modal fade" id="multiBookingModal" tabindex="-1" aria-labelledby="multiBookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="multiBookingModalLabel">
+                        <i class="bi bi-list"></i>
+                        Multiple Bookings
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="multi-booking-content">
+                    <!-- Multiple booking options will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
     <script>
-        $(document).ready(function () {
-            $(".sidebar").hide();
-        });
+        // Enhanced event booking calendar with improved UI
+        let shiftMap = {};
+        let calendar;
+        const bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
+        const detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
+        const multiBookingModal = new bootstrap.Modal(document.getElementById('multiBookingModal'));
 
-        function initThreeJsBackground() {
-            const container = document.getElementById('canvas-container');
-            const width = window.innerWidth;
-            const height = window.innerHeight;
+        // Utility functions
+        function localYMD(date) {
+            const Y = date.getFullYear();
+            const M = String(date.getMonth() + 1).padStart(2, '0');
+            const D = String(date.getDate()).padStart(2, '0');
+            return `${Y}-${M}-${D}`;
+        }
 
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ alpha: true });
-            renderer.setSize(width, height);
-            container.appendChild(renderer.domElement);
-
-            const geometry = new THREE.BufferGeometry();
-            const particlesCount = 1500;
-            const posArray = new Float32Array(particlesCount * 3);
-
-            for (let i = 0; i < particlesCount * 3; i++) {
-                posArray[i] = (Math.random() - 0.5) * 10;
-            }
-
-            geometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-
-            const material = new THREE.PointsMaterial({
-                size: 0.02,
-                color: 0x6366f1,
-                transparent: true
+        function formatDate(dateStr) {
+            if (!dateStr) return '—';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
             });
+        }
 
-            const particles = new THREE.Points(geometry, material);
-            scene.add(particles);
-            camera.position.z = 3;
+        function capitalizeFirstLetter(string) {
+            if (!string) return '';
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
 
-            let mouseX = 0, mouseY = 0;
-            document.addEventListener('mousemove', e => {
-                mouseX = (e.clientX - width / 2) / 100;
-                mouseY = (e.clientY - height / 2) / 100;
-            });
-
-            const animate = () => {
-                requestAnimationFrame(animate);
-                particles.rotation.x += (mouseY * 0.02 - particles.rotation.x) * 0.05;
-                particles.rotation.y += (mouseX * 0.02 - particles.rotation.y) * 0.05;
-                renderer.render(scene, camera);
+        function showToast(message, type = 'info') {
+            // Enhanced toast with better styling
+            const toastId = 'toast-' + Date.now();
+            const iconMap = {
+                success: 'bi-check-circle-fill',
+                error: 'bi-exclamation-triangle-fill',
+                info: 'bi-info-circle-fill',
+                warning: 'bi-exclamation-triangle-fill'
             };
 
-            animate();
+            const toast = document.createElement('div');
+            toast.id = toastId;
+            toast.className = `alert alert-${type === 'error' ? 'danger' : type} position-fixed d-flex align-items-center`;
+            toast.style.cssText = `
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                min-width: 300px;
+                animation: slideInRight 0.3s ease-out;
+            `;
 
-            window.addEventListener('resize', () => {
-                const newWidth = window.innerWidth;
-                const newHeight = window.innerHeight;
-                camera.aspect = newWidth / newHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(newWidth, newHeight);
+            toast.innerHTML = `
+                <i class="bi ${iconMap[type] || iconMap.info} me-2"></i>
+                <span class="flex-grow-1">${message}</span>
+                <button type="button" class="btn-close" onclick="removeToast('${toastId}')"></button>
+            `;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                removeToast(toastId);
+            }, 4000);
+        }
+
+        function removeToast(toastId) {
+            const toast = document.getElementById(toastId);
+            if (toast) {
+                toast.style.animation = 'slideOutRight 0.3s ease-in';
+                setTimeout(() => {
+                    if (toast.parentNode) toast.parentNode.removeChild(toast);
+                }, 300);
+            }
+        }
+
+        function showLoader() {
+            document.getElementById('calendar-loader').classList.remove('d-none');
+        }
+
+        function hideLoader() {
+            document.getElementById('calendar-loader').classList.add('d-none');
+        }
+
+        function createShiftBlock(shiftType, bookings, dateStr) {
+            const div = document.createElement('div');
+            div.className = `shift-block shift-${shiftType.replace(' ', '')}`;
+
+            // Add shift icon based on type
+            const shiftIcons = {
+                'morning': '🌅',
+                'evening': '🌆',
+                'full day': '🌟'
+            };
+
+            // Show customer name AND address with shift icon
+            if (bookings[0] && bookings[0].fullBookingData) {
+                const data = bookings[0].fullBookingData;
+
+                // Customer name with shift icon (first priority)
+                if (data.customerName && data.customerName.trim()) {
+                    const customerDiv = document.createElement('div');
+                    customerDiv.className = 'shift-customer-name';
+                    customerDiv.innerHTML = `${shiftIcons[shiftType] || '📅'} ${data.customerName.trim()}`;
+                    div.appendChild(customerDiv);
+                }
+
+                // Address (second priority)
+                if (data.address && data.address.trim()) {
+                    const addressDiv = document.createElement('div');
+                    addressDiv.className = 'shift-address';
+
+                    // Clean up address - remove extra spaces and get first meaningful part
+                    let cleanAddress = data.address.split(',')[0].trim();
+
+                    addressDiv.innerHTML = `<i class="bi bi-geo-alt-fill"></i> ${cleanAddress}`;
+                    div.appendChild(addressDiv);
+                }
+
+                // If no customer name, show event name as fallback with icon
+                if ((!data.customerName || !data.customerName.trim()) && data.eventName && data.eventName.trim()) {
+                    const eventDiv = document.createElement('div');
+                    eventDiv.className = 'shift-customer-name';
+                    eventDiv.innerHTML = `${shiftIcons[shiftType] || '📅'} ${data.eventName.trim()}`;
+                    div.appendChild(eventDiv);
+                }
+            }
+
+            div.onclick = function (e) {
+                e.stopPropagation();
+                handleDateClick(dateStr);
+            };
+
+            // Add hover effect for better UX
+            div.setAttribute('title', `${shiftIcons[shiftType]} ${capitalizeFirstLetter(shiftType)} shift - Click to view details`);
+
+            return div;
+        }
+
+        function addEmptyShiftArea(cell, shiftType, dateStr) {
+            const area = document.createElement('div');
+            area.className = 'empty-shift-area';
+
+            const position = shiftType === 'morning' ?
+                { top: '32px', height: '50%', left: '2px', right: '2px' } :
+                { bottom: '2px', height: '50%', left: '2px', right: '2px' };
+
+            Object.assign(area.style, position);
+
+            // Show shift icon with plus
+            const shiftIcons = {
+                'morning': '🌅',
+                'evening': '🌆'
+            };
+
+            const content = document.createElement('div');
+            content.innerHTML = `${shiftIcons[shiftType]} <i class="bi bi-plus-circle ms-1"></i>`;
+            content.style.fontSize = '1rem';
+            area.appendChild(content);
+
+            area.onclick = function(e) {
+                e.stopPropagation();
+                openBookingModal(dateStr, [shiftType]);
+            };
+
+            area.setAttribute('title', `${shiftIcons[shiftType]} Add ${shiftType} shift`);
+            return area;
+        }
+
+        // Enhanced shift block rendering
+        function renderShiftBlocks(arg) {
+            const dateStr = localYMD(arg.date);
+            const shifts = shiftMap[dateStr] || [];
+
+            if (!shifts.length) return;
+
+            const cell = arg.el;
+            cell.style.position = 'relative';
+
+            const POSITIONS = {
+                'full day': { top: '32px', height: 'calc(100% - 36px)', left: '2px', right: '2px' },
+                'morning': { top: '-2px', height: '50%', left: '2px', right: '2px' },
+                'evening': { bottom: '2px', height: '50%', left: '2px', right: '2px' }
+            };
+
+            const byType = shifts.reduce((acc, s) => {
+                (acc[s.shift] = acc[s.shift] || []).push(s);
+                return acc;
+            }, {});
+
+            const hasFull = byType['full day'];
+            const hasMorn = byType['morning'];
+            const hasEven = byType['evening'];
+
+            // Add empty shift areas for partial bookings
+            if (!hasFull && (hasMorn || hasEven)) {
+                if (hasMorn && !hasEven) {
+                    const emptyArea = addEmptyShiftArea(cell, 'evening', dateStr);
+                    Object.assign(emptyArea.style, POSITIONS['evening']);
+                    cell.appendChild(emptyArea);
+                } else if (!hasMorn && hasEven) {
+                    const emptyArea = addEmptyShiftArea(cell, 'morning', dateStr);
+                    Object.assign(emptyArea.style, POSITIONS['morning']);
+                    cell.appendChild(emptyArea);
+                }
+            }
+
+            // Render existing shift blocks
+            Object.entries(byType).forEach(([type, list]) => {
+                const block = createShiftBlock(type, list, dateStr);
+                Object.assign(block.style, POSITIONS[type]);
+                cell.appendChild(block);
             });
         }
 
-        function showLoading() {
-            $('#error-message').text('Loading...').show();
+        function openNewBookingModal() {
+            document.getElementById('bookingForm').reset();
+            document.getElementById('bookingId').value = 0;
+            document.getElementById('userId').value = 1;
+            document.getElementById('modal-title-text').textContent = 'New Booking';
+
+            // Set today's date if no specific date is provided
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('fromDate').value = today;
+            document.getElementById('toDate').value = today;
+
+            // Generate shifts for default dates
+            generateDateWiseShifts();
+
+            bookingModal.show();
         }
 
-        function hideLoading() {
-            $('#error-message').hide();
-        }
+        // Enhanced date click handling
+        function handleDateClick(dateStr) {
+            const shifts = shiftMap[dateStr] || [];
+            const bookedShiftTypes = shifts.map(s => s.shift);
+            const hasMorning = bookedShiftTypes.includes('morning');
+            const hasEvening = bookedShiftTypes.includes('evening');
+            const hasFullDay = bookedShiftTypes.includes('full day');
 
-        function login() {
-            const username = $('#username').val().trim();
-            const password = $('#password').val().trim();
+            // Set the clicked date in the form
+            document.getElementById('fromDate').value = dateStr;
+            document.getElementById('toDate').value = dateStr;
 
-            if (!username || !password) {
-                $('#error-message').text('Please enter both username and password').show();
+            if (hasFullDay || (hasMorning && hasEvening) || shifts.length > 1) {
+                showMultipleBookings(dateStr, shifts);
                 return;
             }
 
-            showLoading();
+            if ((hasMorning && !hasEvening) || (!hasMorning && hasEvening)) {
+                const availableShifts = [];
+                if (hasMorning) availableShifts.push('evening');
+                if (hasEvening) availableShifts.push('morning');
+                showPartialBookingOptions(dateStr, shifts, availableShifts);
+                return;
+            }
+
+            openBookingModal(dateStr);
+        }
+
+        function showPartialBookingOptions(dateStr, existingBookings, availableShifts) {
+            const formattedDate = formatDate(dateStr);
+
+            let content = `
+                <div class="alert alert-info mb-4">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>${formattedDate}</strong> has partial bookings. Choose an option below:
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="text-primary mb-3">
+                        <i class="bi bi-calendar-check me-2"></i>Existing Bookings
+                    </h6>`;
+
+            existingBookings.forEach((booking, index) => {
+                const data = booking.fullBookingData;
+                const shiftIcon = booking.shift === 'morning' ? '🌅' : '🌆';
+                const statusColor = data.bookingStatus === 'Confirmed' ? 'success' :
+                                  data.bookingStatus === 'Pending' ? 'warning' : 'danger';
+
+                content += `
+                    <div class="detail-card mb-3" onclick="selectExistingBooking(${index})" style="cursor: pointer;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="me-2">${shiftIcon}</span>
+                                    <strong>${data.eventName || 'Event'}</strong>
+                                </div>
+                                <div class="text-muted small">
+                                    <i class="bi bi-person me-1"></i>${data.customerName || 'Customer'}
+                                </div>
+                                <div class="text-muted small">
+                                    <i class="bi bi-telephone me-1"></i>${data.phoneNumber || 'No phone'}
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-${statusColor} mb-1">${capitalizeFirstLetter(booking.shift)}</span>
+                                <br><small class="text-success fw-bold">₹${data.totalAmount || 0}</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            content += `</div>`;
+
+            if (availableShifts.length > 0) {
+                content += `
+                    <div class="mb-3">
+                        <h6 class="text-success mb-3">
+                            <i class="bi bi-plus-circle me-2"></i>Available Shifts
+                        </h6>
+                        <div class="d-grid gap-2">`;
+
+                availableShifts.forEach(shift => {
+                    const shiftIcon = shift === 'morning' ? '🌅' : '🌆';
+                    const shiftLabel = shift === 'morning' ? 'Morning Shift' : 'Evening Shift';
+
+                    content += `
+                        <button class="btn btn-outline-success btn-lg d-flex align-items-center justify-content-center"
+                                onclick="bookAvailableShift('${dateStr}', '${shift}')">
+                            <span class="me-2">${shiftIcon}</span>
+                            Book ${shiftLabel}
+                            <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    `;
+                });
+                content += `</div></div>`;
+            }
+
+            document.getElementById('multi-booking-content').innerHTML = content;
+            window._existingBookings = existingBookings;
+            multiBookingModal.show();
+        }
+
+        window.selectExistingBooking = function(index) {
+            multiBookingModal.hide();
+            const booking = window._existingBookings[index];
+            viewBookingDetails(booking.fullBookingData);
+        };
+
+        window.bookAvailableShift = function(dateStr, shift) {
+            multiBookingModal.hide();
+            openBookingModal(dateStr, [shift]);
+        };
+
+        function showMultipleBookings(dateStr, bookings) {
+            const formattedDate = formatDate(dateStr);
+
+            let content = `
+                <div class="alert alert-primary mb-4">
+                    <i class="bi bi-calendar-event me-2"></i>
+                    <strong>${formattedDate}</strong> - ${bookings.length} booking(s)
+                </div>
+            `;
+
+            bookings.forEach((booking, index) => {
+                const data = booking.fullBookingData;
+                const shiftIcons = {
+                    'morning': '🌅',
+                    'evening': '🌆',
+                    'full day': '🌟'
+                };
+
+                const statusColors = {
+                    'Confirmed': 'success',
+                    'Pending': 'warning',
+                    'Cancelled': 'danger'
+                };
+
+                const paymentColors = {
+                    'Paid': 'success',
+                    'Partially Paid': 'warning',
+                    'Pending': 'secondary'
+                };
+
+                content += `
+                    <div class="detail-card mb-3" onclick="selectBooking(${index})" style="cursor: pointer;">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="me-2 fs-5">${shiftIcons[booking.shift] || '📅'}</span>
+                                    <h6 class="mb-0 fw-bold">${data.eventName || 'Event'}</h6>
+                                </div>
+
+                                <div class="mb-2">
+                                    <div class="text-muted small mb-1">
+                                        <i class="bi bi-person-fill me-1"></i>${data.customerName || 'Customer'}
+                                    </div>
+                                    <div class="text-muted small">
+                                        <i class="bi bi-telephone-fill me-1"></i>${data.phoneNumber || 'No phone'}
+                                    </div>
+                                </div>
+
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <span class="badge bg-${statusColors[data.bookingStatus] || 'secondary'}">${data.bookingStatus || 'Unknown'}</span>
+                                    <span class="badge bg-${paymentColors[data.paymentStatus] || 'secondary'}">${data.paymentStatus || 'Unknown'}</span>
+                                </div>
+                            </div>
+
+                            <div class="text-end ms-3">
+                                <div class="badge bg-primary mb-2 px-3">${capitalizeFirstLetter(booking.shift)}</div>
+                                <div class="fw-bold text-success">₹${(data.totalAmount || 0).toLocaleString()}</div>
+                                <small class="text-muted">Total Amount</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('multi-booking-content').innerHTML = content;
+            window._multiBookingData = bookings;
+            multiBookingModal.show();
+        }
+
+        window.selectBooking = function(index) {
+            multiBookingModal.hide();
+            const booking = window._multiBookingData[index];
+            viewBookingDetails(booking.fullBookingData);
+        };
+
+        // Enhanced booking details view
+        function viewBookingDetails(booking) {
+            const statusIcons = {
+                'Confirmed': '✅',
+                'Pending': '⏳',
+                'Cancelled': '❌'
+            };
+
+            const paymentIcons = {
+                'Paid': '💰',
+                'Partially Paid': '💳',
+                'Pending': '⏰'
+            };
+
+            // 🔥 FIXED: Extract shift details from dateWiseShifts
+            let shiftDetailsHTML = '';
+            if (booking.dateWiseShifts) {
+                try {
+                    const shiftsData = JSON.parse(booking.dateWiseShifts);
+                    const shiftIcons = {
+                        'morning': '🌅',
+                        'evening': '🌆',
+                        'full day': '🌟'
+                    };
+
+                    shiftDetailsHTML = `
+                        <div class="col-12">
+                            <div class="fw-medium text-muted mb-2">Shift Details</div>
+                            <div class="bg-light p-3 rounded">`;
+
+                    Object.keys(shiftsData).forEach(dateStr => {
+                        const dayShifts = shiftsData[dateStr];
+                        const formattedDate = formatDate(dateStr);
+
+                        shiftDetailsHTML += `<div class="mb-2"><strong>${formattedDate}:</strong><br>`;
+
+                        dayShifts.forEach(shift => {
+                            const icon = shiftIcons[shift.shift] || '📅';
+                            const shiftName = capitalizeFirstLetter(shift.shift);
+                            shiftDetailsHTML += `
+                                <span class="badge bg-primary me-2 mb-1">
+                                    ${icon} ${shiftName}: ${shift.startTime} - ${shift.endTime}
+                                </span>
+                            `;
+                        });
+
+                        shiftDetailsHTML += `</div>`;
+                    });
+
+                    shiftDetailsHTML += `</div></div>`;
+                } catch (error) {
+                    console.error('Error parsing shift details:', error);
+                    // Fallback to basic shift type if dateWiseShifts parsing fails
+                    shiftDetailsHTML = `
+                        <div class="col-12">
+                            <div class="fw-medium text-muted mb-1">Shift Type</div>
+                            <div class="fw-bold">${capitalizeFirstLetter(booking.shiftType || 'Not specified')}</div>
+                        </div>
+                    `;
+                }
+            } else if (booking.shiftType) {
+                // Fallback for older bookings without dateWiseShifts
+                shiftDetailsHTML = `
+                    <div class="col-12">
+                        <div class="fw-medium text-muted mb-1">Shift Type</div>
+                        <div class="fw-bold">${capitalizeFirstLetter(booking.shiftType)}</div>
+                    </div>
+                `;
+            }
+
+            const content = `
+                <div class="detail-card">
+                    <div class="detail-header">
+                        <i class="bi bi-calendar-event"></i>Event Information
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="fw-medium text-muted">Event Name</div>
+                                <div class="fw-bold">${booking.eventName || '—'}</div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="fw-medium text-muted mb-1">From Date</div>
+                            <div class="fw-bold">${formatDate(booking.fromDate)}</div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="fw-medium text-muted mb-1">To Date</div>
+                            <div class="fw-bold">${formatDate(booking.toDate)}</div>
+                        </div>
+
+                        ${shiftDetailsHTML}
+
+                        <div class="col-6">
+                            <div class="fw-medium text-muted mb-1">Band Type</div>
+                            <div class="fw-bold">${booking.bandType || '—'}</div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="fw-medium text-muted mb-1">Diesel</div>
+                            <div class="fw-bold">${booking.diesel || '—'}</div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="fw-medium text-muted mb-1">Status</div>
+                            <span class="badge bg-success">${statusIcons[booking.bookingStatus] || ''} ${booking.bookingStatus}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <div class="detail-header">
+                        <i class="bi bi-person-circle"></i>Customer Details
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="fw-medium text-muted">Customer Name</div>
+                                <div class="fw-bold">${booking.customerName || '—'}</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="fw-medium text-muted">Primary Phone</div>
+                                <a href="tel:${booking.phoneNumber}" class="fw-bold text-decoration-none text-primary">
+                                    <i class="bi bi-telephone-fill me-1"></i>${booking.phoneNumber || '—'}
+                                </a>
+                            </div>
+                        </div>
+
+                        ${booking.alternativeNumber ? `
+                        <div class="col-12">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="fw-medium text-muted">Alternative Phone</div>
+                                <a href="tel:${booking.alternativeNumber}" class="fw-bold text-decoration-none text-primary">
+                                    <i class="bi bi-telephone-plus-fill me-1"></i>${booking.alternativeNumber}
+                                </a>
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        ${booking.address ? `
+                        <div class="col-12">
+                            <div class="fw-medium text-muted mb-2">Event Address</div>
+                            <div class="bg-light p-3 rounded">
+                                <i class="bi bi-geo-alt-fill text-primary me-2"></i>${booking.address}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <div class="detail-header">
+                        <i class="bi bi-currency-rupee"></i>Payment Information
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-4">
+                            <div class="text-center">
+                                <div class="fw-medium text-muted mb-1">Total Amount</div>
+                                <div class="h5 fw-bold text-primary mb-0">₹${(booking.totalAmount || 0).toLocaleString()}</div>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="text-center">
+                                <div class="fw-medium text-muted mb-1">Advance Paid</div>
+                                <div class="h5 fw-bold text-success mb-0">₹${(booking.advancePayment || 0).toLocaleString()}</div>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="text-center">
+                                <div class="fw-medium text-muted mb-1">Balance Due</div>
+                                <div class="h5 fw-bold text-warning mb-0">₹${(booking.remainingPayment || 0).toLocaleString()}</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="text-center">
+                                <span class="badge bg-info px-4 py-2">
+                                    ${paymentIcons[booking.paymentStatus] || ''} ${booking.paymentStatus || 'Unknown'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('booking-details-content').innerHTML = content;
+            document.getElementById('details-title').textContent = booking.eventName || 'Booking Details';
+
+            document.getElementById('edit-booking-btn').onclick = function () {
+                detailsModal.hide();
+                openBookingModalForEdit(booking);
+            };
+
+            document.getElementById('whatsapp-btn').onclick = function () {
+                sendWhatsAppMessage(booking);
+            };
+
+            detailsModal.show();
+        }
+
+        // Load events from server with enhanced filtering for edit conflicts
+        function loadEvents() {
+            showLoader();
 
             $.ajax({
-                url: '/Home/GetUserByUserName',
-                type: 'POST',
-                data: { username, password },
-                success: function (response) {
-                    hideLoading();
-                    if (response.success) {
-                        window.location.href = '/Eventbooking/Eventbooking';
-                    } else {
-                        $('#error-message').text(response.message || 'Invalid username or password').show();
+                url: '/EventBooking/GetAllEventBookings',
+                type: 'GET',
+                timeout: 10000 // 10 second timeout
+            }).done(function(bookings) {
+                shiftMap = {};
+                const bgEvents = [];
+
+                bookings.forEach(function(booking) {
+                    const from = booking.fromDate ? new Date(booking.fromDate) : new Date(booking.createdDate);
+                    const to = booking.toDate ? new Date(booking.toDate) : from;
+
+                    from.setHours(0, 0, 0, 0);
+                    to.setHours(0, 0, 0, 0);
+
+                    const parsedShifts = booking.dateWiseShifts ? JSON.parse(booking.dateWiseShifts) : {};
+                    const defaultShift = booking.shiftType ? [booking.shiftType.toLowerCase()] : ['full day'];
+
+                    for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
+                        const key = localYMD(d);
+                        const dayShifts = parsedShifts[key] || defaultShift;
+
+                        dayShifts.forEach(function(item) {
+                            const shiftName = (typeof item === 'string' ? item : item.shift).toLowerCase();
+                            if (['morning', 'evening', 'full day'].includes(shiftName)) {
+                                shiftMap[key] = shiftMap[key] || [];
+                                shiftMap[key].push({
+                                    shift: shiftName,
+                                    fullBookingData: booking
+                                });
+                            }
+                        });
                     }
-                },
-                error: function (xhr, status, error) {
-                    hideLoading();
-                    $('#error-message').text('An error occurred during login: ' + (xhr.responseText || error)).show();
+
+                    const bgStart = new Date(from);
+                    const bgEnd = new Date(to);
+                    bgEnd.setDate(bgEnd.getDate() + 1);
+
+                    bgEvents.push({
+                        id: booking.bookingId,
+                        start: localYMD(bgStart),
+                        end: localYMD(bgEnd),
+                        display: 'background',
+                        backgroundColor: 'transparent'
+                    });
+                });
+
+                calendar.removeAllEvents();
+                bgEvents.forEach(e => calendar.addEvent(e));
+                hideLoader();
+                showToast(`✅ Loaded ${bookings.length} booking(s) successfully`, 'success');
+
+            }).fail(function(xhr, status, error) {
+                console.error('Failed to load bookings:', error);
+                let errorMessage = 'Failed to load bookings';
+                if (status === 'timeout') {
+                    errorMessage = 'Request timeout - please check your connection';
+                } else if (xhr.status === 404) {
+                    errorMessage = 'Booking service not found';
+                } else if (xhr.status >= 500) {
+                    errorMessage = 'Server error - please try again later';
                 }
+                showToast(errorMessage, 'error');
+                hideLoader();
             });
         }
 
-        $(document).ready(() => {
-            initThreeJsBackground();
+        // Enhanced calendar initialization
+        function initializeCalendar() {
+            const calendarEl = document.getElementById('calendar');
+
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                height: 'auto',
+                headerToolbar: {
+                    left: 'prev',
+                    center: 'title',
+                    right: 'next'
+                },
+
+                dateClick(info) {
+                    const target = info.jsEvent.target;
+                    const isShiftBlock = target.closest('.shift-block');
+                    const isEmptyArea = target.closest('.empty-shift-area');
+
+                    if (!isShiftBlock && !isEmptyArea) {
+                        handleDateClick(info.dateStr);
+                    }
+                },
+
+                dayCellDidMount(arg) {
+                    renderShiftBlocks(arg);
+                },
+
+                datesSet() {
+                    loadEvents();
+                },
+
+                // Enhanced loading state
+                loading(isLoading) {
+                    if (isLoading) {
+                        showLoader();
+                    } else {
+                        hideLoader();
+                    }
+                }
+            });
+
+            calendar.render();
+        }
+
+        // 🔥 FIXED: Enhanced booking modal functions with generateDateWiseShifts() inside
+        window.openBookingModal = function(dateStr = '', availableShifts = null) {
+            resetBookingForm();
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('fromDate').value = dateStr || today;
+            document.getElementById('toDate').value = dateStr || today;
+
+            if (availableShifts) {
+                const shiftSelect = document.getElementById('shiftType');
+                if (shiftSelect) {
+                    Array.from(shiftSelect.options).forEach(option => {
+                        option.disabled = !availableShifts.includes(option.value);
+                    });
+                    if (availableShifts.length > 0) {
+                        shiftSelect.value = availableShifts[0];
+                    }
+                }
+            }
+
+            document.getElementById('modal-title-text').textContent = 'New Booking';
+            document.getElementById('delete-booking').style.display = 'none';
+
+            // 🔥 KEY FIX: Generate shifts IMMEDIATELY when modal opens
+            generateDateWiseShifts();
+
+            bookingModal.show();
+        };
+
+        function resetBookingForm() {
+            document.getElementById('bookingForm').reset();
+            document.getElementById('bookingId').value = '';
+            document.getElementById('userId').value = '1';
+            document.querySelectorAll('.error-message').forEach(el => el.remove());
+            document.getElementById('modal-message').classList.add('d-none');
+        }
+
+        function calculateRemainingPayment() {
+            const total = parseFloat(document.getElementById('totalAmount').value) || 0;
+            const advance = parseFloat(document.getElementById('advancePayment').value) || 0;
+            const remaining = Math.max(0, total - advance);
+
+            document.getElementById('remainingPayment').value = remaining.toFixed(2);
+
+            const paymentStatus = document.getElementById('paymentStatus');
+            if (total === 0) {
+                paymentStatus.value = 'Pending';
+            } else if (remaining <= 0) {
+                paymentStatus.value = 'Paid';
+            } else if (advance > 0) {
+                paymentStatus.value = 'Partially Paid';
+            } else {
+                paymentStatus.value = 'Pending';
+            }
+        }
+
+        window.saveBooking = function() {
+            if (!validateForm()) return;
+
+            const saveBtn = document.querySelector('[onclick="saveBooking()"]');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Saving...';
+            saveBtn.disabled = true;
+
+            // Collect dynamic date-wise shift data (only for checked shifts)
+            const dateWiseShifts = {};
+            const container = document.getElementById('dateWiseShiftContainer');
+            const checkedBoxes = container.querySelectorAll('.shift-checkbox:checked');
+
+            checkedBoxes.forEach(checkbox => {
+                const dateStr = checkbox.dataset.date;
+                const shiftType = checkbox.dataset.shift;
+
+                const startInput = container.querySelector(`input[name="shift-${dateStr}-${shiftType}-start"]`);
+                const endInput = container.querySelector(`input[name="shift-${dateStr}-${shiftType}-end"]`);
+
+                if (startInput && endInput && startInput.value && endInput.value) {
+                    if (!dateWiseShifts[dateStr]) {
+                        dateWiseShifts[dateStr] = [];
+                    }
+
+                    dateWiseShifts[dateStr].push({
+                        shift: shiftType,
+                        startTime: startInput.value,
+                        endTime: endInput.value
+                    });
+                }
+            });
+
+            const formData = {
+                bookingId: document.getElementById('bookingId').value || 0,
+                userId: document.getElementById('userId').value || 1,
+                EventName: document.getElementById('EventName').value,
+                customerName: document.getElementById('customerName').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                alternativeNumber: document.getElementById('alternativeNumber').value,
+                fromDate: document.getElementById('fromDate').value,
+                toDate: document.getElementById('toDate').value,
+                bookingStatus: document.getElementById('bookingStatus').value,
+                paymentStatus: document.getElementById('paymentStatus').value,
+                totalAmount: parseFloat(document.getElementById('totalAmount').value) || 0,
+                advancePayment: parseFloat(document.getElementById('advancePayment').value) || 0,
+                remainingPayment: parseFloat(document.getElementById('remainingPayment').value) || 0,
+                address: document.getElementById('address').value,
+                dateWiseShifts: JSON.stringify(dateWiseShifts),
+                bandType: document.getElementById('bandType').value,
+                diesel: document.getElementById('diesel').value
+            };
+
+            const messageEl = document.getElementById('modal-message');
+            messageEl.className = 'alert alert-info d-flex align-items-center';
+            messageEl.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Saving booking...';
+            messageEl.classList.remove('d-none');
+
+            $.ajax({
+                url: '/EventBooking/AddOrUpdateEventBooking',
+                type: 'POST',
+                data: { eventBooking: formData },
+                success: function(response) {
+                    if (response.success) {
+                        showToast('🎉 Booking saved successfully!', 'success');
+                        bookingModal.hide();
+                        loadEvents();
+                    } else {
+                        messageEl.className = 'alert alert-danger d-flex align-items-center';
+                        messageEl.innerHTML = `<i class="bi bi-exclamation-triangle me-2"></i>${response.message || 'Error saving booking'}`;
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Save booking error:', error);
+                    let errorMessage = 'Failed to save booking. Please try again.';
+                    if (status === 'timeout') {
+                        errorMessage = 'Request timeout - please check your connection and try again.';
+                    } else if (xhr.status >= 500) {
+                        errorMessage = 'Server error - please try again later.';
+                    }
+                    messageEl.className = 'alert alert-danger d-flex align-items-center';
+                    messageEl.innerHTML = `<i class="bi bi-exclamation-triangle me-2"></i>${errorMessage}`;
+                },
+                complete: function() {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.disabled = false;
+                }
+            });
+        };
+
+        function validateForm() {
+            document.querySelectorAll('.error-message').forEach(el => el.remove());
+            let isValid = true;
+
+            const requiredFields = [
+                { id: 'EventName', name: 'Event Name', icon: 'bi-star' },
+                { id: 'customerName', name: 'Customer Name', icon: 'bi-person' },
+                { id: 'phoneNumber', name: 'Phone Number', icon: 'bi-telephone' },
+                { id: 'fromDate', name: 'From Date', icon: 'bi-calendar-date' },
+                { id: 'toDate', name: 'To Date', icon: 'bi-calendar-check' },
+                { id: 'totalAmount', name: 'Total Amount', icon: 'bi-currency-rupee' }
+            ];
+
+            requiredFields.forEach(field => {
+                const element = document.getElementById(field.id);
+                if (!element.value.trim()) {
+                    const error = document.createElement('div');
+                    error.className = 'error-message d-flex align-items-center';
+                    error.innerHTML = `<i class="bi ${field.icon} me-2"></i>${field.name} is required`;
+                    element.parentNode.insertBefore(error, element.nextSibling);
+                    isValid = false;
+                }
+            });
+
+            // Enhanced phone validation
+            const phone = document.getElementById('phoneNumber').value.trim();
+            if (phone && !/^\d{10}$/.test(phone)) {
+                const error = document.createElement('div');
+                error.className = 'error-message d-flex align-items-center';
+                error.innerHTML = '<i class="bi bi-telephone-x me-2"></i>Please enter a valid 10-digit phone number';
+                document.getElementById('phoneNumber').parentNode.appendChild(error);
+                isValid = false;
+            }
+
+            // Date validation
+            const fromDate = new Date(document.getElementById('fromDate').value);
+            const toDate = new Date(document.getElementById('toDate').value);
+            if (fromDate && toDate && fromDate > toDate) {
+                const error = document.createElement('div');
+                error.className = 'error-message d-flex align-items-center';
+                error.innerHTML = '<i class="bi bi-calendar-x me-2"></i>From date cannot be after to date';
+                document.getElementById('toDate').parentNode.appendChild(error);
+                isValid = false;
+            }
+
+            // Amount validation
+            const totalAmount = parseFloat(document.getElementById('totalAmount').value) || 0;
+            const advanceAmount = parseFloat(document.getElementById('advancePayment').value) || 0;
+            if (advanceAmount > totalAmount) {
+                const error = document.createElement('div');
+                error.className = 'error-message d-flex align-items-center';
+                error.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i>Advance payment cannot exceed total amount';
+                document.getElementById('advancePayment').parentNode.appendChild(error);
+                isValid = false;
+            }
+
+            // 🔥 NEW: Shift selection validation
+            const container = document.getElementById('dateWiseShiftContainer');
+            const checkedBoxes = container.querySelectorAll('.shift-checkbox:checked');
+
+            if (checkedBoxes.length === 0) {
+                const error = document.createElement('div');
+                error.className = 'error-message d-flex align-items-center mt-3';
+                error.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i>Please select at least one shift for your booking dates';
+                container.appendChild(error);
+
+                // Scroll to the shift container to show the error
+                container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                isValid = false;
+            } else {
+                // Validate that each selected shift has start and end times
+                let hasTimeError = false;
+                checkedBoxes.forEach(checkbox => {
+                    const dateStr = checkbox.dataset.date;
+                    const shiftType = checkbox.dataset.shift;
+
+                    const startInput = container.querySelector(`input[name="shift-${dateStr}-${shiftType}-start"]`);
+                    const endInput = container.querySelector(`input[name="shift-${dateStr}-${shiftType}-end"]`);
+
+                    if (!startInput?.value || !endInput?.value) {
+                        if (!hasTimeError) {
+                            const error = document.createElement('div');
+                            error.className = 'error-message d-flex align-items-center mt-3';
+                            error.innerHTML = '<i class="bi bi-clock me-2"></i>Please set start and end times for all selected shifts';
+                            container.appendChild(error);
+                            hasTimeError = true;
+                            isValid = false;
+                        }
+                    } else if (startInput.value >= endInput.value) {
+                        if (!hasTimeError) {
+                            const error = document.createElement('div');
+                            error.className = 'error-message d-flex align-items-center mt-3';
+                            error.innerHTML = '<i class="bi bi-clock-history me-2"></i>End time must be after start time for all shifts';
+                            container.appendChild(error);
+                            hasTimeError = true;
+                            isValid = false;
+                        }
+                    }
+                });
+            }
+
+            return isValid;
+        }
+
+        function openBookingModalForEdit(bookingData) {
+            resetBookingForm();
+
+            document.getElementById('modal-title-text').textContent = 'Edit Booking';
+            document.getElementById('delete-booking').style.display = 'block';
+
+            // Populate form fields
+            document.getElementById('bookingId').value = bookingData.bookingId;
+            document.getElementById('EventName').value = bookingData.eventName || '';
+            document.getElementById('customerName').value = bookingData.customerName || '';
+            document.getElementById('phoneNumber').value = bookingData.phoneNumber || '';
+            document.getElementById('alternativeNumber').value = bookingData.alternativeNumber || '';
+            document.getElementById('fromDate').value = bookingData.fromDate ? bookingData.fromDate.split('T')[0] : '';
+            document.getElementById('toDate').value = bookingData.toDate ? bookingData.toDate.split('T')[0] : '';
+            document.getElementById('bookingStatus').value = bookingData.bookingStatus || 'Confirmed';
+            document.getElementById('paymentStatus').value = bookingData.paymentStatus || 'Pending';
+            document.getElementById('totalAmount').value = bookingData.totalAmount || '';
+            document.getElementById('advancePayment').value = bookingData.advancePayment || '';
+            document.getElementById('address').value = bookingData.address || '';
+            document.getElementById('bandType').value = bookingData.bandType || '';
+            document.getElementById('diesel').value = bookingData.diesel || '';
+
+            calculateRemainingPayment();
+
+            // Generate date-wise shifts first
+            generateDateWiseShifts(bookingData.bookingId, bookingData.shiftDetailsArray);
+
+            // Then populate existing shift times if available
+            setTimeout(() => {
+                populateExistingShiftTimes(bookingData);
+            }, 100);
+
+            bookingModal.show();
+        }
+
+        function populateExistingShiftTimes(bookingData) {
+            if (bookingData.dateWiseShifts) {
+                try {
+                    const existingShifts = JSON.parse(bookingData.dateWiseShifts);
+
+                    Object.keys(existingShifts).forEach(dateStr => {
+                        const dayShifts = existingShifts[dateStr];
+
+                        dayShifts.forEach(shiftData => {
+                            const shiftType = shiftData.shift;
+
+                            // 1. ✅ Check the shift checkbox
+                            const checkbox = document.getElementById(`checkbox-${shiftType}-${dateStr}`);
+                            if (checkbox) {
+                                checkbox.checked = true;
+
+                                // 2. ✅ Show the shift time section
+                                const timesContainer = document.getElementById(`${shiftType}-times-${dateStr}`);
+                                if (timesContainer) {
+                                    timesContainer.style.display = 'block';
+                                }
+
+                                // 3. ✅ Fill in start/end times
+                                const startInput = document.querySelector(`input[name="shift-${dateStr}-${shiftType}-start"]`);
+                                const endInput = document.querySelector(`input[name="shift-${dateStr}-${shiftType}-end"]`);
+
+                                if (startInput && shiftData.startTime) {
+                                    startInput.value = shiftData.startTime;
+                                }
+                                if (endInput && shiftData.endTime) {
+                                    endInput.value = shiftData.endTime;
+                                }
+                            }
+                        });
+                    });
+                } catch (error) {
+                    console.error('Error parsing shift times:', error);
+                }
+            }
+        }
+
+        function sendWhatsAppMessage(booking) {
+            const phone = booking.phoneNumber?.replace(/\D/g, '');
+            if (!phone) {
+                showToast('❌ No phone number available', 'error');
+                return;
+            }
+
+            const eventName = booking.eventName || 'your event';
+            const customerName = booking.customerName || 'Customer';
+            const eventDate = formatDate(booking.fromDate);
+            const shiftType = capitalizeFirstLetter(booking.shiftType);
+            const totalAmount = (booking.totalAmount || 0).toLocaleString();
+            const balance = (booking.remainingPayment || 0).toLocaleString();
+
+            let message = `🎉 Hello ${customerName}!\n\n`;
+            message += `Your booking for "${eventName}" has been confirmed! ✅\n\n`;
+            message += `📅 Date: ${eventDate}\n`;
+            message += `⏰ Shift: ${shiftType}\n`;
+            message += `💰 Total Amount: ₹${totalAmount}\n`;
+
+            if (booking.remainingPayment > 0) {
+                message += `💳 Balance Due: ₹${balance}\n`;
+            }
+
+            message += `\nThank you for choosing our services! 🙏\n`;
+            message += `For any queries, feel free to contact us.`;
+
+            const url = `https://wa.me/91${phone}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+            showToast('📱 Opening WhatsApp...', 'success');
+        }
+
+        window.refreshCalendar = function() {
+            showToast('🔄 Refreshing calendar...', 'info');
+            loadEvents();
+        };
+
+        window.openWhatsApp = function() {
+            const phone = document.getElementById('phoneNumber').value.replace(/\D/g, '');
+            if (!phone) {
+                showToast('📱 Please enter phone number first', 'error');
+                return;
+            }
+
+            const url = `https://wa.me/91${phone}`;
+            window.open(url, '_blank');
+            showToast('📱 Opening WhatsApp...', 'success');
+        };
+
+        // Enhanced event handlers
+        document.getElementById('advancePayment').addEventListener('input', calculateRemainingPayment);
+        document.getElementById('totalAmount').addEventListener('input', calculateRemainingPayment);
+
+        document.getElementById('delete-booking').addEventListener('click', function() {
+            const bookingId = document.getElementById('bookingId').value;
+            if (!bookingId) return;
+
+            // Enhanced confirmation dialog
+            const eventName = document.getElementById('EventName').value || 'this booking';
+            const confirmMessage = `Are you sure you want to delete "${eventName}"?\n\nThis action cannot be undone.`;
+
+            if (!confirm(confirmMessage)) return;
+
+            const deleteBtn = this;
+            const originalText = deleteBtn.innerHTML;
+            deleteBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Deleting...';
+            deleteBtn.disabled = true;
+
+            $.ajax({
+                url: `/EventBooking/Delete/${bookingId}`,
+                type: 'POST',
+                timeout: 10000,
+                success: function(response) {
+                    if (response.success) {
+                        showToast('🗑️ Booking deleted successfully', 'success');
+                        bookingModal.hide();
+                        loadEvents();
+                    } else {
+                        showToast('❌ Failed to delete booking', 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Delete booking error:', error);
+                    let errorMessage = 'Failed to delete booking';
+                    if (status === 'timeout') {
+                        errorMessage = 'Request timeout - please try again';
+                    }
+                    showToast(`❌ ${errorMessage}`, 'error');
+                },
+                complete: function() {
+                    deleteBtn.innerHTML = originalText;
+                    deleteBtn.disabled = false;
+                }
+            });
         });
 
-        document.getElementById('password').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveBooking();
+        });
+
+        // 🔥 FIXED: Date change listeners will regenerate shifts when dates change
+        document.getElementById('fromDate').addEventListener('change', generateDateWiseShifts);
+        document.getElementById('toDate').addEventListener('change', generateDateWiseShifts);
+
+        function generateDateWiseShifts(editBookingId = null, editBookingData = []) {
+            const fromDateInput = document.getElementById('fromDate');
+            const toDateInput = document.getElementById('toDate');
+            const container = document.getElementById('dateWiseShiftContainer');
+
+            const fromDate = new Date(fromDateInput.value);
+            const toDate = new Date(toDateInput.value);
+
+            if (isNaN(fromDate) || isNaN(toDate)) {
+                container.innerHTML = '';
+                return;
+            }
+
+            if (fromDate > toDate) {
+                container.innerHTML = `
+                    <div class="alert alert-warning d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Please select a valid date range
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="alert alert-primary mb-3">
+                    <i class="bi bi-calendar-check me-2"></i>
+                    <strong>Select your preferred shifts and set times:</strong>
+                </div>
+            `;
+
+            let dayCount = 0;
+            for (let d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
+                dayCount++;
+                if (dayCount > 31) break;
+
+                const dateStr = localYMD(d);
+                const allShifts = shiftMap[dateStr] || [];
+
+                const editableShifts = editBookingData.filter(b => b.date === dateStr).map(b => b.shift);
+                const shiftTimeMap = {};
+                editBookingData.forEach(entry => {
+                    if (entry.date === dateStr) {
+                        shiftTimeMap[entry.shift] = {
+                            start: entry.startTime,
+                            end: entry.endTime
+                        };
+                    }
+                });
+
+                const dayName = d.toLocaleDateString('en-US', { weekday: 'long' });
+
+                const shiftTemplate = (shiftType, icon, label, colorClass) => {
+                    // 🔥 FIXED: Only consider shifts from OTHER bookings (exclude current booking being edited)
+                    const shiftBookedByOthers = allShifts.find(s =>
+                        s.shift === shiftType &&
+                        (!editBookingId || s.fullBookingData.bookingId !== parseInt(editBookingId))
+                    );
+
+                    const isDisabled = !!shiftBookedByOthers;
+                    const isChecked = editableShifts.includes(shiftType);
+                    const times = shiftTimeMap[shiftType] || { start: '', end: '' };
+
+                    const inputId = `checkbox-${shiftType}-${dateStr}`;
+
+                    let labelMessage = '<small class="text-muted">Available</small>';
+                    if (isDisabled) {
+                        const bookedByName = shiftBookedByOthers.fullBookingData.customerName || 'Another customer';
+                        labelMessage = `<small class="text-danger">⚠️ Booked by ${bookedByName}</small>`;
+                    } else if (isChecked) {
+                        labelMessage = '<small class="text-success">✅ Selected for this booking</small>';
+                    }
+
+                    return {
+                        checkboxHTML: `
+                            <div class="col-12 mb-3"> <!-- Full width on mobile -->
+                                <label class="d-flex align-items-center p-4 border rounded cursor-pointer ${isDisabled ? 'bg-light opacity-50' : isChecked ? 'bg-success bg-opacity-10 border-success' : 'bg-white'}"
+                                       for="${inputId}">
+                                    <input type="checkbox"
+                                           id="${inputId}"
+                                           class="form-check-input me-3 shift-checkbox"
+                                           data-date="${dateStr}"
+                                           data-shift="${shiftType}"
+                                           ${isDisabled ? 'disabled' : ''}
+                                           ${isChecked && !isDisabled ? 'checked' : ''}
+                                           style="transform: scale(1.8); margin-right: 1rem;">
+                                    <div class="flex-grow-1">
+                                        <div class="fw-bold ${colorClass} d-flex align-items-center">
+                                            <i class="bi ${icon} me-2 fs-4"></i>
+                                            <span class="fs-5">${label}</span>
+                                        </div>
+                                        <div class="mt-1">${labelMessage}</div>
+                                    </div>
+                                </label>
+                            </div>
+                        `,
+                        timesHTML: `
+                            <div id="${shiftType}-times-${dateStr}" class="shift-times-section" style="display: ${isChecked && !isDisabled ? 'block' : 'none'};">
+                                <div class="alert alert-${shiftType === 'morning' ? 'warning' : 'info'} mb-4">
+                                    <h6 class="alert-heading d-flex align-items-center">
+                                        <i class="bi ${icon} me-2 fs-5"></i>
+                                        <span>${label} Configuration</span>
+                                    </h6>
+                                    <div class="row g-3">
+                                        <div class="col-6">
+                                            <label class="form-label fw-bold">Start Time</label>
+                                            <input type="time"
+                                                   class="form-control form-control-lg"
+                                                   name="shift-${dateStr}-${shiftType}-start"
+                                                   value="${times.start || (shiftType === 'morning' ? '09:00' : '17:00')}"
+                                                   style="font-size: 16px;"
+                                                   required>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label fw-bold">End Time</label>
+                                            <input type="time"
+                                                   class="form-control form-control-lg"
+                                                   name="shift-${dateStr}-${shiftType}-end"
+                                                   value="${times.end || (shiftType === 'morning' ? '13:00' : '21:00')}"
+                                                   style="font-size: 16px;"
+                                                   required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `
+                    };
+                };
+
+                const morning = shiftTemplate('morning', 'bi-sunrise', 'Morning Shift', 'text-warning');
+                const evening = shiftTemplate('evening', 'bi-sunset', 'Evening Shift', 'text-info');
+
+                html += `
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0">
+                                <i class="bi bi-calendar-event me-2"></i>
+                                ${formatDate(dateStr)} - ${dayName}
+                            </h6>
+                        </div>
+                        <div class="card-body">
+
+                            <div class="mb-4">
+                                <h6 class="text-primary mb-3">
+                                    <i class="bi bi-check-square me-2"></i>Choose your shifts:
+                                </h6>
+                                <div class="row g-3">
+                                    ${morning.checkboxHTML}
+                                    ${evening.checkboxHTML}
+                                </div>
+                            </div>
+
+                            ${morning.timesHTML}
+                            ${evening.timesHTML}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+            addShiftCheckboxListeners();
+        }
+
+        function addShiftCheckboxListeners() {
+            // 🔍 Find all checkboxes with class 'shift-checkbox'
+            const allCheckboxes = document.querySelectorAll('.shift-checkbox');
+            console.log('Found checkboxes:', allCheckboxes.length); // Debug log
+
+            allCheckboxes.forEach((checkbox, index) => {
+                console.log(`Setting up checkbox ${index}:`, checkbox.id); // Debug log
+
+                // 🎯 Add change event listener to each checkbox
+                checkbox.addEventListener('change', function() {
+                    const dateStr = this.getAttribute('data-date');
+                    const shiftType = this.getAttribute('data-shift');
+                    const timesContainer = document.getElementById(`${shiftType}-times-${dateStr}`);
+
+                    console.log(`Checkbox changed: ${shiftType} for ${dateStr}, checked: ${this.checked}`);
+
+                    if (this.checked) {
+                        // ✅ SHOW time configuration when checked
+                        if (timesContainer) {
+                            timesContainer.style.display = 'block';
+                            timesContainer.style.animation = 'fadeInUp 0.3s ease-out';
+                        }
+                    } else {
+                        // ❌ HIDE time configuration when unchecked
+                        if (timesContainer) {
+                            timesContainer.style.display = 'none';
+
+                            // Clear the time values
+                            const startInput = timesContainer.querySelector(`input[name="shift-${dateStr}-${shiftType}-start"]`);
+                            const endInput = timesContainer.querySelector(`input[name="shift-${dateStr}-${shiftType}-end"]`);
+                            if (startInput) startInput.value = '';
+                            if (endInput) endInput.value = '';
+                        }
+                    }
+                });
+            });
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @@keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+
+            @@keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+
+            @@keyframes fadeInUp {
+                from {
+                    transform: translateY(30px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            .detail-card {
+                animation: fadeInUp 0.3s ease-out;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize calendar when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add loading animation to body
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.3s ease-in-out';
+
+            setTimeout(() => {
+                initializeCalendar();
+                document.body.style.opacity = '1';
+                showToast('🎉 Event Booking Pro loaded successfully!', 'success');
+            }, 100);
+        });
+
+        // Enhanced keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + N to open new booking
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
                 e.preventDefault();
-                login();
+                openBookingModal();
+            }
+
+            // Ctrl/Cmd + R to refresh calendar
+            if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                e.preventDefault();
+                refreshCalendar();
+            }
+
+            // Escape to close modals
+            if (e.key === 'Escape') {
+                const openModals = document.querySelectorAll('.modal.show');
+                openModals.forEach(modal => {
+                    bootstrap.Modal.getInstance(modal)?.hide();
+                });
             }
         });
+
+        // Add service worker for offline support (optional)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                // Register service worker if available
+                // This would need to be implemented separately
+                console.log('Service Worker support detected');
+            });
+        }
+
     </script>
 </body>
 </html>

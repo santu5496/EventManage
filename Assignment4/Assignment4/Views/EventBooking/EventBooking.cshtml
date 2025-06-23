@@ -852,7 +852,7 @@
                             <textarea id="address" class="form-control" rows="3" placeholder="Enter complete event location with landmarks..."></textarea>
                         </div>
 
-                        <div id="dateWiseShiftContainer">
+                        <div class="date-block" id="dateWiseShiftContainer">
                             <!-- Dynamic shift selection will appear here -->
                         </div>
 
@@ -1810,10 +1810,15 @@
             });
         };
 
-        function validateForm() {
+
+
+
+                function validateForm() {
+            // Clear any existing error messages
             document.querySelectorAll('.error-message').forEach(el => el.remove());
             let isValid = true;
 
+            // Required field validation
             const requiredFields = [
                 { id: 'EventName', name: 'Event Name', icon: 'bi-star' },
                 { id: 'customerName', name: 'Customer Name', icon: 'bi-person' },
@@ -1834,7 +1839,7 @@
                 }
             });
 
-            // Enhanced phone validation
+            // Phone validation
             const phone = document.getElementById('phoneNumber').value.trim();
             if (phone && !/^\d{10}$/.test(phone)) {
                 const error = document.createElement('div');
@@ -1844,7 +1849,7 @@
                 isValid = false;
             }
 
-            // Date validation
+            // Date range validation
             const fromDate = new Date(document.getElementById('fromDate').value);
             const toDate = new Date(document.getElementById('toDate').value);
             if (fromDate && toDate && fromDate > toDate) {
@@ -1866,53 +1871,221 @@
                 isValid = false;
             }
 
-            // 🔥 NEW: Shift selection validation
+            // 🔥 ENHANCED SHIFT VALIDATION - Check each date individually
             const container = document.getElementById('dateWiseShiftContainer');
-            const checkedBoxes = container.querySelectorAll('.shift-checkbox:checked');
+            const cards = container.querySelectorAll('.card'); // Each card represents one date
 
-            if (checkedBoxes.length === 0) {
+            if (cards.length === 0) {
+                // No date cards generated - this shouldn't happen but let's handle it
                 const error = document.createElement('div');
                 error.className = 'error-message d-flex align-items-center mt-3';
-                error.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i>Please select at least one shift for your booking dates';
+                error.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i>Please select valid dates first';
                 container.appendChild(error);
-
-                // Scroll to the shift container to show the error
-                container.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 isValid = false;
-            } else {
-                // Validate that each selected shift has start and end times
-                let hasTimeError = false;
-                checkedBoxes.forEach(checkbox => {
-                    const dateStr = checkbox.dataset.date;
-                    const shiftType = checkbox.dataset.shift;
+                return isValid;
+            }
 
-                    const startInput = container.querySelector(`input[name="shift-${dateStr}-${shiftType}-start"]`);
-                    const endInput = container.querySelector(`input[name="shift-${dateStr}-${shiftType}-end"]`);
+            // Validate each date card
+            cards.forEach((card, cardIndex) => {
+                // Get the date from card header
+                const cardHeader = card.querySelector('.card-header h6');
+                const dateText = cardHeader ? cardHeader.textContent.trim() : `Date ${cardIndex + 1}`;
 
-                    if (!startInput?.value || !endInput?.value) {
-                        if (!hasTimeError) {
-                            const error = document.createElement('div');
-                            error.className = 'error-message d-flex align-items-center mt-3';
-                            error.innerHTML = '<i class="bi bi-clock me-2"></i>Please set start and end times for all selected shifts';
-                            container.appendChild(error);
-                            hasTimeError = true;
-                            isValid = false;
-                        }
-                    } else if (startInput.value >= endInput.value) {
-                        if (!hasTimeError) {
-                            const error = document.createElement('div');
-                            error.className = 'error-message d-flex align-items-center mt-3';
-                            error.innerHTML = '<i class="bi bi-clock-history me-2"></i>End time must be after start time for all shifts';
-                            container.appendChild(error);
-                            hasTimeError = true;
-                            isValid = false;
-                        }
+                // Find all checkboxes within this specific card
+                const checkboxesInCard = card.querySelectorAll('.shift-checkbox');
+                const checkedBoxesInCard = card.querySelectorAll('.shift-checkbox:checked');
+
+                console.log(`Validating card ${cardIndex + 1}: ${dateText}`);
+                console.log(`Total checkboxes in card: ${checkboxesInCard.length}`);
+                console.log(`Checked boxes in card: ${checkedBoxesInCard.length}`);
+
+                // Check if at least one shift is selected for this date
+                if (checkedBoxesInCard.length === 0) {
+                    // Remove any existing error in this card first
+                    card.querySelectorAll('.error-message').forEach(err => err.remove());
+
+                    // Add error message to this specific card
+                    const error = document.createElement('div');
+                    error.className = 'error-message d-flex align-items-center mt-3 p-3 bg-danger bg-opacity-10 border border-danger rounded';
+                    error.innerHTML = `
+                        <i class="bi bi-exclamation-triangle-fill me-2 text-danger"></i>
+                        <strong class="text-danger">Please select at least one shift for ${dateText}</strong>
+                    `;
+
+                    // Insert error at the end of card body
+                    const cardBody = card.querySelector('.card-body');
+                    if (cardBody) {
+                        cardBody.appendChild(error);
+
+                        // Scroll to this card to show the error
+                        card.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
                     }
-                });
+
+                    isValid = false;
+                } else {
+                    // At least one shift is selected, now validate the time inputs for checked shifts
+                    let hasTimeError = false;
+
+                    checkedBoxesInCard.forEach(checkbox => {
+                        const dateStr = checkbox.dataset.date;
+                        const shiftType = checkbox.dataset.shift;
+
+                        // Find the time inputs for this specific shift
+                        const startInput = card.querySelector(`input[name="shift-${dateStr}-${shiftType}-start"]`);
+                        const endInput = card.querySelector(`input[name="shift-${dateStr}-${shiftType}-end"]`);
+
+                        console.log(`Checking times for ${shiftType} on ${dateStr}`);
+                        console.log(`Start time: ${startInput?.value}, End time: ${endInput?.value}`);
+
+                        if (!startInput?.value || !endInput?.value) {
+                            if (!hasTimeError) {
+                                // Remove any existing time errors in this card
+                                card.querySelectorAll('.time-error-message').forEach(err => err.remove());
+
+                                const error = document.createElement('div');
+                                error.className = 'time-error-message error-message d-flex align-items-center mt-3 p-3 bg-warning bg-opacity-10 border border-warning rounded';
+                                error.innerHTML = `
+                                    <i class="bi bi-clock me-2 text-warning"></i>
+                                    <strong class="text-warning">Please set start and end times for all selected shifts on ${dateText}</strong>
+                                `;
+
+                                const cardBody = card.querySelector('.card-body');
+                                if (cardBody) {
+                                    cardBody.appendChild(error);
+                                }
+
+                                hasTimeError = true;
+                                isValid = false;
+                            }
+                        } else if (startInput.value >= endInput.value) {
+                            if (!hasTimeError) {
+                                // Remove any existing time errors in this card
+                                card.querySelectorAll('.time-error-message').forEach(err => err.remove());
+
+                                const error = document.createElement('div');
+                                error.className = 'time-error-message error-message d-flex align-items-center mt-3 p-3 bg-warning bg-opacity-10 border border-warning rounded';
+                                error.innerHTML = `
+                                    <i class="bi bi-clock-history me-2 text-warning"></i>
+                                    <strong class="text-warning">End time must be after start time for ${dateText}</strong>
+                                `;
+
+                                const cardBody = card.querySelector('.card-body');
+                                if (cardBody) {
+                                    cardBody.appendChild(error);
+                                }
+
+                                hasTimeError = true;
+                                isValid = false;
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Summary validation message
+            if (!isValid) {
+                // Show a summary toast message
+                const checkedShiftsCount = container.querySelectorAll('.shift-checkbox:checked').length;
+                const totalDates = cards.length;
+
+                console.log(`Validation Summary: ${checkedShiftsCount} shifts selected across ${totalDates} dates`);
+
+                // Scroll to the first error if validation fails
+                const firstError = container.querySelector('.error-message');
+                if (firstError) {
+                    firstError.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
             }
 
             return isValid;
         }
+
+        // Helper function to get date string from date inputs
+        function getDateRange() {
+            const fromDate = new Date(document.getElementById('fromDate').value);
+            const toDate = new Date(document.getElementById('toDate').value);
+
+            if (isNaN(fromDate) || isNaN(toDate)) {
+                return [];
+            }
+
+            const dates = [];
+            for (let d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
+                dates.push(d.toISOString().split('T')[0]);
+            }
+
+            return dates;
+        }
+
+        // Enhanced validation with real-time feedback
+        function addRealTimeValidation() {
+            // Add real-time validation for shift selection
+            const container = document.getElementById('dateWiseShiftContainer');
+
+            // Use event delegation for dynamically added checkboxes
+            container.addEventListener('change', function(e) {
+                if (e.target.classList.contains('shift-checkbox')) {
+                    const card = e.target.closest('.card');
+                    if (card) {
+                        // Remove previous validation errors for this card
+                        card.querySelectorAll('.error-message').forEach(err => err.remove());
+
+                        // Check if at least one checkbox is checked in this card
+                        const checkedInCard = card.querySelectorAll('.shift-checkbox:checked');
+
+                        if (checkedInCard.length > 0) {
+                            // At least one shift selected - remove any "no shift selected" errors
+                            card.querySelectorAll('.error-message').forEach(err => {
+                                if (err.textContent.includes('select at least one shift')) {
+                                    err.remove();
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            // Real-time validation for time inputs
+            container.addEventListener('blur', function(e) {
+                if (e.target.type === 'time') {
+                    const card = e.target.closest('.card');
+                    if (card) {
+                        // Remove previous time validation errors
+                        card.querySelectorAll('.time-error-message').forEach(err => err.remove());
+
+                        // Validate time pairs in this card
+                        const checkedBoxes = card.querySelectorAll('.shift-checkbox:checked');
+                        checkedBoxes.forEach(checkbox => {
+                            const dateStr = checkbox.dataset.date;
+                            const shiftType = checkbox.dataset.shift;
+
+                            const startInput = card.querySelector(`input[name="shift-${dateStr}-${shiftType}-start"]`);
+                            const endInput = card.querySelector(`input[name="shift-${dateStr}-${shiftType}-end"]`);
+
+                            if (startInput?.value && endInput?.value && startInput.value >= endInput.value) {
+                                const error = document.createElement('div');
+                                error.className = 'time-error-message error-message d-flex align-items-center mt-2 text-warning';
+                                error.innerHTML = '<i class="bi bi-clock-history me-2"></i>End time must be after start time';
+                                endInput.parentNode.appendChild(error);
+                            }
+                        });
+                    }
+                }
+            }, true);
+        }
+
+        // Initialize real-time validation when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            addRealTimeValidation();
+        });
+
+
 
         function openBookingModalForEdit(bookingData) {
             resetBookingForm();
