@@ -41,6 +41,31 @@
         * {
             box-sizing: border-box;
         }
+        /* Styles for concise display */
+        .shift-main-text {
+            font-size: 0.7rem;
+            font-weight: 700;
+            line-height: 1.2;
+            text-align: center;
+            word-break: break-word;
+        }
+
+        /* Enhanced shift block base styles */
+        .shift-block {
+            justify-content: center;
+            align-items: center;
+            padding: 2px 4px;
+        }
+
+        /* Responsive text sizing */
+        @@media (max-width: 480px) {
+            .shift-main-text
+
+        {
+            font-size: 0.6rem;
+        }
+
+        }
 
         body {
             background: var(--background-color);
@@ -1009,72 +1034,38 @@
             document.getElementById('calendar-loader').classList.add('d-none');
         }
 
-        function createShiftBlock11(shiftType, bookings, dateStr) {
+                   function createShiftBlock(shiftType, bookings, dateStr) {
             const div = document.createElement('div');
             div.className = `shift-block shift-${shiftType.replace(' ', '')}`;
 
-            // Add shift icon based on type
-            const shiftIcons = {
-                'morning': '🌅',
-                'evening': '🌆',
-                'full day': '🌟'
-            };
-
-            // Show DATE, EVENT NAME and ADDRESS/PLACE (NO customer name)
             if (bookings[0] && bookings[0].fullBookingData) {
                 const data = bookings[0].fullBookingData;
 
-                // 1. Date with shift icon (first priority)
-                const eventDate = data.fromDate ? new Date(data.fromDate) : new Date(dateStr);
-                const formattedDate = eventDate.toLocaleDateString('en-IN', {
-                    day: '2-digit',
-                    month: 'short'
-                });
+                // Primary display: Event name OR place (whichever is more meaningful)
+                let displayText = '';
 
-                const dateDiv = document.createElement('div');
-                dateDiv.className = 'shift-customer-name'; // Reusing existing CSS class
-                dateDiv.innerHTML = `${shiftIcons[shiftType] || '📅'} ${formattedDate}`;
-                div.appendChild(dateDiv);
-
-                // 2. Event name (second priority)
                 if (data.eventName && data.eventName.trim()) {
-                    const eventDiv = document.createElement('div');
-                    eventDiv.className = 'shift-address';
+                    displayText = data.eventName.trim();
+                } else if (data.address && data.address.trim()) {
+                    displayText = data.address.split(',')[0].trim();
+                } else {
+                    displayText = `${capitalizeFirstLetter(shiftType)} Event`;
+                }
 
-                    // Truncate long event names
-                    let eventName = data.eventName.trim();
-                    if (eventName.length > 20) {
-                        eventName = eventName.substring(0, 17) + '...';
+                // Smart truncation - keep important words
+                if (displayText.length > 15) {
+                    const words = displayText.split(' ');
+                    if (words.length > 2) {
+                        displayText = words.slice(0, 2).join(' ') + '...';
+                    } else {
+                        displayText = displayText.substring(0, 12) + '...';
                     }
-
-                    eventDiv.innerHTML = `<i class="bi bi-star-fill"></i> ${eventName}`;
-                    div.appendChild(eventDiv);
                 }
 
-                // 3. Address/Place (third priority) - NO customer name
-                if (data.address && data.address.trim()) {
-                    const addressDiv = document.createElement('div');
-                    addressDiv.className = 'shift-address';
-
-                    // Clean up address - get first meaningful part (place/location)
-                    let cleanAddress = data.address.split(',')[0].trim();
-
-                    // If the first part is too long, take first few words
-                    if (cleanAddress.length > 20) {
-                        cleanAddress = cleanAddress.split(' ').slice(0, 2).join(' ') + '...';
-                    }
-
-                    addressDiv.innerHTML = `<i class="bi bi-geo-alt-fill"></i> ${cleanAddress}`;
-                    div.appendChild(addressDiv);
-                }
-
-                // 4. Fallback: If no event name, show shift type only
-                if (!data.eventName || !data.eventName.trim()) {
-                    const fallbackDiv = document.createElement('div');
-                    fallbackDiv.className = 'shift-address';
-                    fallbackDiv.innerHTML = `<i class="bi bi-clock-fill"></i> ${capitalizeFirstLetter(shiftType)} Shift`;
-                    div.appendChild(fallbackDiv);
-                }
+                const textDiv = document.createElement('div');
+                textDiv.className = 'shift-main-text';
+                textDiv.textContent = displayText;
+                div.appendChild(textDiv);
             }
 
             div.onclick = function (e) {
@@ -1082,14 +1073,13 @@
                 handleDateClick(dateStr);
             };
 
-            // Updated hover tooltip with date
+            // Enhanced tooltip with more details
             const eventName = bookings[0]?.fullBookingData?.eventName || 'Event';
             const place = bookings[0]?.fullBookingData?.address?.split(',')[0] || 'Location';
-            const eventDate = bookings[0]?.fullBookingData?.fromDate ?
-                new Date(bookings[0].fullBookingData.fromDate).toLocaleDateString('en-IN') :
-                formatDate(dateStr);
+            const customer = bookings[0]?.fullBookingData?.customerName || 'Customer';
+            const status = bookings[0]?.fullBookingData?.bookingStatus || 'Status';
 
-            div.setAttribute('title', `${shiftIcons[shiftType]} ${eventDate}\n${eventName} - ${place}\nClick to view details`);
+            div.setAttribute('title', `${eventName}\n📍 ${place}\n👤 ${customer}\n📋 ${status}\n\nClick for details`);
 
             return div;
         }
@@ -1125,18 +1115,19 @@
         }
 
         // Enhanced shift block rendering
+               // Updated renderShiftBlocks function - WITHOUT empty shift areas
         function renderShiftBlocks(arg) {
             const dateStr = localYMD(arg.date);
             const shifts = shiftMap[dateStr] || [];
 
-            if (!shifts.length) return;
+            if (!shifts.length) return; // No shifts, show nothing (no empty areas)
 
             const cell = arg.el;
             cell.style.position = 'relative';
 
             const POSITIONS = {
                 'full day': { top: '32px', height: 'calc(100% - 36px)', left: '2px', right: '2px' },
-                'morning': { top: '-2px', height: '50%', left: '2px', right: '2px' },
+                'morning': { top: '32px', height: '50%', left: '2px', right: '2px' },
                 'evening': { bottom: '2px', height: '50%', left: '2px', right: '2px' }
             };
 
@@ -1145,11 +1136,14 @@
                 return acc;
             }, {});
 
+            // REMOVED: All empty shift area creation code
+            // No more dashed boxes for unbooked shifts
+            /*
             const hasFull = byType['full day'];
             const hasMorn = byType['morning'];
             const hasEven = byType['evening'];
 
-            // Add empty shift areas for partial bookings
+            // COMMENTED OUT: Empty shift areas creation
             if (!hasFull && (hasMorn || hasEven)) {
                 if (hasMorn && !hasEven) {
                     const emptyArea = addEmptyShiftArea(cell, 'evening', dateStr);
@@ -1161,8 +1155,9 @@
                     cell.appendChild(emptyArea);
                 }
             }
+            */
 
-            // Render existing shift blocks
+            // Only render existing shift blocks (actual bookings)
             Object.entries(byType).forEach(([type, list]) => {
                 const block = createShiftBlock(type, list, dateStr);
                 Object.assign(block.style, POSITIONS[type]);
