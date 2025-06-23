@@ -919,13 +919,20 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
-    <script>
-        // Enhanced event booking calendar with improved UI
+<script>
+            // Enhanced event booking calendar with improved UI and optimized data loading
         let shiftMap = {};
         let calendar;
         const bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
         const detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
         const multiBookingModal = new bootstrap.Modal(document.getElementById('multiBookingModal'));
+
+        // Optimized data loading variables
+        let isLoading = false;
+        let loadingTimeout;
+        let cachedBookings = null;
+        let lastLoadTime = 0;
+        const CACHE_DURATION = 30000; // 30 seconds cache
 
         // Utility functions
         function localYMD(date) {
@@ -1002,7 +1009,7 @@
             document.getElementById('calendar-loader').classList.add('d-none');
         }
 
-        function createShiftBlock(shiftType, bookings, dateStr) {
+        function createShiftBlock11(shiftType, bookings, dateStr) {
             const div = document.createElement('div');
             div.className = `shift-block shift-${shiftType.replace(' ', '')}`;
 
@@ -1013,36 +1020,60 @@
                 'full day': '🌟'
             };
 
-            // Show customer name AND address with shift icon
+            // Show DATE, EVENT NAME and ADDRESS/PLACE (NO customer name)
             if (bookings[0] && bookings[0].fullBookingData) {
                 const data = bookings[0].fullBookingData;
 
-                // Customer name with shift icon (first priority)
-                if (data.customerName && data.customerName.trim()) {
-                    const customerDiv = document.createElement('div');
-                    customerDiv.className = 'shift-customer-name';
-                    customerDiv.innerHTML = `${shiftIcons[shiftType] || '📅'} ${data.customerName.trim()}`;
-                    div.appendChild(customerDiv);
+                // 1. Date with shift icon (first priority)
+                const eventDate = data.fromDate ? new Date(data.fromDate) : new Date(dateStr);
+                const formattedDate = eventDate.toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: 'short'
+                });
+
+                const dateDiv = document.createElement('div');
+                dateDiv.className = 'shift-customer-name'; // Reusing existing CSS class
+                dateDiv.innerHTML = `${shiftIcons[shiftType] || '📅'} ${formattedDate}`;
+                div.appendChild(dateDiv);
+
+                // 2. Event name (second priority)
+                if (data.eventName && data.eventName.trim()) {
+                    const eventDiv = document.createElement('div');
+                    eventDiv.className = 'shift-address';
+
+                    // Truncate long event names
+                    let eventName = data.eventName.trim();
+                    if (eventName.length > 20) {
+                        eventName = eventName.substring(0, 17) + '...';
+                    }
+
+                    eventDiv.innerHTML = `<i class="bi bi-star-fill"></i> ${eventName}`;
+                    div.appendChild(eventDiv);
                 }
 
-                // Address (second priority)
+                // 3. Address/Place (third priority) - NO customer name
                 if (data.address && data.address.trim()) {
                     const addressDiv = document.createElement('div');
                     addressDiv.className = 'shift-address';
 
-                    // Clean up address - remove extra spaces and get first meaningful part
+                    // Clean up address - get first meaningful part (place/location)
                     let cleanAddress = data.address.split(',')[0].trim();
+
+                    // If the first part is too long, take first few words
+                    if (cleanAddress.length > 20) {
+                        cleanAddress = cleanAddress.split(' ').slice(0, 2).join(' ') + '...';
+                    }
 
                     addressDiv.innerHTML = `<i class="bi bi-geo-alt-fill"></i> ${cleanAddress}`;
                     div.appendChild(addressDiv);
                 }
 
-                // If no customer name, show event name as fallback with icon
-                if ((!data.customerName || !data.customerName.trim()) && data.eventName && data.eventName.trim()) {
-                    const eventDiv = document.createElement('div');
-                    eventDiv.className = 'shift-customer-name';
-                    eventDiv.innerHTML = `${shiftIcons[shiftType] || '📅'} ${data.eventName.trim()}`;
-                    div.appendChild(eventDiv);
+                // 4. Fallback: If no event name, show shift type only
+                if (!data.eventName || !data.eventName.trim()) {
+                    const fallbackDiv = document.createElement('div');
+                    fallbackDiv.className = 'shift-address';
+                    fallbackDiv.innerHTML = `<i class="bi bi-clock-fill"></i> ${capitalizeFirstLetter(shiftType)} Shift`;
+                    div.appendChild(fallbackDiv);
                 }
             }
 
@@ -1051,8 +1082,14 @@
                 handleDateClick(dateStr);
             };
 
-            // Add hover effect for better UX
-            div.setAttribute('title', `${shiftIcons[shiftType]} ${capitalizeFirstLetter(shiftType)} shift - Click to view details`);
+            // Updated hover tooltip with date
+            const eventName = bookings[0]?.fullBookingData?.eventName || 'Event';
+            const place = bookings[0]?.fullBookingData?.address?.split(',')[0] || 'Location';
+            const eventDate = bookings[0]?.fullBookingData?.fromDate ?
+                new Date(bookings[0].fullBookingData.fromDate).toLocaleDateString('en-IN') :
+                formatDate(dateStr);
+
+            div.setAttribute('title', `${shiftIcons[shiftType]} ${eventDate}\n${eventName} - ${place}\nClick to view details`);
 
             return div;
         }
@@ -1353,7 +1390,7 @@
                 'Pending': '⏰'
             };
 
-            // 🔥 FIXED: Extract shift details from dateWiseShifts
+            // Extract shift details from dateWiseShifts
             let shiftDetailsHTML = '';
             if (booking.dateWiseShifts) {
                 try {
@@ -1391,7 +1428,6 @@
                     shiftDetailsHTML += `</div></div>`;
                 } catch (error) {
                     console.error('Error parsing shift details:', error);
-                    // Fallback to basic shift type if dateWiseShifts parsing fails
                     shiftDetailsHTML = `
                         <div class="col-12">
                             <div class="fw-medium text-muted mb-1">Shift Type</div>
@@ -1400,7 +1436,6 @@
                     `;
                 }
             } else if (booking.shiftType) {
-                // Fallback for older bookings without dateWiseShifts
                 shiftDetailsHTML = `
                     <div class="col-12">
                         <div class="fw-medium text-muted mb-1">Shift Type</div>
@@ -1549,78 +1584,157 @@
             detailsModal.show();
         }
 
-        // Load events from server with enhanced filtering for edit conflicts
-        function loadEvents() {
+        // Debounced load function to prevent multiple simultaneous calls
+        function debouncedLoadEvents(delay = 500) {
+            if (loadingTimeout) {
+                clearTimeout(loadingTimeout);
+            }
+
+            loadingTimeout = setTimeout(() => {
+                loadEvents(false); // false = don't force reload if cache is fresh
+            }, delay);
+        }
+
+        // Enhanced loadEvents with caching
+        function loadEvents(forceReload = false) {
+            const now = Date.now();
+
+            // Check if we have fresh cached data
+            if (!forceReload && cachedBookings && (now - lastLoadTime) < CACHE_DURATION) {
+                console.log('📦 Using cached data');
+                renderCachedEvents();
+                return;
+            }
+
+            // Prevent multiple simultaneous requests
+            if (isLoading) {
+                console.log('⏳ Already loading, skipping duplicate request');
+                return;
+            }
+
+            isLoading = true;
             showLoader();
+
+            console.log('🔄 Loading fresh data from server...');
 
             $.ajax({
                 url: '/EventBooking/GetAllEventBookings',
                 type: 'GET',
-                timeout: 10000 // 10 second timeout
+                timeout: 15000, // Increased timeout
+                cache: false // Prevent browser caching issues
             }).done(function(bookings) {
-                shiftMap = {};
-                const bgEvents = [];
+                // Cache the fresh data
+                cachedBookings = bookings;
+                lastLoadTime = now;
 
-                bookings.forEach(function(booking) {
-                    const from = booking.fromDate ? new Date(booking.fromDate) : new Date(booking.createdDate);
-                    const to = booking.toDate ? new Date(booking.toDate) : from;
+                processAndRenderEvents(bookings);
 
-                    from.setHours(0, 0, 0, 0);
-                    to.setHours(0, 0, 0, 0);
-
-                    const parsedShifts = booking.dateWiseShifts ? JSON.parse(booking.dateWiseShifts) : {};
-                    const defaultShift = booking.shiftType ? [booking.shiftType.toLowerCase()] : ['full day'];
-
-                    for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
-                        const key = localYMD(d);
-                        const dayShifts = parsedShifts[key] || defaultShift;
-
-                        dayShifts.forEach(function(item) {
-                            const shiftName = (typeof item === 'string' ? item : item.shift).toLowerCase();
-                            if (['morning', 'evening', 'full day'].includes(shiftName)) {
-                                shiftMap[key] = shiftMap[key] || [];
-                                shiftMap[key].push({
-                                    shift: shiftName,
-                                    fullBookingData: booking
-                                });
-                            }
-                        });
-                    }
-
-                    const bgStart = new Date(from);
-                    const bgEnd = new Date(to);
-                    bgEnd.setDate(bgEnd.getDate() + 1);
-
-                    bgEvents.push({
-                        id: booking.bookingId,
-                        start: localYMD(bgStart),
-                        end: localYMD(bgEnd),
-                        display: 'background',
-                        backgroundColor: 'transparent'
-                    });
-                });
-
-                calendar.removeAllEvents();
-                bgEvents.forEach(e => calendar.addEvent(e));
                 hideLoader();
-                showToast(`✅ Loaded ${bookings.length} booking(s) successfully`, 'success');
+                isLoading = false;
+
+                // Only show success message for manual refreshes
+                if (forceReload) {
+                    showToast(`✅ Refreshed ${bookings.length} booking(s)`, 'success');
+                }
+
+                console.log(`📊 Loaded ${bookings.length} bookings successfully`);
 
             }).fail(function(xhr, status, error) {
-                console.error('Failed to load bookings:', error);
-                let errorMessage = 'Failed to load bookings';
-                if (status === 'timeout') {
-                    errorMessage = 'Request timeout - please check your connection';
-                } else if (xhr.status === 404) {
-                    errorMessage = 'Booking service not found';
-                } else if (xhr.status >= 500) {
-                    errorMessage = 'Server error - please try again later';
+                console.error('❌ Failed to load bookings:', error);
+
+                // Use cached data as fallback if available
+                if (cachedBookings && cachedBookings.length > 0) {
+                    console.log('📦 Using cached data as fallback');
+                    renderCachedEvents();
+                    showToast('⚠️ Using cached data - connection issue', 'warning');
+                } else {
+                    let errorMessage = 'Failed to load bookings';
+                    if (status === 'timeout') {
+                        errorMessage = 'Request timeout - please check your connection';
+                    } else if (xhr.status === 404) {
+                        errorMessage = 'Booking service not found';
+                    } else if (xhr.status >= 500) {
+                        errorMessage = 'Server error - please try again later';
+                    }
+                    showToast(errorMessage, 'error');
                 }
-                showToast(errorMessage, 'error');
+
                 hideLoader();
+                isLoading = false;
             });
         }
 
-        // Enhanced calendar initialization
+        // Render cached events without server call
+        function renderCachedEvents() {
+            if (cachedBookings) {
+                processAndRenderEvents(cachedBookings);
+            }
+        }
+
+        // Separate function to process and render events
+        function processAndRenderEvents(bookings) {
+            shiftMap = {};
+            const bgEvents = [];
+
+            bookings.forEach(function(booking) {
+                const from = booking.fromDate ? new Date(booking.fromDate) : new Date(booking.createdDate);
+                const to = booking.toDate ? new Date(booking.toDate) : from;
+
+                from.setHours(0, 0, 0, 0);
+                to.setHours(0, 0, 0, 0);
+
+                const parsedShifts = booking.dateWiseShifts ? JSON.parse(booking.dateWiseShifts) : {};
+                const defaultShift = booking.shiftType ? [booking.shiftType.toLowerCase()] : ['full day'];
+
+                for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
+                    const key = localYMD(d);
+                    const dayShifts = parsedShifts[key] || defaultShift;
+
+                    dayShifts.forEach(function(item) {
+                        const shiftName = (typeof item === 'string' ? item : item.shift).toLowerCase();
+                        if (['morning', 'evening', 'full day'].includes(shiftName)) {
+                            shiftMap[key] = shiftMap[key] || [];
+                            shiftMap[key].push({
+                                shift: shiftName,
+                                fullBookingData: booking
+                            });
+                        }
+                    });
+                }
+
+                const bgStart = new Date(from);
+                const bgEnd = new Date(to);
+                bgEnd.setDate(bgEnd.getDate() + 1);
+
+                bgEvents.push({
+                    id: booking.bookingId,
+                    start: localYMD(bgStart),
+                    end: localYMD(bgEnd),
+                    display: 'background',
+                    backgroundColor: 'transparent'
+                });
+            });
+
+            // Clear and re-render calendar events
+            calendar.removeAllEvents();
+            bgEvents.forEach(e => calendar.addEvent(e));
+        }
+
+        // Smart refresh function
+        window.refreshCalendar = function() {
+            console.log('🔄 Manual refresh requested');
+            showToast('🔄 Refreshing calendar...', 'info');
+            loadEvents(true); // Force reload
+        };
+
+        // Invalidate cache when data changes
+        function invalidateCache() {
+            cachedBookings = null;
+            lastLoadTime = 0;
+            console.log('🗑️ Cache invalidated');
+        }
+
+        // Enhanced calendar initialization with optimized loading
         function initializeCalendar() {
             const calendarEl = document.getElementById('calendar');
 
@@ -1647,8 +1761,18 @@
                     renderShiftBlocks(arg);
                 },
 
-                datesSet() {
-                    loadEvents();
+                // OPTIMIZED: Only load on initial render and month changes
+                datesSet(dateInfo) {
+                    console.log('📅 Calendar view changed:', dateInfo.view.type);
+
+                    // Only load data if we don't have fresh cached data
+                    const now = Date.now();
+                    if (!cachedBookings || (now - lastLoadTime) > CACHE_DURATION) {
+                        debouncedLoadEvents(300); // Debounced loading with shorter delay
+                    } else {
+                        console.log('📦 Using cached data for view change');
+                        renderCachedEvents();
+                    }
                 },
 
                 // Enhanced loading state
@@ -1662,9 +1786,12 @@
             });
 
             calendar.render();
+
+            // Initial load
+            loadEvents(true);
         }
 
-        // 🔥 FIXED: Enhanced booking modal functions with generateDateWiseShifts() inside
+        // Enhanced booking modal functions
         window.openBookingModal = function(dateStr = '', availableShifts = null) {
             resetBookingForm();
 
@@ -1687,7 +1814,7 @@
             document.getElementById('modal-title-text').textContent = 'New Booking';
             document.getElementById('delete-booking').style.display = 'none';
 
-            // 🔥 KEY FIX: Generate shifts IMMEDIATELY when modal opens
+            // Generate shifts IMMEDIATELY when modal opens
             generateDateWiseShifts();
 
             bookingModal.show();
@@ -1720,6 +1847,7 @@
             }
         }
 
+        // Enhanced save booking with cache invalidation
         window.saveBooking = function() {
             if (!validateForm()) return;
 
@@ -1786,7 +1914,10 @@
                     if (response.success) {
                         showToast('🎉 Booking saved successfully!', 'success');
                         bookingModal.hide();
-                        loadEvents();
+
+                        // OPTIMIZED: Invalidate cache and reload once
+                        invalidateCache();
+                        loadEvents(true);
                     } else {
                         messageEl.className = 'alert alert-danger d-flex align-items-center';
                         messageEl.innerHTML = `<i class="bi bi-exclamation-triangle me-2"></i>${response.message || 'Error saving booking'}`;
@@ -1810,10 +1941,8 @@
             });
         };
 
-
-
-
-                function validateForm() {
+        // Enhanced form validation with per-date shift validation
+        function validateForm() {
             // Clear any existing error messages
             document.querySelectorAll('.error-message').forEach(el => el.remove());
             let isValid = true;
@@ -1871,7 +2000,7 @@
                 isValid = false;
             }
 
-            // 🔥 ENHANCED SHIFT VALIDATION - Check each date individually
+            // ENHANCED SHIFT VALIDATION - Check each date individually
             const container = document.getElementById('dateWiseShiftContainer');
             const cards = container.querySelectorAll('.card'); // Each card represents one date
 
@@ -2006,87 +2135,6 @@
             return isValid;
         }
 
-        // Helper function to get date string from date inputs
-        function getDateRange() {
-            const fromDate = new Date(document.getElementById('fromDate').value);
-            const toDate = new Date(document.getElementById('toDate').value);
-
-            if (isNaN(fromDate) || isNaN(toDate)) {
-                return [];
-            }
-
-            const dates = [];
-            for (let d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
-                dates.push(d.toISOString().split('T')[0]);
-            }
-
-            return dates;
-        }
-
-        // Enhanced validation with real-time feedback
-        function addRealTimeValidation() {
-            // Add real-time validation for shift selection
-            const container = document.getElementById('dateWiseShiftContainer');
-
-            // Use event delegation for dynamically added checkboxes
-            container.addEventListener('change', function(e) {
-                if (e.target.classList.contains('shift-checkbox')) {
-                    const card = e.target.closest('.card');
-                    if (card) {
-                        // Remove previous validation errors for this card
-                        card.querySelectorAll('.error-message').forEach(err => err.remove());
-
-                        // Check if at least one checkbox is checked in this card
-                        const checkedInCard = card.querySelectorAll('.shift-checkbox:checked');
-
-                        if (checkedInCard.length > 0) {
-                            // At least one shift selected - remove any "no shift selected" errors
-                            card.querySelectorAll('.error-message').forEach(err => {
-                                if (err.textContent.includes('select at least one shift')) {
-                                    err.remove();
-                                }
-                            });
-                        }
-                    }
-                }
-            });
-
-            // Real-time validation for time inputs
-            container.addEventListener('blur', function(e) {
-                if (e.target.type === 'time') {
-                    const card = e.target.closest('.card');
-                    if (card) {
-                        // Remove previous time validation errors
-                        card.querySelectorAll('.time-error-message').forEach(err => err.remove());
-
-                        // Validate time pairs in this card
-                        const checkedBoxes = card.querySelectorAll('.shift-checkbox:checked');
-                        checkedBoxes.forEach(checkbox => {
-                            const dateStr = checkbox.dataset.date;
-                            const shiftType = checkbox.dataset.shift;
-
-                            const startInput = card.querySelector(`input[name="shift-${dateStr}-${shiftType}-start"]`);
-                            const endInput = card.querySelector(`input[name="shift-${dateStr}-${shiftType}-end"]`);
-
-                            if (startInput?.value && endInput?.value && startInput.value >= endInput.value) {
-                                const error = document.createElement('div');
-                                error.className = 'time-error-message error-message d-flex align-items-center mt-2 text-warning';
-                                error.innerHTML = '<i class="bi bi-clock-history me-2"></i>End time must be after start time';
-                                endInput.parentNode.appendChild(error);
-                            }
-                        });
-                    }
-                }
-            }, true);
-        }
-
-        // Initialize real-time validation when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            addRealTimeValidation();
-        });
-
-
-
         function openBookingModalForEdit(bookingData) {
             resetBookingForm();
 
@@ -2133,18 +2181,18 @@
                         dayShifts.forEach(shiftData => {
                             const shiftType = shiftData.shift;
 
-                            // 1. ✅ Check the shift checkbox
+                            // 1. Check the shift checkbox
                             const checkbox = document.getElementById(`checkbox-${shiftType}-${dateStr}`);
                             if (checkbox) {
                                 checkbox.checked = true;
 
-                                // 2. ✅ Show the shift time section
+                                // 2. Show the shift time section
                                 const timesContainer = document.getElementById(`${shiftType}-times-${dateStr}`);
                                 if (timesContainer) {
                                     timesContainer.style.display = 'block';
                                 }
 
-                                // 3. ✅ Fill in start/end times
+                                // 3. Fill in start/end times
                                 const startInput = document.querySelector(`input[name="shift-${dateStr}-${shiftType}-start"]`);
                                 const endInput = document.querySelector(`input[name="shift-${dateStr}-${shiftType}-end"]`);
 
@@ -2195,11 +2243,6 @@
             showToast('📱 Opening WhatsApp...', 'success');
         }
 
-        window.refreshCalendar = function() {
-            showToast('🔄 Refreshing calendar...', 'info');
-            loadEvents();
-        };
-
         window.openWhatsApp = function() {
             const phone = document.getElementById('phoneNumber').value.replace(/\D/g, '');
             if (!phone) {
@@ -2212,59 +2255,7 @@
             showToast('📱 Opening WhatsApp...', 'success');
         };
 
-        // Enhanced event handlers
-        document.getElementById('advancePayment').addEventListener('input', calculateRemainingPayment);
-        document.getElementById('totalAmount').addEventListener('input', calculateRemainingPayment);
-
-        document.getElementById('delete-booking').addEventListener('click', function() {
-            const bookingId = document.getElementById('bookingId').value;
-            if (!bookingId) return;
-
-            // Enhanced confirmation dialog
-            const eventName = document.getElementById('EventName').value || 'this booking';
-            const confirmMessage = `Are you sure you want to delete "${eventName}"?\n\nThis action cannot be undone.`;
-
-            if (!confirm(confirmMessage)) return;
-
-            const deleteBtn = this;
-            const originalText = deleteBtn.innerHTML;
-            deleteBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Deleting...';
-            deleteBtn.disabled = true;
-
-            $.ajax({
-                url: `/EventBooking/Delete/${bookingId}`,
-                type: 'POST',
-                timeout: 10000,
-                success: function(response) {
-                    if (response.success) {
-                        showToast('🗑️ Booking deleted successfully', 'success');
-                        bookingModal.hide();
-                        loadEvents();
-                    } else {
-                        showToast('❌ Failed to delete booking', 'error');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Delete booking error:', error);
-                    let errorMessage = 'Failed to delete booking';
-                    if (status === 'timeout') {
-                        errorMessage = 'Request timeout - please try again';
-                    }
-                    showToast(`❌ ${errorMessage}`, 'error');
-                },
-                complete: function() {
-                    deleteBtn.innerHTML = originalText;
-                    deleteBtn.disabled = false;
-                }
-            });
-        });
-
-        document.getElementById('bookingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            saveBooking();
-        });
-
-        // 🔥 FIXED: Date change listeners will regenerate shifts when dates change
+        // Date change listeners will regenerate shifts when dates change
         document.getElementById('fromDate').addEventListener('change', generateDateWiseShifts);
         document.getElementById('toDate').addEventListener('change', generateDateWiseShifts);
 
@@ -2320,7 +2311,7 @@
                 const dayName = d.toLocaleDateString('en-US', { weekday: 'long' });
 
                 const shiftTemplate = (shiftType, icon, label, colorClass) => {
-                    // 🔥 FIXED: Only consider shifts from OTHER bookings (exclude current booking being edited)
+                    // Only consider shifts from OTHER bookings (exclude current booking being edited)
                     const shiftBookedByOthers = allShifts.find(s =>
                         s.shift === shiftType &&
                         (!editBookingId || s.fullBookingData.bookingId !== parseInt(editBookingId))
@@ -2396,7 +2387,7 @@
                 const evening = shiftTemplate('evening', 'bi-sunset', 'Evening Shift', 'text-info');
 
                 html += `
-                    <div class="card mb-4 shadow-sm">
+                    <div class="card mb-4 shadow-sm" data-date="${dateStr}">
                         <div class="card-header bg-primary text-white">
                             <h6 class="mb-0">
                                 <i class="bi bi-calendar-event me-2"></i>
@@ -2427,14 +2418,14 @@
         }
 
         function addShiftCheckboxListeners() {
-            // 🔍 Find all checkboxes with class 'shift-checkbox'
+            // Find all checkboxes with class 'shift-checkbox'
             const allCheckboxes = document.querySelectorAll('.shift-checkbox');
-            console.log('Found checkboxes:', allCheckboxes.length); // Debug log
+            console.log('Found checkboxes:', allCheckboxes.length);
 
             allCheckboxes.forEach((checkbox, index) => {
-                console.log(`Setting up checkbox ${index}:`, checkbox.id); // Debug log
+                console.log(`Setting up checkbox ${index}:`, checkbox.id);
 
-                // 🎯 Add change event listener to each checkbox
+                // Add change event listener to each checkbox
                 checkbox.addEventListener('change', function() {
                     const dateStr = this.getAttribute('data-date');
                     const shiftType = this.getAttribute('data-shift');
@@ -2443,13 +2434,13 @@
                     console.log(`Checkbox changed: ${shiftType} for ${dateStr}, checked: ${this.checked}`);
 
                     if (this.checked) {
-                        // ✅ SHOW time configuration when checked
+                        // SHOW time configuration when checked
                         if (timesContainer) {
                             timesContainer.style.display = 'block';
                             timesContainer.style.animation = 'fadeInUp 0.3s ease-out';
                         }
                     } else {
-                        // ❌ HIDE time configuration when unchecked
+                        // HIDE time configuration when unchecked
                         if (timesContainer) {
                             timesContainer.style.display = 'none';
 
@@ -2462,6 +2453,118 @@
                     }
                 });
             });
+        }
+
+        // Enhanced event handlers
+        document.getElementById('advancePayment').addEventListener('input', calculateRemainingPayment);
+        document.getElementById('totalAmount').addEventListener('input', calculateRemainingPayment);
+
+        // Enhanced delete with cache invalidation
+        document.getElementById('delete-booking').addEventListener('click', function() {
+            const bookingId = document.getElementById('bookingId').value;
+            if (!bookingId) return;
+
+            const eventName = document.getElementById('EventName').value || 'this booking';
+            const confirmMessage = `Are you sure you want to delete "${eventName}"?\n\nThis action cannot be undone.`;
+
+            if (!confirm(confirmMessage)) return;
+
+            const deleteBtn = this;
+            const originalText = deleteBtn.innerHTML;
+            deleteBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Deleting...';
+            deleteBtn.disabled = true;
+
+            $.ajax({
+                url: `/EventBooking/Delete/${bookingId}`,
+                type: 'POST',
+                timeout: 10000,
+                success: function(response) {
+                    if (response.success) {
+                        showToast('🗑️ Booking deleted successfully', 'success');
+                        bookingModal.hide();
+
+                        // OPTIMIZED: Invalidate cache and reload once
+                        invalidateCache();
+                        loadEvents(true);
+                    } else {
+                        showToast('❌ Failed to delete booking', 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Delete booking error:', error);
+                    let errorMessage = 'Failed to delete booking';
+                    if (status === 'timeout') {
+                        errorMessage = 'Request timeout - please try again';
+                    }
+                    showToast(`❌ ${errorMessage}`, 'error');
+                },
+                complete: function() {
+                    deleteBtn.innerHTML = originalText;
+                    deleteBtn.disabled = false;
+                }
+            });
+        });
+
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveBooking();
+        });
+
+        // Enhanced real-time validation
+        function addRealTimeValidation() {
+            // Add real-time validation for shift selection
+            const container = document.getElementById('dateWiseShiftContainer');
+
+            // Use event delegation for dynamically added checkboxes
+            container.addEventListener('change', function(e) {
+                if (e.target.classList.contains('shift-checkbox')) {
+                    const card = e.target.closest('.card');
+                    if (card) {
+                        // Remove previous validation errors for this card
+                        card.querySelectorAll('.error-message').forEach(err => err.remove());
+
+                        // Check if at least one checkbox is checked in this card
+                        const checkedInCard = card.querySelectorAll('.shift-checkbox:checked');
+
+                        if (checkedInCard.length > 0) {
+                            // At least one shift selected - remove any "no shift selected" errors
+                            card.querySelectorAll('.error-message').forEach(err => {
+                                if (err.textContent.includes('select at least one shift')) {
+                                    err.remove();
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            // Real-time validation for time inputs
+            container.addEventListener('blur', function(e) {
+                if (e.target.type === 'time') {
+                    const card = e.target.closest('.card');
+                    if (card) {
+                        // Remove previous time validation errors
+                        card.querySelectorAll('.time-error-message').forEach(err => err.remove());
+
+                        // Validate time pairs in this card
+                        const checkedBoxes = card.querySelectorAll('.shift-checkbox:checked');
+                        checkedBoxes.forEach(checkbox => {
+                            const dateStr = checkbox.dataset.date;
+                            const shiftType = checkbox.dataset.shift;
+
+                            const startInput = card.querySelector(`input[name="shift-${dateStr}-${shiftType}-start"]`);
+                            const endInput = card.querySelector(`input[name="shift-${dateStr}-${shiftType}-end"]`);
+
+                            if (startInput?.value && endInput?.value && startInput.value >= endInput.value) {
+                                const error = document.createElement('div');
+                                error.className = 'time-error-message error-message d-flex align-items-center mt-2 text-warning';
+                                error.innerHTML = '<i class="bi bi-clock-history me-2"></i>End time must be after start time';
+                                endInput.parentNode.appendChild(error);
+                            }
+                        });
+                    }
+                }
+            }, true);
         }
 
         // Add CSS animations
@@ -2514,6 +2617,7 @@
 
             setTimeout(() => {
                 initializeCalendar();
+                addRealTimeValidation();
                 document.body.style.opacity = '1';
                 showToast('🎉 Event Booking Pro loaded successfully!', 'success');
             }, 100);
@@ -2542,6 +2646,11 @@
             }
         });
 
+        // Clear cache on page unload
+        window.addEventListener('beforeunload', function() {
+            invalidateCache();
+        });
+
         // Add service worker for offline support (optional)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
@@ -2550,7 +2659,6 @@
                 console.log('Service Worker support detected');
             });
         }
-
-    </script>
+</script>
 </body>
 </html>
