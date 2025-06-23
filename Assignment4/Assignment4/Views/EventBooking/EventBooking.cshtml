@@ -41,31 +41,6 @@
         * {
             box-sizing: border-box;
         }
-        /* Styles for concise display */
-        .shift-main-text {
-            font-size: 0.7rem;
-            font-weight: 700;
-            line-height: 1.2;
-            text-align: center;
-            word-break: break-word;
-        }
-
-        /* Enhanced shift block base styles */
-        .shift-block {
-            justify-content: center;
-            align-items: center;
-            padding: 2px 4px;
-        }
-
-        /* Responsive text sizing */
-        @@media (max-width: 480px) {
-            .shift-main-text
-
-        {
-            font-size: 0.6rem;
-        }
-
-        }
 
         body {
             background: var(--background-color);
@@ -1033,39 +1008,53 @@
         function hideLoader() {
             document.getElementById('calendar-loader').classList.add('d-none');
         }
-
-                   function createShiftBlock(shiftType, bookings, dateStr) {
+                function createShiftBlock(shiftType, bookings, dateStr) {
             const div = document.createElement('div');
             div.className = `shift-block shift-${shiftType.replace(' ', '')}`;
 
+            // Show only PLACE NAME and EVENT NAME (NO icons, NO dates)
             if (bookings[0] && bookings[0].fullBookingData) {
                 const data = bookings[0].fullBookingData;
 
-                // Primary display: Event name OR place (whichever is more meaningful)
-                let displayText = '';
-
+                // 1. Event name (first priority) - NO icons
                 if (data.eventName && data.eventName.trim()) {
-                    displayText = data.eventName.trim();
-                } else if (data.address && data.address.trim()) {
-                    displayText = data.address.split(',')[0].trim();
-                } else {
-                    displayText = `${capitalizeFirstLetter(shiftType)} Event`;
-                }
+                    const eventDiv = document.createElement('div');
+                    eventDiv.className = 'shift-customer-name'; // Reusing existing CSS class
 
-                // Smart truncation - keep important words
-                if (displayText.length > 15) {
-                    const words = displayText.split(' ');
-                    if (words.length > 2) {
-                        displayText = words.slice(0, 2).join(' ') + '...';
-                    } else {
-                        displayText = displayText.substring(0, 12) + '...';
+                    // Truncate long event names
+                    let eventName = data.eventName.trim();
+                    if (eventName.length > 20) {
+                        eventName = eventName.substring(0, 17) + '...';
                     }
+
+                    eventDiv.innerHTML = eventName; // NO icons, just text
+                    div.appendChild(eventDiv);
                 }
 
-                const textDiv = document.createElement('div');
-                textDiv.className = 'shift-main-text';
-                textDiv.textContent = displayText;
-                div.appendChild(textDiv);
+                // 2. Place/Address (second priority) - NO icons
+                if (data.address && data.address.trim()) {
+                    const addressDiv = document.createElement('div');
+                    addressDiv.className = 'shift-address';
+
+                    // Clean up address - get first meaningful part (place/location)
+                    let cleanAddress = data.address.split(',')[0].trim();
+
+                    // If the first part is too long, take first few words
+                    if (cleanAddress.length > 20) {
+                        cleanAddress = cleanAddress.split(' ').slice(0, 2).join(' ') + '...';
+                    }
+
+                    addressDiv.innerHTML = cleanAddress; // NO icons, just place name
+                    div.appendChild(addressDiv);
+                }
+
+                // 3. Fallback: If no event name, show shift type only (no icons)
+                if (!data.eventName || !data.eventName.trim()) {
+                    const fallbackDiv = document.createElement('div');
+                    fallbackDiv.className = 'shift-customer-name';
+                    fallbackDiv.innerHTML = `${capitalizeFirstLetter(shiftType)} Shift`; // NO icons
+                    div.appendChild(fallbackDiv);
+                }
             }
 
             div.onclick = function (e) {
@@ -1073,16 +1062,15 @@
                 handleDateClick(dateStr);
             };
 
-            // Enhanced tooltip with more details
+            // Simple hover tooltip without icons
             const eventName = bookings[0]?.fullBookingData?.eventName || 'Event';
             const place = bookings[0]?.fullBookingData?.address?.split(',')[0] || 'Location';
-            const customer = bookings[0]?.fullBookingData?.customerName || 'Customer';
-            const status = bookings[0]?.fullBookingData?.bookingStatus || 'Status';
 
-            div.setAttribute('title', `${eventName}\n📍 ${place}\n👤 ${customer}\n📋 ${status}\n\nClick for details`);
+            div.setAttribute('title', `${eventName} - ${place}\nClick to view details`);
 
             return div;
         }
+
 
         function addEmptyShiftArea(cell, shiftType, dateStr) {
             const area = document.createElement('div');
@@ -1116,34 +1104,27 @@
 
         // Enhanced shift block rendering
                // Updated renderShiftBlocks function - WITHOUT empty shift areas
-        function renderShiftBlocks(arg) {
+              function renderShiftBlocks(arg) {
             const dateStr = localYMD(arg.date);
             const shifts = shiftMap[dateStr] || [];
-
             if (!shifts.length) return; // No shifts, show nothing (no empty areas)
-
             const cell = arg.el;
             cell.style.position = 'relative';
-
             const POSITIONS = {
                 'full day': { top: '32px', height: 'calc(100% - 36px)', left: '2px', right: '2px' },
-                'morning': { top: '32px', height: '50%', left: '2px', right: '2px' },
+                'morning': { top: '-2px', height: '50%', left: '2px', right: '2px' },
                 'evening': { bottom: '2px', height: '50%', left: '2px', right: '2px' }
             };
-
             const byType = shifts.reduce((acc, s) => {
                 (acc[s.shift] = acc[s.shift] || []).push(s);
                 return acc;
             }, {});
 
-            // REMOVED: All empty shift area creation code
-            // No more dashed boxes for unbooked shifts
-            /*
             const hasFull = byType['full day'];
             const hasMorn = byType['morning'];
             const hasEven = byType['evening'];
 
-            // COMMENTED OUT: Empty shift areas creation
+            // Empty shift areas creation
             if (!hasFull && (hasMorn || hasEven)) {
                 if (hasMorn && !hasEven) {
                     const emptyArea = addEmptyShiftArea(cell, 'evening', dateStr);
@@ -1155,12 +1136,31 @@
                     cell.appendChild(emptyArea);
                 }
             }
-            */
 
             // Only render existing shift blocks (actual bookings)
             Object.entries(byType).forEach(([type, list]) => {
                 const block = createShiftBlock(type, list, dateStr);
                 Object.assign(block.style, POSITIONS[type]);
+
+                // Enhanced colors for better visibility
+                if (type === 'morning') {
+                    block.style.background = 'linear-gradient(135deg, #FF6B35 0%, #F7931E 100%)'; // Orange gradient
+                    block.style.border = '2px solid #FF6B35';
+                    block.style.boxShadow = '0 2px 8px rgba(255, 107, 53, 0.3)';
+                } else if (type === 'evening') {
+                    block.style.background = 'linear-gradient(135deg, #4A90E2 0%, #357ABD 100%)'; // Blue gradient
+                    block.style.border = '2px solid #4A90E2';
+                    block.style.boxShadow = '0 2px 8px rgba(74, 144, 226, 0.3)';
+                } else if (type === 'full day') {
+                    block.style.background = 'linear-gradient(135deg, #7B68EE 0%, #9370DB 100%)'; // Purple gradient
+                    block.style.border = '2px solid #7B68EE';
+                    block.style.boxShadow = '0 2px 8px rgba(123, 104, 238, 0.3)';
+                }
+
+                // Add address display
+                const bookingData = list[0]?.fullBookingData;
+          
+
                 cell.appendChild(block);
             });
         }
@@ -2617,6 +2617,7 @@
                 showToast('🎉 Event Booking Pro loaded successfully!', 'success');
             }, 100);
         });
+
 
         // Enhanced keyboard shortcuts
         document.addEventListener('keydown', function(e) {
