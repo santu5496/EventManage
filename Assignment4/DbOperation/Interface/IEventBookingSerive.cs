@@ -15,8 +15,6 @@ namespace DbOperation.Interface
         List<Bookings> GetAllBookings();
         List<Bookings> GetBookingByID(int id);
         bool AddBooking(Bookings bookings);
-
-
-
+        string GetLastError();
     }
 }

@@ -28,7 +28,8 @@ namespace EventManagement.Controllers
                 var result = _eventBookingSerive.AddBooking(eventBooking);
                 if (!result)
                 {
-                    return Json(new { success = false, message = "Failed to update event booking." });
+                    var errorMsg = _eventBookingSerive.GetLastError();
+                    return Json(new { success = false, message = string.IsNullOrEmpty(errorMsg) ? "Failed to update event booking." : errorMsg });
                 }
                 return Json(new { success = true, message = "Event booking updated successfully." });
             }
@@ -37,8 +38,8 @@ namespace EventManagement.Controllers
                 var result = _eventBookingSerive.AddBooking(eventBooking);
                 if (!result)
                 {
-
-                    return Json(new { success = false, message = "Failed to add event booking." });
+                    var errorMsg = _eventBookingSerive.GetLastError();
+                    return Json(new { success = false, message = string.IsNullOrEmpty(errorMsg) ? "Failed to add event booking." : errorMsg });
                 }
                 return Json(new { success = true, message = "Event booking added successfully." });
             }

@@ -53,56 +53,98 @@ namespace DbOperation.Implementation
 
    
 
+        public string LastError { get; private set; } = string.Empty;
+
         public bool AddBooking(Bookings bookings)
         {
             try
             {
+                LastError = string.Empty;
                 using (var db = new EventContext(_context))
                 {
                     if (bookings.bookingId == 0)
                     {
                         bookings.createdDate = DateTime.Now;
-                        var existing = db.Users.FirstOrDefault();
-                        var userid = existing.userId;
-
-                        bookings.userId = userid;
+                        var existingUser = db.Users.FirstOrDefault();
+                        if (existingUser == null)
+                        {
+                            LastError = "No users found in the system. Please create a user first.";
+                            return false;
+                        }
+                        bookings.userId = existingUser.userId;
 
                         db.Bookings.Add(bookings);
-                        
                     }
                     else
                     {
                         var existing = db.Bookings.FirstOrDefault(b => b.bookingId == bookings.bookingId);
-                        if (existing != null)
+                        if (existing == null)
                         {
-                            // Update fields
-                            existing.eventId = bookings.eventId;
-                            existing.bookingDate = bookings.bookingDate;
-                            existing.fromDate = bookings.fromDate;
-                            existing.toDate = bookings.toDate;
-                            existing.shiftType = bookings.shiftType;
-                            existing.bookingStatus = bookings.bookingStatus;
-                            existing.totalAmount = bookings.totalAmount;
-                            existing.advancePayment = bookings.advancePayment;
-                            existing.remainingPayment = bookings.remainingPayment;
-                            existing.paymentStatus = bookings.paymentStatus;
-                            existing.customerName = bookings.customerName;
-                            existing.phoneNumber = bookings.phoneNumber;
-                            existing.alternativeNumber = bookings.alternativeNumber;
-                            existing.address = bookings.address;
-                            existing.dateWiseShifts = bookings.dateWiseShifts;
-                            db.Bookings.Update(existing);
+                            LastError = "Booking not found. It may have been deleted.";
+                            return false;
                         }
+
+                        if (bookings.eventId.HasValue)
+                            existing.eventId = bookings.eventId;
+                        if (bookings.bookingDate.HasValue)
+                            existing.bookingDate = bookings.bookingDate;
+                        if (bookings.fromDate.HasValue)
+                            existing.fromDate = bookings.fromDate;
+                        if (bookings.toDate.HasValue)
+                            existing.toDate = bookings.toDate;
+                        if (!string.IsNullOrEmpty(bookings.shiftType))
+                            existing.shiftType = bookings.shiftType;
+                        if (!string.IsNullOrEmpty(bookings.bookingStatus))
+                            existing.bookingStatus = bookings.bookingStatus;
+                        if (bookings.totalAmount.HasValue)
+                            existing.totalAmount = bookings.totalAmount;
+                        if (bookings.advancePayment.HasValue)
+                            existing.advancePayment = bookings.advancePayment;
+                        if (bookings.remainingPayment.HasValue)
+                            existing.remainingPayment = bookings.remainingPayment;
+                        if (!string.IsNullOrEmpty(bookings.paymentStatus))
+                            existing.paymentStatus = bookings.paymentStatus;
+                        if (!string.IsNullOrEmpty(bookings.customerName))
+                            existing.customerName = bookings.customerName;
+                        if (!string.IsNullOrEmpty(bookings.phoneNumber))
+                            existing.phoneNumber = bookings.phoneNumber;
+                        if (!string.IsNullOrEmpty(bookings.alternativeNumber))
+                            existing.alternativeNumber = bookings.alternativeNumber;
+                        if (!string.IsNullOrEmpty(bookings.address))
+                            existing.address = bookings.address;
+                        if (!string.IsNullOrEmpty(bookings.dateWiseShifts))
+                            existing.dateWiseShifts = bookings.dateWiseShifts;
+                        if (!string.IsNullOrEmpty(bookings.EventName))
+                            existing.EventName = bookings.EventName;
+                        if (bookings.diesel.HasValue)
+                            existing.diesel = bookings.diesel;
+                        if (!string.IsNullOrEmpty(bookings.bandType))
+                            existing.bandType = bookings.bandType;
                     }
 
-                    return db.SaveChanges() > 0;
+                    var changes = db.SaveChanges();
+                    if (changes == 0)
+                    {
+                        LastError = "No changes were made to the booking.";
+                        return false;
+                    }
+                    return true;
                 }
             }
             catch (Exception ex)
             {
+                var innerMsg = ex.InnerException?.Message ?? ex.Message;
+                LastError = $"Database error: {innerMsg}";
                 Console.WriteLine($"Error: {ex.Message}");
+                if (ex.InnerException != null)
+                    Console.WriteLine($"Inner Error: {ex.InnerException.Message}");
                 return false;
             }
+        }
+
+        public string GetLastError()
+        {
+            return LastError;
         }
 
         public bool AddEventNameColumn()
