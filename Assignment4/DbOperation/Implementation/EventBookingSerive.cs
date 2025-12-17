@@ -148,7 +148,49 @@ namespace DbOperation.Implementation
         {
             using (var db = new EventContext(_context))
             {
-                db.Bookings.Update(bookings);
+                var existing = db.Bookings.FirstOrDefault(b => b.bookingId == bookings.bookingId);
+                if (existing == null)
+                {
+                    return false;
+                }
+
+                if (bookings.eventId.HasValue)
+                    existing.eventId = bookings.eventId;
+                if (bookings.bookingDate.HasValue)
+                    existing.bookingDate = bookings.bookingDate;
+                if (bookings.fromDate.HasValue)
+                    existing.fromDate = bookings.fromDate;
+                if (bookings.toDate.HasValue)
+                    existing.toDate = bookings.toDate;
+                if (!string.IsNullOrEmpty(bookings.shiftType))
+                    existing.shiftType = bookings.shiftType;
+                if (!string.IsNullOrEmpty(bookings.bookingStatus))
+                    existing.bookingStatus = bookings.bookingStatus;
+                if (bookings.totalAmount.HasValue)
+                    existing.totalAmount = bookings.totalAmount;
+                if (bookings.advancePayment.HasValue)
+                    existing.advancePayment = bookings.advancePayment;
+                if (bookings.remainingPayment.HasValue)
+                    existing.remainingPayment = bookings.remainingPayment;
+                if (!string.IsNullOrEmpty(bookings.paymentStatus))
+                    existing.paymentStatus = bookings.paymentStatus;
+                if (!string.IsNullOrEmpty(bookings.customerName))
+                    existing.customerName = bookings.customerName;
+                if (!string.IsNullOrEmpty(bookings.phoneNumber))
+                    existing.phoneNumber = bookings.phoneNumber;
+                if (!string.IsNullOrEmpty(bookings.alternativeNumber))
+                    existing.alternativeNumber = bookings.alternativeNumber;
+                if (!string.IsNullOrEmpty(bookings.address))
+                    existing.address = bookings.address;
+                if (!string.IsNullOrEmpty(bookings.EventName))
+                    existing.EventName = bookings.EventName;
+                if (bookings.diesel.HasValue)
+                    existing.diesel = bookings.diesel;
+                if (!string.IsNullOrEmpty(bookings.bandType))
+                    existing.bandType = bookings.bandType;
+                if (!string.IsNullOrEmpty(bookings.dateWiseShifts))
+                    existing.dateWiseShifts = bookings.dateWiseShifts;
+
                 return db.SaveChanges() > 0;
             }
         }
@@ -201,7 +243,49 @@ namespace DbOperation.Implementation
         {
             using (var db = new EventContext(_context))
             {
-                db.Bookings.Update(eventBooking);
+                var existing = db.Bookings.FirstOrDefault(b => b.bookingId == eventBooking.bookingId);
+                if (existing == null)
+                {
+                    return false;
+                }
+
+                if (eventBooking.eventId.HasValue)
+                    existing.eventId = eventBooking.eventId;
+                if (eventBooking.bookingDate.HasValue)
+                    existing.bookingDate = eventBooking.bookingDate;
+                if (eventBooking.fromDate.HasValue)
+                    existing.fromDate = eventBooking.fromDate;
+                if (eventBooking.toDate.HasValue)
+                    existing.toDate = eventBooking.toDate;
+                if (!string.IsNullOrEmpty(eventBooking.shiftType))
+                    existing.shiftType = eventBooking.shiftType;
+                if (!string.IsNullOrEmpty(eventBooking.bookingStatus))
+                    existing.bookingStatus = eventBooking.bookingStatus;
+                if (eventBooking.totalAmount.HasValue)
+                    existing.totalAmount = eventBooking.totalAmount;
+                if (eventBooking.advancePayment.HasValue)
+                    existing.advancePayment = eventBooking.advancePayment;
+                if (eventBooking.remainingPayment.HasValue)
+                    existing.remainingPayment = eventBooking.remainingPayment;
+                if (!string.IsNullOrEmpty(eventBooking.paymentStatus))
+                    existing.paymentStatus = eventBooking.paymentStatus;
+                if (!string.IsNullOrEmpty(eventBooking.customerName))
+                    existing.customerName = eventBooking.customerName;
+                if (!string.IsNullOrEmpty(eventBooking.phoneNumber))
+                    existing.phoneNumber = eventBooking.phoneNumber;
+                if (!string.IsNullOrEmpty(eventBooking.alternativeNumber))
+                    existing.alternativeNumber = eventBooking.alternativeNumber;
+                if (!string.IsNullOrEmpty(eventBooking.address))
+                    existing.address = eventBooking.address;
+                if (!string.IsNullOrEmpty(eventBooking.EventName))
+                    existing.EventName = eventBooking.EventName;
+                if (eventBooking.diesel.HasValue)
+                    existing.diesel = eventBooking.diesel;
+                if (!string.IsNullOrEmpty(eventBooking.bandType))
+                    existing.bandType = eventBooking.bandType;
+                if (!string.IsNullOrEmpty(eventBooking.dateWiseShifts))
+                    existing.dateWiseShifts = eventBooking.dateWiseShifts;
+
                 return db.SaveChanges() > 0;
             }
         }
