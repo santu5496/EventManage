@@ -1,0 +1,27 @@
+{
+  "name": "Event Management Pro",
+  "short_name": "EventMgr",
+  "description": "Professional Event Management Application",
+  "start_url": "/EventBooking/EventBooking",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6750a4",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/Image/LogoImg.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/Image/LogoImg.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "screenshots": [],
+  "prefer_related_applications": false
+}

@@ -2,6 +2,16 @@
 <html lang="en">
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#6750a4">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/Image/LogoImg.png">
+    
     <!-- General CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -348,6 +358,32 @@
         </main>
     </div>
 
+    <!-- Bottom Navigation Bar for Mobile/Tablet -->
+    <nav class="bottom-nav" id="bottomNav">
+        <div class="bottom-nav-container">
+            <a href="/EventBooking/EventBooking" class="bottom-nav-item ripple" data-page="booking">
+                <i class="fas fa-calendar-check"></i>
+                <span>Book</span>
+            </a>
+            <a href="/DashBoard/DashBoard" class="bottom-nav-item ripple" data-page="dashboard">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="/User/User" class="bottom-nav-item ripple" data-page="users">
+                <i class="fas fa-user-plus"></i>
+                <span>Users</span>
+            </a>
+            <a href="/EventBooking/TableView" class="bottom-nav-item ripple" data-page="reports">
+                <i class="fas fa-file-alt"></i>
+                <span>Reports</span>
+            </a>
+            <a href="/Home/Login" class="bottom-nav-item ripple" data-page="logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </nav>
+
     @await RenderSectionAsync("Scripts", required: false)
 
     <script>
@@ -420,7 +456,42 @@
                     container.classList.remove('active');
                 });
             }
+            
+            // Highlight active bottom nav item
+            highlightActiveNavItem();
         });
+        
+        // Bottom navigation active state
+        function highlightActiveNavItem() {
+            const currentPath = window.location.pathname.toLowerCase();
+            const navItems = document.querySelectorAll('.bottom-nav-item');
+            
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                const href = item.getAttribute('href').toLowerCase();
+                
+                if (currentPath.includes('eventbooking/eventbooking') && href.includes('eventbooking/eventbooking')) {
+                    item.classList.add('active');
+                } else if (currentPath.includes('dashboard') && href.includes('dashboard')) {
+                    item.classList.add('active');
+                } else if (currentPath.includes('user/user') && href.includes('user/user')) {
+                    item.classList.add('active');
+                } else if (currentPath.includes('tableview') && href.includes('tableview')) {
+                    item.classList.add('active');
+                }
+            });
+        }
+        
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('ServiceWorker registered:', registration.scope);
+                }).catch(err => {
+                    console.log('ServiceWorker registration failed:', err);
+                });
+            });
+        }
     </script>
 </body>
 </html>
