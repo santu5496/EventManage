@@ -402,10 +402,12 @@ html {
 }
 
 .bottom-nav-container {
-    display: flex;
+    display: flex !important;
+    flex-direction: row !important;
     justify-content: space-around;
     align-items: center;
     height: 100%;
+    width: 100%;
     max-width: 100%;
     margin: 0 auto;
     padding: 0 8px;
@@ -477,7 +479,9 @@ html {
 
 @media (max-width: 768px) {
     .bottom-nav {
-        display: block;
+        display: flex !important;
+        flex-direction: column;
+        justify-content: center;
     }
     
     nav.sidebar {
