@@ -176,9 +176,9 @@
         $('#UserID').val(user.userId);
         $('#txtName').val(user.fullName);
         $('#txtEmail').val(user.email);
+        $('#Username').val(user.username);
         $('#txtPhoneNumber').val(user.phoneNumber);
         $('#ddlRole').val(user.userRole);
-
         $('#txtPassword').val(user.passwordHash);
         $('#userModal').modal('show');
     }
@@ -202,13 +202,12 @@
 
     function SaveUser() {
         var userData = {
-            userID: $('#UserID').val(),
+            userId: $('#UserID').val(),
             fullName: $('#txtName').val(),
             email: $('#txtEmail').val(),
             phoneNumber: $('#txtPhoneNumber').val(),
             userRole: $('#ddlRole').val(),
-            userName: $('#Username').val(),
-            address: $('#txtAddress').val(),
+            username: $('#Username').val(),
             passwordHash: $('#txtPassword').val()
         };
 
