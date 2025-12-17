@@ -17,7 +17,7 @@ namespace DbOperation.Implementation
         {
             _connectionString = connectionString;
             _context = new DbContextOptionsBuilder<EventContext>()
-                            .UseSqlServer(connectionString).Options;
+                            .UseNpgsql(connectionString).Options;
             //var a = AddDateWiseShiftsColumn();
             AddNewBookingColumns();
 

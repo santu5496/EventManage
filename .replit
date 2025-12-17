@@ -1,0 +1,39 @@
+modules = ["web", "dotnet-7.0", "nodejs-20", "dotnet-8.0"]
+[agent]
+expertMode = true
+
+[nix]
+channel = "stable-25_05"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "ASP.NET Core Server"
+
+[[workflows.workflow]]
+name = "ASP.NET Core Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd Assignment4/Assignment4 && dotnet run"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["dotnet", "publish/Assignment4.dll"]
+build = ["dotnet", "publish", "-c", "Release", "-o", "publish", "Assignment4/EventManagement.sln"]
