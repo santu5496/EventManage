@@ -393,11 +393,11 @@ html {
     left: 0;
     right: 0;
     height: 65px;
-    background: #ffffff;
-    box-shadow: 0 -1px 20px rgba(0, 0, 0, 0.08);
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+    box-shadow: 0 -4px 20px rgba(124, 58, 237, 0.3);
     z-index: 1200;
     padding-bottom: var(--safe-area-inset-bottom);
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: none;
 }
 
 .bottom-nav-container {
@@ -418,11 +418,11 @@ html {
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    color: #9ca3af;
+    color: rgba(255, 255, 255, 0.7);
     padding: 6px 0;
     transition: all 0.25s ease;
     flex: 1;
-    max-width: 80px;
+    max-width: 100px;
 }
 
 .nav-pill {
@@ -440,30 +440,32 @@ html {
     font-size: 22px;
     transition: all 0.25s ease;
     line-height: 1;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .bottom-nav-item span {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 500;
     letter-spacing: 0.2px;
     transition: all 0.25s ease;
-    margin-top: 2px;
+    margin-top: 4px;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .bottom-nav-item.active {
-    color: #7c3aed;
+    color: #ffffff;
 }
 
 .bottom-nav-item.active .nav-pill {
-    background: rgba(124, 58, 237, 0.1);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .bottom-nav-item.active i {
-    color: #7c3aed;
+    color: #ffffff;
 }
 
 .bottom-nav-item.active span {
-    color: #7c3aed;
+    color: #ffffff;
     font-weight: 600;
 }
 
@@ -472,7 +474,7 @@ html {
 }
 
 .bottom-nav-item:active .nav-pill {
-    background: rgba(124, 58, 237, 0.15);
+    background: rgba(255, 255, 255, 0.25);
 }
 
 @media (max-width: 768px) {
