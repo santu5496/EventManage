@@ -358,28 +358,32 @@
         </main>
     </div>
 
-    <!-- Bottom Navigation Bar for Mobile/Tablet -->
+    <!-- Modern Bottom Navigation Bar -->
     <nav class="bottom-nav" id="bottomNav">
         <div class="bottom-nav-container">
-            <a href="/EventBooking/EventBooking" class="bottom-nav-item ripple" data-page="booking">
-                <i class="fas fa-calendar-check"></i>
-                <span>Book</span>
-            </a>
             <a href="/DashBoard/DashBoard" class="bottom-nav-item ripple" data-page="dashboard">
-                <i class="fas fa-home"></i>
+                <div class="nav-icon-wrapper">
+                    <i class="fas fa-home"></i>
+                </div>
                 <span>Home</span>
             </a>
+            <a href="/EventBooking/EventBooking" class="bottom-nav-item ripple" data-page="booking">
+                <div class="nav-icon-wrapper">
+                    <i class="fas fa-calendar-plus"></i>
+                </div>
+                <span>Book</span>
+            </a>
             <a href="/User/User" class="bottom-nav-item ripple" data-page="users">
-                <i class="fas fa-user-plus"></i>
+                <div class="nav-icon-wrapper">
+                    <i class="fas fa-users"></i>
+                </div>
                 <span>Users</span>
             </a>
             <a href="/EventBooking/TableView" class="bottom-nav-item ripple" data-page="reports">
-                <i class="fas fa-file-alt"></i>
+                <div class="nav-icon-wrapper">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
                 <span>Reports</span>
-            </a>
-            <a href="/Home/Login" class="bottom-nav-item ripple" data-page="logout">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
             </a>
         </div>
     </nav>
@@ -470,9 +474,9 @@
                 item.classList.remove('active');
                 const href = item.getAttribute('href').toLowerCase();
                 
-                if (currentPath.includes('eventbooking/eventbooking') && href.includes('eventbooking/eventbooking')) {
+                if (currentPath.includes('dashboard') && href.includes('dashboard')) {
                     item.classList.add('active');
-                } else if (currentPath.includes('dashboard') && href.includes('dashboard')) {
+                } else if (currentPath.includes('eventbooking/eventbooking') && href.includes('eventbooking/eventbooking')) {
                     item.classList.add('active');
                 } else if (currentPath.includes('user/user') && href.includes('user/user')) {
                     item.classList.add('active');
