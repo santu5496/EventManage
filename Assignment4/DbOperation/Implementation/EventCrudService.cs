@@ -15,7 +15,7 @@ namespace DbOperation.Implementation
 
         public EventCrudService(string context)
         {
-            _context = new DbContextOptionsBuilder<EventContext>().UseSqlite(context).Options;
+            _context = new DbContextOptionsBuilder<EventContext>().UseSqlServer(context).Options;
         }
         public bool AddEvent(Events events)
         {

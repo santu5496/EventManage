@@ -16,7 +16,7 @@ namespace DbOperation.Implementation
 
         public UsersService(string context)
         {
-            _context = new DbContextOptionsBuilder<EventContext>().UseSqlite(context).Options;
+            _context = new DbContextOptionsBuilder<EventContext>().UseSqlServer(context).Options;
         }
 
 
