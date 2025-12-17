@@ -27,7 +27,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd Assignment4/Assignment4 && dotnet run"
+args = "cd Assignment4/Assignment4 && dotnet run --project EventManagement.csproj"
 waitForPort = 5000
 
 [[ports]]
