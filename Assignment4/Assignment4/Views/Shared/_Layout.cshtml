@@ -358,35 +358,6 @@
         </main>
     </div>
 
-    <!-- Modern iOS/Material Style Bottom Navigation Bar -->
-    <nav class="bottom-nav" id="bottomNav">
-        <div class="bottom-nav-container">
-            <a href="/DashBoard/DashBoard" class="bottom-nav-item" data-page="dashboard">
-                <div class="nav-pill">
-                    <i class="fas fa-home"></i>
-                    <span>Home</span>
-                </div>
-            </a>
-            <a href="/EventBooking/EventBooking" class="bottom-nav-item" data-page="booking">
-                <div class="nav-pill">
-                    <i class="far fa-calendar-alt"></i>
-                    <span>Book</span>
-                </div>
-            </a>
-            <a href="/User/User" class="bottom-nav-item" data-page="users">
-                <div class="nav-pill">
-                    <i class="far fa-user"></i>
-                    <span>Users</span>
-                </div>
-            </a>
-            <a href="/EventBooking/TableView" class="bottom-nav-item" data-page="reports">
-                <div class="nav-pill">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Reports</span>
-                </div>
-            </a>
-        </div>
-    </nav>
 
     @await RenderSectionAsync("Scripts", required: false)
 
@@ -461,30 +432,6 @@
                 });
             }
             
-            // Highlight active bottom nav item
-            highlightActiveNavItem();
-        });
-        
-        // Bottom navigation active state
-        function highlightActiveNavItem() {
-            const currentPath = window.location.pathname.toLowerCase();
-            const navItems = document.querySelectorAll('.bottom-nav-item');
-            
-            navItems.forEach(item => {
-                item.classList.remove('active');
-                const href = item.getAttribute('href').toLowerCase();
-                
-                if (currentPath.includes('dashboard') && href.includes('dashboard')) {
-                    item.classList.add('active');
-                } else if (currentPath.includes('eventbooking/eventbooking') && href.includes('eventbooking/eventbooking')) {
-                    item.classList.add('active');
-                } else if (currentPath.includes('user/user') && href.includes('user/user')) {
-                    item.classList.add('active');
-                } else if (currentPath.includes('tableview') && href.includes('tableview')) {
-                    item.classList.add('active');
-                }
-            });
-        }
         
         // Register service worker for PWA
         if ('serviceWorker' in navigator) {
