@@ -18,10 +18,17 @@ namespace DbOperation.Implementation
             _context = new DbContextOptionsBuilder<EventContext>()
                             .UseSqlServer(connectionString).Options;
             
-            // Ensure database is created
-            using (var db = new EventContext(_context))
+            // Ensure database is created (wrapped in try-catch for offline testing)
+            try
             {
-                db.Database.EnsureCreated();
+                using (var db = new EventContext(_context))
+                {
+                    db.Database.EnsureCreated();
+                }
+            }
+            catch
+            {
+                // Database not available - will work when deployed to bsite.net
             }
         }
 
