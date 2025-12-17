@@ -42,14 +42,23 @@ namespace EventManagement.Controllers
             }
         }
 
+        [HttpDelete]
         public IActionResult Delete(int id)
         {
-            var result = _userService.DeleteUser(id);
-            if (!result)
+            try
             {
-                return Json(new { success = false, message = "Failed to delete user." });
+                var result = _userService.DeleteUser(id);
+                if (!result)
+                {
+                    return Json(new { success = false, message = "Failed to delete user. User may have associated bookings or events." });
+                }
+                return Json(new { success = true, message = "User deleted successfully." });
             }
-            return Json(new { success = true, message = "User deleted successfully." });
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Delete error: {ex.Message}");
+                return Json(new { success = false, message = "Cannot delete user. User may have associated bookings or events." });
+            }
         }
 
         public IActionResult GetAllUsers()
