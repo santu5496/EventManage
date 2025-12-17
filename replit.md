@@ -5,7 +5,7 @@ This is an ASP.NET Core MVC web application for event management. It provides fu
 
 ## Technology Stack
 - **Framework**: ASP.NET Core 8.0 (MVC)
-- **Database**: SQL Server (external - site4now.net)
+- **Database**: SQL Server (external - sql.bsite.net)
 - **ORM**: Entity Framework Core
 - **Frontend**: Bootstrap, jQuery, Three.js (for visual effects)
 
@@ -33,7 +33,10 @@ cd Assignment4/Assignment4 && dotnet run
 ```
 
 ## Database Configuration
-The app connects to an external SQL Server database. Connection string is in `appsettings.json`. If the database is unavailable, the app will display a warning but continue to run.
+The app connects to an external SQL Server database at `sql.bsite.net\MSSQL2016`. 
+Connection string is configured in `appsettings.json`.
+
+**Note**: If the SQL Server is not accessible from Replit due to firewall restrictions, the app will show a database seeding error but will continue to run if the database already has data.
 
 ## Default Credentials (if database is seeded)
 - Admin: username `admin`, password `admin123`
@@ -55,4 +58,4 @@ Configured for autoscale deployment:
 ## Recent Changes
 - 2025-12-17: Configured for Replit environment (port 5000, 0.0.0.0 binding)
 - 2025-12-17: Added forwarded headers support for Replit proxy
-- 2025-12-17: Removed HTTPS redirection for development mode
+- 2025-12-17: Connected to external SQL Server database (sql.bsite.net)
