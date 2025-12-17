@@ -1,27 +1,50 @@
-﻿@{
+@{
     ViewData["Title"] = "Users Management";
 }
 
 <style>
     .customBtn {
-        background-color: #28a745;
+        background-color: #6750a4;
         color: white;
-        padding: 10px 20px;
+        padding: 12px 24px;
         border: none;
         cursor: pointer;
-        border-radius: 5px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(103, 80, 164, 0.3);
     }
 
-        .customBtn:hover {
-            background-color: #218838;
-        }
+    .customBtn:hover {
+        background-color: #5a4690;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(103, 80, 164, 0.4);
+    }
 
-    .modal-header, .modal-footer {
-        background-color: #f1f1f1;
+    .customBtn:active {
+        transform: translateY(0);
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #6750a4 0%, #8b5cf6 100%);
+        color: white;
+        border-radius: 0;
+    }
+
+    .modal-footer {
+        background-color: #f8f9fa;
+        border-top: 1px solid #e2e8f0;
     }
 
     .modal-title {
-        font-weight: bold;
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    .btn-close {
+        filter: invert(1);
+        opacity: 0.8;
     }
 
     #tblUsers {
@@ -29,107 +52,403 @@
         border-collapse: collapse;
     }
 
-        #tblUsers th, #tblUsers td {
-            padding: 8px 12px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
+    #tblUsers th, #tblUsers td {
+        padding: 10px 12px;
+        text-align: left;
+        border: 1px solid #e2e8f0;
+    }
 
-        #tblUsers th {
-            background-color: #f8f9fa;
-        }
+    #tblUsers th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
 
-    .btn-sm {
-        padding: 5px 10px;
-        font-size: 12px;
-        margin: 2px;
-        border-radius: 4px;
+    #tblUsers tbody tr:hover {
+        background-color: #f1f5f9;
     }
 
     .form-label {
-        font-weight: bold;
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 2px solid #e2e8f0;
+        padding: 12px 14px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #6750a4;
+        box-shadow: 0 0 0 3px rgba(103, 80, 164, 0.15);
+    }
+
+    .form-control.is-invalid, .form-select.is-invalid {
+        border-color: #ef4444 !important;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+    }
+
+    .form-control.is-valid, .form-select.is-valid {
+        border-color: #22c55e !important;
+    }
+
+    .invalid-feedback {
+        color: #ef4444;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        font-weight: 500;
+    }
+
+    .required-asterisk {
+        color: #ef4444;
+        margin-left: 2px;
+    }
+
+    .action-icons {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .action-icons i {
+        cursor: pointer;
+        font-size: 1.1rem;
+        padding: 8px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+
+    .action-icons .btn-edit {
+        color: #22c55e;
+        background: rgba(34, 197, 94, 0.1);
+    }
+
+    .action-icons .btn-edit:hover {
+        background: rgba(34, 197, 94, 0.2);
+        transform: scale(1.1);
+    }
+
+    .action-icons .btn-delete {
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.1);
+    }
+
+    .action-icons .btn-delete:hover {
+        background: rgba(239, 68, 68, 0.2);
+        transform: scale(1.1);
+    }
+
+    /* Mobile Responsive Styles */
+    @@media (max-width: 768px) {
+        .container-fluid {
+            padding: 10px !important;
+        }
+
+        .customBtn {
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 1rem;
+        }
+
+        .modal-dialog {
+            margin: 0.5rem;
+            max-width: calc(100% - 1rem);
+        }
+
+        .modal-content {
+            border-radius: 12px;
+            max-height: 95vh;
+        }
+
+        .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .modal-header {
+            padding: 1rem;
+        }
+
+        .modal-footer {
+            padding: 0.75rem 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .modal-footer .btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 16px;
+        }
+
+        .form-control, .form-select {
+            font-size: 16px !important;
+            padding: 14px 12px;
+            min-height: 50px;
+        }
+
+        .mb-3 {
+            margin-bottom: 1rem !important;
+        }
+
+        .form-label {
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dataTables_wrapper {
+            overflow-x: auto;
+        }
+
+        #tblUsers {
+            min-width: 600px;
+        }
+
+        .action-icons {
+            flex-direction: row;
+            gap: 8px;
+        }
+
+        .action-icons i {
+            padding: 10px;
+            font-size: 1.2rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .modal-dialog {
+            margin: 0;
+            max-width: 100%;
+            height: 100%;
+        }
+
+        .modal-content {
+            border-radius: 0;
+            height: 100%;
+        }
+
+        .modal-body {
+            max-height: calc(100vh - 180px);
+        }
+
+        .modal-footer {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+    }
+
+    .btn-loading {
+        position: relative;
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    .btn-loading::after {
+        content: '';
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        top: 50%;
+        left: 50%;
+        margin-left: -8px;
+        margin-top: -8px;
+        border: 2px solid transparent;
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
     }
 </style>
 
 <div class="container-fluid mt-3">
-    <button class="customBtn mb-2 mt-2" onclick="LoadUserForm()">Add User</button>
+    <button class="customBtn mb-3 mt-2" onclick="LoadUserForm()">
+        <i class="fa fa-plus me-2"></i>Add User
+    </button>
 
-    <table id="tblUsers" class="table table-striped mb-3">
-        <thead>
-            <tr>
-                <th>FullName</th> 
-                <th>UserName</th>
-                <th>Email</th>
-                <th>Phone Number</th>
-                <th>Role</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-    
+    <div class="table-responsive">
+        <table id="tblUsers" class="table table-striped mb-3">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>Role</th>
+                    <th style="min-width: 100px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
 
     <!-- User Modal -->
     <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="userModalLabel">Add / Update User</h5>
+                    <h5 class="modal-title" id="userModalLabel">
+                        <i class="fa fa-user me-2"></i>
+                        <span id="modalTitleText">Add New User</span>
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Name</label>
-                        <input type="text" class="form-control ClearUserModalData" id="txtName" />
-                    </div>  
-                    <div hidden class="mb-3">
-                        <label class="form-label">Userid</label>
-                        <input type="number" class="form-control ClearUserModalData" id="UserID" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control ClearUserModalData" id="txtEmail" />
-                    </div> <div class="mb-3">
-                        <label class="form-label">Username</label>
-                        <input type="text" class="form-control ClearUserModalData" id="Username" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Phone Number</label>
-                        <input type="text" class="form-control ClearUserModalData" id="txtPhoneNumber" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Role</label>
-                        <select class="form-control ClearUserModalData" id="ddlRole">
-                            <option value="Customer">Customer</option>
-                            <option value="Admin">Admin</option>
-                        </select>
-                    </div>
-                 
-                    <div class="mb-3">
-                        <label class="form-label">Password</label>
-                        <input type="password" class="form-control ClearUserModalData" id="txtPassword" />
-                    </div>
+                    <form id="userForm" novalidate>
+                        <input type="hidden" id="UserID" />
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Full Name<span class="required-asterisk">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="txtName" 
+                                       placeholder="Enter full name" required minlength="2" maxlength="100" />
+                                <div class="invalid-feedback">Please enter a valid name (2-100 characters)</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Username<span class="required-asterisk">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="Username" 
+                                       placeholder="Enter username" required minlength="3" maxlength="50" />
+                                <div class="invalid-feedback">Please enter a valid username (3-50 characters)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Email<span class="required-asterisk">*</span>
+                                </label>
+                                <input type="email" class="form-control" id="txtEmail" 
+                                       placeholder="Enter email address" required />
+                                <div class="invalid-feedback">Please enter a valid email address</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Phone Number<span class="required-asterisk">*</span>
+                                </label>
+                                <input type="tel" class="form-control" id="txtPhoneNumber" 
+                                       placeholder="Enter phone number" required pattern="[0-9]{10,15}" />
+                                <div class="invalid-feedback">Please enter a valid phone number (10-15 digits)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Role<span class="required-asterisk">*</span>
+                                </label>
+                                <select class="form-select" id="ddlRole" required>
+                                    <option value="">Select Role</option>
+                                    <option value="Customer">Customer</option>
+                                    <option value="Admin">Admin</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a role</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Password<span class="required-asterisk">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="txtPassword" 
+                                           placeholder="Enter password" required minlength="4" />
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="fa fa-eye" id="passwordIcon"></i>
+                                    </button>
+                                </div>
+                                <div class="invalid-feedback">Password must be at least 4 characters</div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" onclick="SaveUser()" class="btn btn-primary">Save</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fa fa-times me-1"></i>Cancel
+                    </button>
+                    <button type="button" onclick="SaveUser()" class="btn btn-primary" id="btnSave">
+                        <i class="fa fa-save me-1"></i>Save User
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                <h5 class="modal-title text-white">
+                    <i class="fa fa-exclamation-triangle me-2"></i>Confirm Delete
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fa fa-trash fa-3x text-danger mb-3"></i>
+                <p class="mb-0 fs-5">Are you sure you want to delete this user?</p>
+                <p class="text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fa fa-times me-1"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="fa fa-trash me-1"></i>Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    function LoadUserForm() 
-    {
-        $('.ClearUserModalData').val('');
+    let deleteUserId = null;
+    let deleteModal = null;
+
+    function LoadUserForm() {
+        resetForm();
+        $('#modalTitleText').text('Add New User');
         $('#UserID').val('');
         $('#userModal').modal('show');
     }
 
+    function resetForm() {
+        $('#userForm')[0].reset();
+        $('#userForm .form-control, #userForm .form-select').removeClass('is-invalid is-valid');
+    }
+
     window.onload = function () {
         GetUsersData();
+        deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+
+        $('#togglePassword').on('click', function() {
+            const passwordField = $('#txtPassword');
+            const icon = $('#passwordIcon');
+            if (passwordField.attr('type') === 'password') {
+                passwordField.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                passwordField.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+
+        $('#userForm .form-control, #userForm .form-select').on('input change', function() {
+            validateField($(this));
+        });
 
         $('#tblUsers').on('click', '.btn-edit', function () {
             var user = JSON.parse($(this).attr('data-user'));
@@ -137,42 +456,107 @@
         });
 
         $('#tblUsers').on('click', '.btn-delete', function () {
-            var userID = $(this).attr('data-id');
-            debugger
-            DeleteUser(userID);
+            deleteUserId = $(this).attr('data-id');
+            deleteModal.show();
+        });
+
+        $('#confirmDeleteBtn').on('click', function() {
+            if (deleteUserId) {
+                DeleteUser(deleteUserId);
+                deleteModal.hide();
+            }
         });
     }
 
-      function GetUsersData() {
-        var table = $('#tblUsers').DataTable();
+    function validateField(field) {
+        const value = field.val().trim();
+        const id = field.attr('id');
+        let isValid = true;
+
+        if (field.prop('required') && !value) {
+            isValid = false;
+        } else if (id === 'txtEmail' && value) {
+            const emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+            isValid = emailRegex.test(value);
+        } else if (id === 'txtPhoneNumber' && value) {
+            const phoneRegex = /^[0-9]{10,15}$/;
+            isValid = phoneRegex.test(value);
+        } else if (id === 'txtName' && value) {
+            isValid = value.length >= 2 && value.length <= 100;
+        } else if (id === 'Username' && value) {
+            isValid = value.length >= 3 && value.length <= 50;
+        } else if (id === 'txtPassword' && value) {
+            isValid = value.length >= 4;
+        } else if (id === 'ddlRole') {
+            isValid = value !== '';
+        }
+
+        if (isValid) {
+            field.removeClass('is-invalid').addClass('is-valid');
+        } else {
+            field.removeClass('is-valid').addClass('is-invalid');
+        }
+
+        return isValid;
+    }
+
+    function validateForm() {
+        let isFormValid = true;
+        $('#userForm .form-control, #userForm .form-select').each(function() {
+            if (!validateField($(this))) {
+                isFormValid = false;
+            }
+        });
+        return isFormValid;
+    }
+
+    function GetUsersData() {
+        var table = $('#tblUsers').DataTable({
+            responsive: true,
+            destroy: true,
+            language: {
+                emptyTable: "No users found",
+                loadingRecords: "Loading...",
+                processing: "Processing..."
+            }
+        });
         table.clear().draw();
 
         $.ajax({
             url: '/User/GetAllUsers',
             type: 'GET',
             success: function (response) {
+                if (response.success === false) {
+                    return;
+                }
                 response.forEach(function (user) {
                     table.row.add([
-                        user.fullName,            // FullName
-                        user.username,            // UserName (ensure you have the correct field here)
-                        user.email,               // Email
-                        user.phoneNumber,         // Phone Number
-                        user.userRole,            // Role
-                        '<div class="contentCenter">' +
-                            '<i class="fa fa-edit me-4 ml-2 btn-edit" style="color:green" data-user=\'' + JSON.stringify(user) + '\'></i>' +
-                            '<i class="fa fa-trash ml-2 btn-delete" style="color:red" data-id=\'' + user.userId + '\'></i>' +
-                        '</div>'                   // Action buttons
+                        user.fullName || '-',
+                        user.username || '-',
+                        user.email || '-',
+                        user.phoneNumber || '-',
+                        '<span class="badge ' + (user.userRole === 'Admin' ? 'bg-primary' : 'bg-secondary') + '">' + 
+                            (user.userRole || '-') + '</span>',
+                        '<div class="action-icons">' +
+                            '<i class="fa fa-edit btn-edit" title="Edit" data-user=\'' + JSON.stringify(user) + '\'></i>' +
+                            '<i class="fa fa-trash btn-delete" title="Delete" data-id=\'' + user.userId + '\'></i>' +
+                        '</div>'
                     ]).draw();
                 });
             },
             error: function (xhr, status, error) {
-                alert('Error: ' + error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load users: ' + error
+                });
             }
         });
     }
 
-
     function EditUser(user) {
+        resetForm();
+        $('#modalTitleText').text('Edit User');
         $('#UserID').val(user.userId);
         $('#txtName').val(user.fullName);
         $('#txtEmail').val(user.email);
@@ -184,48 +568,96 @@
     }
 
     function DeleteUser(userId) {
-        if (confirm('Are you sure you want to delete this user?')) {
-            $.ajax({
-                url: '/User/Delete',
-                data: {id: userId },
-                type: 'DELETE',
-                success: function (response) {
-                    alert(response.message);
+        $('#confirmDeleteBtn').addClass('btn-loading');
+        
+        $.ajax({
+            url: '/User/Delete',
+            data: { id: userId },
+            type: 'DELETE',
+            success: function (response) {
+                $('#confirmDeleteBtn').removeClass('btn-loading');
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: response.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                     GetUsersData();
-                },
-                error: function (xhr, status, error) {
-                    alert('Error: ' + error);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message
+                    });
                 }
-            });
-        }
+            },
+            error: function (xhr, status, error) {
+                $('#confirmDeleteBtn').removeClass('btn-loading');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to delete user: ' + error
+                });
+            }
+        });
     }
 
     function SaveUser() {
+        if (!validateForm()) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Validation Error',
+                text: 'Please fill all required fields correctly',
+                confirmButtonColor: '#6750a4'
+            });
+            return;
+        }
+
         var userData = {
-            userId: $('#UserID').val(),
-            fullName: $('#txtName').val(),
-            email: $('#txtEmail').val(),
-            phoneNumber: $('#txtPhoneNumber').val(),
+            userId: $('#UserID').val() || 0,
+            fullName: $('#txtName').val().trim(),
+            email: $('#txtEmail').val().trim(),
+            phoneNumber: $('#txtPhoneNumber').val().trim(),
             userRole: $('#ddlRole').val(),
-            username: $('#Username').val(),
+            username: $('#Username').val().trim(),
             passwordHash: $('#txtPassword').val()
         };
+
+        $('#btnSave').addClass('btn-loading').prop('disabled', true);
 
         $.ajax({
             url: '/User/AddOrUpdateUser',
             type: 'POST',
             data: { user: userData },
             success: function (response) {
+                $('#btnSave').removeClass('btn-loading').prop('disabled', false);
                 if (response.success) {
-                    alert(response.message);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: response.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                     $('#userModal').modal('hide');
                     GetUsersData();
                 } else {
-                    alert(response.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message
+                    });
                 }
             },
             error: function (xhr, status, error) {
-                alert('Error: ' + error);
+                $('#btnSave').removeClass('btn-loading').prop('disabled', false);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to save user: ' + error
+                });
             }
         });
     }
