@@ -16,7 +16,7 @@ namespace DbOperation.Implementation
         {
             _connectionString = connectionString;
             _context = new DbContextOptionsBuilder<EventContext>()
-                            .UseNpgsql(connectionString).Options;
+                            .UseSqlServer(connectionString).Options;
             
             // Ensure database is created (wrapped in try-catch for offline testing)
             try
