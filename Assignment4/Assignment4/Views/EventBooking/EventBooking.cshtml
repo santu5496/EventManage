@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Event Booking Pro</title>
 
     <!-- Bootstrap CSS -->
@@ -624,30 +624,237 @@
             color: #0891b2;
         }
 
-        /* Small screen optimizations */
-        @@media (max-width: 360px) {
-            .fc-daygrid-day
+        /* ============================================
+           RESPONSIVE DESIGN - Mobile First Approach
+           ============================================ */
 
-        {
-            min-height: 75px !important;
+        /* Extra small devices (phones, less than 576px) */
+        @@media (max-width: 575.98px) {
+            .app-bar {
+                padding: 1rem 0.75rem;
+            }
+
+            .app-title {
+                font-size: 1.25rem;
+            }
+
+            .app-subtitle {
+                font-size: 0.75rem;
+            }
+
+            .quick-actions-container {
+                padding: 0.75rem;
+            }
+
+            .quick-action {
+                padding: 1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .quick-action-icon {
+                width: 44px;
+                height: 44px;
+                min-width: 44px;
+            }
+
+            .quick-action-title {
+                font-size: 0.9rem;
+            }
+
+            .quick-action-desc {
+                font-size: 0.75rem;
+            }
+
+            /* Calendar responsive */
+            .calendar-container {
+                padding: 0.5rem;
+                margin: 0.5rem;
+            }
+
+            .fc .fc-toolbar {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .fc .fc-toolbar-title {
+                font-size: 1rem !important;
+            }
+
+            .fc .fc-button {
+                padding: 0.4rem 0.6rem !important;
+                font-size: 0.75rem !important;
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            .fc .fc-button-group {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .fc-daygrid-day {
+                min-height: 70px !important;
+            }
+
+            .fc .fc-daygrid-day-number {
+                font-size: 0.8rem;
+                padding: 4px !important;
+            }
+
+            .shift-block {
+                font-size: 0.65rem;
+                min-height: 18px;
+                padding: 2px 4px;
+                margin-bottom: 2px;
+            }
+
+            /* Modal responsive */
+            .modal-dialog {
+                margin: 0.5rem;
+                max-width: calc(100% - 1rem);
+            }
+
+            .modal-content {
+                border-radius: var(--border-radius-sm);
+            }
+
+            .modal-header {
+                padding: 1rem;
+            }
+
+            .modal-body {
+                padding: 1rem;
+                max-height: 70vh;
+                overflow-y: auto;
+            }
+
+            .modal-footer {
+                padding: 0.75rem 1rem;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .modal-footer .btn {
+                flex: 1 1 auto;
+                min-width: 120px;
+            }
+
+            /* Form responsive */
+            .row.mb-3 > [class*="col-"] {
+                margin-bottom: 0.75rem;
+            }
+
+            .form-control, .form-select {
+                font-size: 16px !important; /* Prevents zoom on iOS */
+                min-height: 44px;
+                padding: 0.5rem 0.75rem;
+            }
+
+            .form-label {
+                font-size: 0.85rem;
+            }
+
+            .btn {
+                min-height: 44px;
+                padding: 0.5rem 1rem;
+            }
+
+            /* FAB responsive */
+            .fab {
+                width: 56px;
+                height: 56px;
+                font-size: 1.5rem;
+                bottom: 1.5rem;
+                right: 1rem;
+            }
+
+            /* Date-wise shift cards */
+            .card {
+                margin-bottom: 0.75rem;
+            }
+
+            .card-body {
+                padding: 0.75rem;
+            }
+
+            .shift-checkbox-container {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            /* Toast position on mobile */
+            .toast-container {
+                bottom: 80px !important;
+                right: 0.5rem !important;
+                left: 0.5rem !important;
+            }
         }
 
-        .shift-block {
-            font-size: 0.7rem;
-            min-height: 20px;
+        /* Small devices (landscape phones, 576px and up) */
+        @@media (min-width: 576px) and (max-width: 767.98px) {
+            .fc .fc-toolbar-title {
+                font-size: 1.1rem !important;
+            }
+
+            .fc .fc-button {
+                padding: 0.5rem 0.75rem !important;
+                font-size: 0.8rem !important;
+                min-height: 44px;
+            }
+
+            .modal-dialog {
+                max-width: 500px;
+                margin: 1rem auto;
+            }
+
+            .shift-block {
+                font-size: 0.7rem;
+                min-height: 20px;
+            }
         }
 
-        .quick-action-icon {
-            width: 48px;
-            height: 48px;
+        /* Medium devices (tablets, 768px and up) */
+        @@media (min-width: 768px) and (max-width: 991.98px) {
+            .fc .fc-toolbar-title {
+                font-size: 1.25rem !important;
+            }
+
+            .modal-dialog {
+                max-width: 600px;
+            }
         }
 
-        .fab {
-            width: 56px;
-            height: 56px;
-            font-size: 1.5rem;
+        /* Touch-friendly improvements */
+        @@media (pointer: coarse) {
+            .shift-block, .quick-action, .btn, .form-control, .form-select {
+                min-height: 44px;
+            }
+
+            .fc .fc-button {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            .empty-shift-area {
+                min-height: 44px;
+            }
+
+            /* Increase tap target for checkboxes */
+            .form-check-input {
+                width: 1.25em;
+                height: 1.25em;
+            }
+
+            .form-check-label {
+                padding-left: 0.5rem;
+            }
         }
 
+        /* Print styles */
+        @@media print {
+            .fab, .quick-actions-container, .app-bar {
+                display: none !important;
+            }
         }
 
         /* Accessibility improvements */
@@ -1768,14 +1975,32 @@
         function initializeCalendar() {
             const calendarEl = document.getElementById('calendar');
 
+            // Detect if mobile
+            const isMobile = window.innerWidth < 576;
+            
             calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
+                initialView: isMobile ? 'dayGridMonth' : 'dayGridMonth',
                 height: 'auto',
-                headerToolbar: {
+                aspectRatio: isMobile ? 1.0 : 1.35,
+                handleWindowResize: true,
+                windowResizeDelay: 100,
+                headerToolbar: isMobile ? {
                     left: 'prev',
                     center: 'title',
                     right: 'next'
+                } : {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth'
                 },
+                buttonText: {
+                    today: 'Today',
+                    month: 'Month'
+                },
+                dayMaxEventRows: isMobile ? 2 : 4,
+                moreLinkClick: 'popover',
+                fixedWeekCount: false,
+                showNonCurrentDates: !isMobile,
 
                 dateClick(info) {
                     const target = info.jsEvent.target;
@@ -2675,6 +2900,31 @@
                     bootstrap.Modal.getInstance(modal)?.hide();
                 });
             }
+        });
+
+        // Handle orientation change on mobile
+        let lastWidth = window.innerWidth;
+        window.addEventListener('resize', function() {
+            const currentWidth = window.innerWidth;
+            const crossedBreakpoint = (lastWidth < 576 && currentWidth >= 576) || 
+                                     (lastWidth >= 576 && currentWidth < 576);
+            
+            if (crossedBreakpoint && calendar) {
+                // Update calendar toolbar for new screen size
+                const isMobile = currentWidth < 576;
+                calendar.setOption('headerToolbar', isMobile ? {
+                    left: 'prev',
+                    center: 'title',
+                    right: 'next'
+                } : {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth'
+                });
+                calendar.setOption('aspectRatio', isMobile ? 1.0 : 1.35);
+                calendar.setOption('showNonCurrentDates', !isMobile);
+            }
+            lastWidth = currentWidth;
         });
 
         // Clear cache on page unload
