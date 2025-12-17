@@ -33,8 +33,7 @@ public partial class EventContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.createdDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
+                .HasDefaultValueSql("datetime('now')");
             entity.Property(e => e.customerName).HasMaxLength(255);
             entity.Property(e => e.fromDate).HasColumnType("datetime");
             entity.Property(e => e.paymentStatus)

@@ -14,7 +14,7 @@ namespace DbOperation.Implementation
         private readonly DbContextOptions<EventContext> _context;
         public TableViewService(string context)
         {
-            _context = new DbContextOptionsBuilder<EventContext>().UseSqlServer(context).Options;
+            _context = new DbContextOptionsBuilder<EventContext>().UseSqlite(context).Options;
         }
     }
 }

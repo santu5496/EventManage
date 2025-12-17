@@ -35,5 +35,5 @@ externalPort = 80
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["dotnet", "publish/Assignment4.dll"]
-build = ["dotnet", "publish", "-c", "Release", "-o", "publish", "Assignment4/EventManagement.sln"]
+run = ["dotnet", "publish/EventManagement.dll"]
+build = ["dotnet", "publish", "-c", "Release", "-o", "publish", "Assignment4/Assignment4/EventManagement.csproj"]

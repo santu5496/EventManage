@@ -1,6 +1,5 @@
-﻿using DbOperation.Interface;
+using DbOperation.Interface;
 using DbOperation.Models;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -17,96 +16,32 @@ namespace DbOperation.Implementation
         {
             _connectionString = connectionString;
             _context = new DbContextOptionsBuilder<EventContext>()
-                            .UseSqlServer(connectionString).Options;
-            //var a = AddDateWiseShiftsColumn();
-            AddNewBookingColumns();
-
-
-
+                            .UseSqlite(connectionString).Options;
+            
+            // Ensure database is created
+            using (var db = new EventContext(_context))
+            {
+                db.Database.EnsureCreated();
+            }
         }
-        // Add these methods to your EventBookingService class
 
         public bool AddDieselColumn()
         {
-            const string alterQuery = @"
-        IF NOT EXISTS (
-            SELECT * 
-            FROM INFORMATION_SCHEMA.COLUMNS 
-            WHERE TABLE_NAME = 'Bookings' 
-              AND COLUMN_NAME = 'diesel'
-        )
-        BEGIN
-            ALTER TABLE Bookings ADD diesel DECIMAL(18,2) NULL;
-        END";
-
-            try
-            {
-                using (var connection = new SqlConnection(_connectionString))
-                using (var command = new SqlCommand(alterQuery, connection))
-                {
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-
-                Console.WriteLine("Column 'diesel' checked/added successfully.");
-                return true;
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine($"SQL Error: {ex.Message}");
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-                return false;
-            }
+            // SQLite doesn't support ALTER TABLE ADD COLUMN in the same way
+            // The column should be defined in the model instead
+            return true;
         }
 
         public bool AddBandTypeColumn()
         {
-            const string alterQuery = @"
-        IF NOT EXISTS (
-            SELECT * 
-            FROM INFORMATION_SCHEMA.COLUMNS 
-            WHERE TABLE_NAME = 'Bookings' 
-              AND COLUMN_NAME = 'bandType'
-        )
-        BEGIN
-            ALTER TABLE Bookings ADD bandType NVARCHAR(50) NULL;
-        END";
-
-            try
-            {
-                using (var connection = new SqlConnection(_connectionString))
-                using (var command = new SqlCommand(alterQuery, connection))
-                {
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-
-                Console.WriteLine("Column 'bandType' checked/added successfully.");
-                return true;
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine($"SQL Error: {ex.Message}");
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-                return false;
-            }
+            // SQLite doesn't support ALTER TABLE ADD COLUMN in the same way
+            // The column should be defined in the model instead
+            return true;
         }
 
-        // Method to add both columns at once
         public bool AddNewBookingColumns()
         {
-            bool dieselAdded = AddDieselColumn();
-            bool bandTypeAdded = AddBandTypeColumn();
-
-            return dieselAdded && bandTypeAdded;
+            return true;
         }
 
    
@@ -165,76 +100,14 @@ namespace DbOperation.Implementation
 
         public bool AddEventNameColumn()
         {
-            const string alterQuery = @"
-        IF NOT EXISTS (
-            SELECT * 
-            FROM INFORMATION_SCHEMA.COLUMNS 
-            WHERE TABLE_NAME = 'Bookings' 
-              AND COLUMN_NAME = 'EventName'
-        )
-        BEGIN
-            ALTER TABLE Bookings ADD EventName NVARCHAR(100);
-        END";
-
-            try
-            {
-                using (var connection = new SqlConnection(_connectionString))
-                using (var command = new SqlCommand(alterQuery, connection))
-                {
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-
-                Console.WriteLine("Column 'EventName' checked/added successfully.");
-                return true;
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine($"SQL Error: {ex.Message}");
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-                return false;
-            }
+            // Schema managed by EF Core model
+            return true;
         }
 
         public bool AddDateWiseShiftsColumn()
         {
-            const string alterQuery = @"
-                IF NOT EXISTS (
-                    SELECT * 
-                    FROM INFORMATION_SCHEMA.COLUMNS 
-                    WHERE TABLE_NAME = 'Bookings' 
-                      AND COLUMN_NAME = 'EventName'
-                )
-                BEGIN
-                    ALTER TABLE Bookings ADD dateWiseShifts NVARCHAR(100);
-                END";
-
-            try
-            {
-                using (var connection = new SqlConnection(_connectionString))
-                using (var command = new SqlCommand(alterQuery, connection))
-                {
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-
-                Console.WriteLine("Column 'dateWiseShifts' checked/added successfully.");
-                return true;
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine($"SQL Error: {ex.Message}");
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-                return false;
-            }
+            // Schema managed by EF Core model
+            return true;
         }
 
         public List<Bookings> GetAllBookings()

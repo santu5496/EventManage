@@ -11,7 +11,7 @@ namespace DbOperation.Implementation
         private readonly DbContextOptions<EventContext> _context;
         public DashBoardSerivice(string context)
         {
-            _context = new DbContextOptionsBuilder<EventContext>().UseSqlServer(context).Options;
+            _context = new DbContextOptionsBuilder<EventContext>().UseSqlite(context).Options;
         }
     
             // Get total booking count for dashboard

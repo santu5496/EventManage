@@ -21,7 +21,7 @@ Assignment4/
 
 ## Technology Stack
 - ASP.NET Core 8.0 MVC
-- Entity Framework Core with SQL Server
+- Entity Framework Core with SQLite
 - Bootstrap, jQuery, SweetAlert2
 - SkiaSharp for image processing
 - ZXing.Net for barcode generation
@@ -33,10 +33,11 @@ cd Assignment4/Assignment4 && dotnet run
 ```
 
 ## Database
-The application uses an external SQL Server database. Connection strings are configured in `appsettings.json`.
+The application uses SQLite database stored locally as `EventManagement.db`. The database is created automatically on first run.
 
 ## Recent Changes
 - December 17, 2025: Initial Replit setup
   - Configured Kestrel to bind to 0.0.0.0:5000
   - Added forwarded headers support for Replit proxy
   - Removed HTTPS redirection for development environment
+  - Migrated from SQL Server to SQLite for local database storage
