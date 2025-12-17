@@ -1721,6 +1721,25 @@
             // Clear and re-render calendar events
             calendar.removeAllEvents();
             bgEvents.forEach(e => calendar.addEvent(e));
+            
+            // Manually render shift blocks on all visible day cells
+            renderAllShiftBlocks();
+        }
+        
+        // Function to manually render shift blocks on all visible cells
+        function renderAllShiftBlocks() {
+            const dayCells = document.querySelectorAll('.fc-daygrid-day');
+            dayCells.forEach(cell => {
+                const dateStr = cell.getAttribute('data-date');
+                if (dateStr && shiftMap[dateStr]) {
+                    // Clear existing shift blocks
+                    const existingBlocks = cell.querySelectorAll('.shift-block, .empty-shift-area');
+                    existingBlocks.forEach(block => block.remove());
+                    
+                    // Render new shift blocks
+                    renderShiftBlocks({ date: new Date(dateStr), el: cell });
+                }
+            });
         }
 
         // Smart refresh function
