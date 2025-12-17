@@ -1686,7 +1686,15 @@
                 from.setHours(0, 0, 0, 0);
                 to.setHours(0, 0, 0, 0);
 
-                const parsedShifts = booking.dateWiseShifts ? JSON.parse(booking.dateWiseShifts) : {};
+                let parsedShifts = {};
+                if (booking.dateWiseShifts) {
+                    try {
+                        parsedShifts = JSON.parse(booking.dateWiseShifts);
+                    } catch (e) {
+                        // dateWiseShifts is a plain string, not JSON - ignore it
+                        parsedShifts = {};
+                    }
+                }
                 const defaultShift = booking.shiftType ? [booking.shiftType.toLowerCase()] : ['full day'];
 
                 for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
