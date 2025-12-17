@@ -89,7 +89,26 @@ namespace DbOperation.Implementation
         {
             using (var db = new EventContext(_context))
             {
-                db.Users.Update(user);
+                var existingUser = db.Users.FirstOrDefault(u => u.userId == user.userId);
+                if (existingUser == null)
+                {
+                    return false;
+                }
+
+                // Update only the fields that are provided (not null or empty)
+                if (!string.IsNullOrEmpty(user.fullName))
+                    existingUser.fullName = user.fullName;
+                if (!string.IsNullOrEmpty(user.email))
+                    existingUser.email = user.email;
+                if (!string.IsNullOrEmpty(user.phoneNumber))
+                    existingUser.phoneNumber = user.phoneNumber;
+                if (!string.IsNullOrEmpty(user.userRole))
+                    existingUser.userRole = user.userRole;
+                if (!string.IsNullOrEmpty(user.passwordHash))
+                    existingUser.passwordHash = user.passwordHash;
+                if (!string.IsNullOrEmpty(user.username))
+                    existingUser.username = user.username;
+
                 return db.SaveChanges() > 0;
             }
         }
