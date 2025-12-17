@@ -28,14 +28,14 @@ public partial class EventContext : DbContext
             entity.Property(e => e.address).HasMaxLength(255);
             entity.Property(e => e.advancePayment).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.alternativeNumber).HasMaxLength(15);
-            entity.Property(e => e.bookingDate).HasColumnType("datetime");
+            entity.Property(e => e.bookingDate).HasColumnType("timestamp with time zone");
             entity.Property(e => e.bookingStatus)
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.createdDate)
-                .HasDefaultValueSql("datetime('now')");
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.customerName).HasMaxLength(255);
-            entity.Property(e => e.fromDate).HasColumnType("datetime");
+            entity.Property(e => e.fromDate).HasColumnType("timestamp with time zone");
             entity.Property(e => e.paymentStatus)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -44,7 +44,7 @@ public partial class EventContext : DbContext
             entity.Property(e => e.shiftType)
                 .HasMaxLength(255)
                 .IsUnicode(false);
-            entity.Property(e => e.toDate).HasColumnType("datetime");
+            entity.Property(e => e.toDate).HasColumnType("timestamp with time zone");
             entity.Property(e => e.totalAmount).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d._event).WithMany(p => p.Bookings)
@@ -60,7 +60,7 @@ public partial class EventContext : DbContext
         {
             entity.HasKey(e => e.eventId).HasName("PK__Events__2DC7BD0995EEB809");
 
-            entity.Property(e => e.createdDate).HasColumnType("datetime");
+            entity.Property(e => e.createdDate).HasColumnType("timestamp with time zone");
             entity.Property(e => e.description)
                 .HasMaxLength(200)
                 .IsUnicode(false);
@@ -77,7 +77,7 @@ public partial class EventContext : DbContext
         {
             entity.HasKey(e => e.userId).HasName("PK__Users__CB9A1CFF3C57403B");
 
-            entity.Property(e => e.createdDate).HasColumnType("datetime");
+            entity.Property(e => e.createdDate).HasColumnType("timestamp with time zone");
             entity.Property(e => e.email)
                 .HasMaxLength(255)
                 .IsUnicode(false);

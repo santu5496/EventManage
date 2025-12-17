@@ -11,58 +11,34 @@ builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<IUserService, UsersService>(provider =>
+// Get connection string from environment variable (PostgreSQL)
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+string connectionString;
+if (!string.IsNullOrWhiteSpace(databaseUrl))
 {
-    var connectionString = builder.Configuration.GetConnectionString("Assignment4");
-    if (string.IsNullOrWhiteSpace(connectionString))
-    {
-        throw new InvalidOperationException("Connection string 'Assignment4' is not configured or is empty.");
-    }
-    return new UsersService(connectionString);
-});
-builder.Services.AddSingleton<ITableViewService, TableViewService>(provider =>
+    // Convert PostgreSQL URI format to Npgsql connection string format
+    var uri = new Uri(databaseUrl);
+    var userInfo = uri.UserInfo.Split(':');
+    var sslMode = "Disable";
+    if (databaseUrl.Contains("sslmode=require")) sslMode = "Require";
+    var port = uri.Port > 0 ? uri.Port : 5432; // Default PostgreSQL port
+    connectionString = $"Host={uri.Host};Port={port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode={sslMode}";
+}
+else
 {
-    var connectionString = builder.Configuration.GetConnectionString("Assignment4");
-    if (string.IsNullOrWhiteSpace(connectionString))
-    {
-        throw new InvalidOperationException("Connection string 'Assignment4' is not configured or is empty.");
-    }
-    return new TableViewService(connectionString);
-});
-builder.Services.AddSingleton<IEventCrudService, EventCrudService>(provider =>
-{
-    var connectionString = builder.Configuration.GetConnectionString("Assignment4");
-    if (string.IsNullOrWhiteSpace(connectionString))
-    {
-        throw new InvalidOperationException("Connection string 'Assignment4' is not configured or is empty.");
-    }
-    return new EventCrudService(connectionString);
-});
-builder.Services.AddSingleton<IEventBookingSerive, EventBookingSerive>(provider =>
-{
-    var connectionString = builder.Configuration.GetConnectionString("Assignment4");
-    if (string.IsNullOrWhiteSpace(connectionString))
-    {
-        throw new InvalidOperationException("Connection string 'Assignment4' is not configured or is empty.");
-    }
-    return new EventBookingSerive(connectionString);
+    connectionString = builder.Configuration.GetConnectionString("Assignment4") ?? throw new InvalidOperationException("DATABASE_URL environment variable or connection string 'Assignment4' is not configured.");
+}
 
-});
-builder.Services.AddSingleton<IDashBoard, DashBoardSerivice>(provider =>
-{
-    var connectionString = builder.Configuration.GetConnectionString("Assignment4");
-    if (string.IsNullOrWhiteSpace(connectionString))
-    {
-        throw new InvalidOperationException("Connection string 'Assignment4' is not configured or is empty.");
-    }
-    return new DashBoardSerivice(connectionString);
-});
+builder.Services.AddSingleton<IUserService, UsersService>(provider => new UsersService(connectionString));
+builder.Services.AddSingleton<ITableViewService, TableViewService>(provider => new TableViewService(connectionString));
+builder.Services.AddSingleton<IEventCrudService, EventCrudService>(provider => new EventCrudService(connectionString));
+builder.Services.AddSingleton<IEventBookingSerive, EventBookingSerive>(provider => new EventBookingSerive(connectionString));
+builder.Services.AddSingleton<IDashBoard, DashBoardSerivice>(provider => new DashBoardSerivice(connectionString));
 
 var app = builder.Build();
 
 // Seed the database with initial data
-var seedConnectionString = builder.Configuration.GetConnectionString("Assignment4");
-var dbOptions = new DbContextOptionsBuilder<EventContext>().UseSqlServer(seedConnectionString).Options;
+var dbOptions = new DbContextOptionsBuilder<EventContext>().UseNpgsql(connectionString).Options;
 try
 {
     using (var db = new EventContext(dbOptions))
@@ -79,7 +55,7 @@ try
             userRole = "Admin",
             passwordHash = "admin123",
             username = "admin",
-            createdDate = DateTime.Now
+            createdDate = DateTime.UtcNow
         });
         
         db.Users.Add(new Users
@@ -90,7 +66,7 @@ try
             userRole = "User",
             passwordHash = "user123",
             username = "john",
-            createdDate = DateTime.Now
+            createdDate = DateTime.UtcNow
         });
         db.SaveChanges();
     }
@@ -102,7 +78,7 @@ try
             eventName = "Wedding Ceremony",
             description = "Full wedding event with band and catering",
             userId = 1,
-            createdDate = DateTime.Now
+            createdDate = DateTime.UtcNow
         });
         
         db.Events.Add(new Events
@@ -110,7 +86,7 @@ try
             eventName = "Birthday Party",
             description = "Birthday celebration with entertainment",
             userId = 1,
-            createdDate = DateTime.Now
+            createdDate = DateTime.UtcNow
         });
         
         db.Events.Add(new Events
@@ -118,7 +94,7 @@ try
             eventName = "Corporate Event",
             description = "Business meeting and corporate gathering",
             userId = 1,
-            createdDate = DateTime.Now
+            createdDate = DateTime.UtcNow
         });
         db.SaveChanges();
     }
@@ -129,9 +105,9 @@ try
         {
             userId = 1,
             eventId = 1,
-            bookingDate = DateTime.Now,
-            fromDate = DateTime.Now.AddDays(7),
-            toDate = DateTime.Now.AddDays(8),
+            bookingDate = DateTime.UtcNow,
+            fromDate = DateTime.UtcNow.AddDays(7),
+            toDate = DateTime.UtcNow.AddDays(8),
             shiftType = "Full Day",
             bookingStatus = "Confirmed",
             totalAmount = 50000,
@@ -144,16 +120,16 @@ try
             address = "123 Main Street, Mumbai",
             EventName = "Wedding Ceremony",
             bandType = "Full Band",
-            createdDate = DateTime.Now
+            createdDate = DateTime.UtcNow
         });
         
         db.Bookings.Add(new Bookings
         {
             userId = 1,
             eventId = 2,
-            bookingDate = DateTime.Now,
-            fromDate = DateTime.Now.AddDays(14),
-            toDate = DateTime.Now.AddDays(14),
+            bookingDate = DateTime.UtcNow,
+            fromDate = DateTime.UtcNow.AddDays(14),
+            toDate = DateTime.UtcNow.AddDays(14),
             shiftType = "Evening",
             bookingStatus = "Pending",
             totalAmount = 15000,
@@ -165,7 +141,7 @@ try
             address = "456 Park Avenue, Delhi",
             EventName = "Birthday Party",
             bandType = "Sada Band",
-            createdDate = DateTime.Now
+            createdDate = DateTime.UtcNow
         });
         db.SaveChanges();
     }
@@ -174,6 +150,10 @@ try
 catch (Exception ex)
 {
     Console.WriteLine($"Database seeding error: {ex.Message}");
+    if (ex.InnerException != null)
+    {
+        Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+    }
     Console.WriteLine("The application will continue without seeding. Please check your database connection.");
 }
 
