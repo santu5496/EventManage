@@ -55,7 +55,16 @@ Configured for autoscale deployment:
 - Build: `dotnet publish -c Release -o out Assignment4/Assignment4/EventManagement.csproj`
 - Run: `dotnet out/EventManagement.dll`
 
+## Mobile App-Like UI Features
+- **Bottom Navigation Bar**: On mobile/tablet devices, the sidebar is replaced with a bottom navigation bar for app-like navigation
+- **PWA Support**: Includes manifest.json and service worker for "Add to Home Screen" capability
+- **Touch-Friendly Design**: Large touch targets, ripple effects, and mobile-optimized modals
+- **Safe Area Support**: Works with notched devices (iPhone X+, etc.)
+
 ## Recent Changes
+- 2025-12-17: Added mobile app-like UI with bottom navigation bar for mobile/tablet
+- 2025-12-17: Added PWA manifest and service worker for install-to-home-screen
+- 2025-12-17: Enhanced touch-friendly CSS with app-like cards and modals
 - 2025-12-17: Configured for Replit environment (port 5000, 0.0.0.0 binding)
 - 2025-12-17: Added forwarded headers support for Replit proxy
 - 2025-12-17: Connected to external SQL Server database (sql.bsite.net)
