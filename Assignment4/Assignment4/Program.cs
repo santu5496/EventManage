@@ -11,23 +11,9 @@ builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-// Get connection string from environment variable (PostgreSQL)
-var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-string connectionString;
-if (!string.IsNullOrWhiteSpace(databaseUrl))
-{
-    // Convert PostgreSQL URI format to Npgsql connection string format
-    var uri = new Uri(databaseUrl);
-    var userInfo = uri.UserInfo.Split(':');
-    var sslMode = "Disable";
-    if (databaseUrl.Contains("sslmode=require")) sslMode = "Require";
-    var port = uri.Port > 0 ? uri.Port : 5432; // Default PostgreSQL port
-    connectionString = $"Host={uri.Host};Port={port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode={sslMode}";
-}
-else
-{
-    connectionString = builder.Configuration.GetConnectionString("Assignment4") ?? throw new InvalidOperationException("DATABASE_URL environment variable or connection string 'Assignment4' is not configured.");
-}
+// Get connection string from configuration (SQL Server)
+var connectionString = builder.Configuration.GetConnectionString("Assignment4") 
+    ?? throw new InvalidOperationException("Connection string 'Assignment4' is not configured.");
 
 builder.Services.AddSingleton<IUserService, UsersService>(provider => new UsersService(connectionString));
 builder.Services.AddSingleton<ITableViewService, TableViewService>(provider => new TableViewService(connectionString));
@@ -38,7 +24,7 @@ builder.Services.AddSingleton<IDashBoard, DashBoardSerivice>(provider => new Das
 var app = builder.Build();
 
 // Seed the database with initial data
-var dbOptions = new DbContextOptionsBuilder<EventContext>().UseNpgsql(connectionString).Options;
+var dbOptions = new DbContextOptionsBuilder<EventContext>().UseSqlServer(connectionString).Options;
 try
 {
     using (var db = new EventContext(dbOptions))
