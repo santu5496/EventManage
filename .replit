@@ -22,13 +22,13 @@ args = "ASP.NET Core Server"
 name = "ASP.NET Core Server"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "webview"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd Assignment4/Assignment4 && dotnet run"
 waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
 
 [[ports]]
 localPort = 5000
@@ -36,5 +36,5 @@ externalPort = 80
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["dotnet", "publish/EventManagement.dll"]
-build = ["dotnet", "publish", "-c", "Release", "-o", "publish", "Assignment4/Assignment4/EventManagement.csproj"]
+run = ["dotnet", "out/EventManagement.dll"]
+build = ["dotnet", "publish", "-c", "Release", "-o", "out", "Assignment4/Assignment4/EventManagement.csproj"]
