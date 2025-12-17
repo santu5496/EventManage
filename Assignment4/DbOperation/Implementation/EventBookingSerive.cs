@@ -64,7 +64,13 @@ namespace DbOperation.Implementation
                 {
                     if (bookings.bookingId == 0)
                     {
-                        bookings.createdDate = DateTime.Now;
+                        bookings.createdDate = DateTime.UtcNow;
+                        if (bookings.bookingDate.HasValue)
+                            bookings.bookingDate = DateTime.SpecifyKind(bookings.bookingDate.Value, DateTimeKind.Utc);
+                        if (bookings.fromDate.HasValue)
+                            bookings.fromDate = DateTime.SpecifyKind(bookings.fromDate.Value, DateTimeKind.Utc);
+                        if (bookings.toDate.HasValue)
+                            bookings.toDate = DateTime.SpecifyKind(bookings.toDate.Value, DateTimeKind.Utc);
                         var existingUser = db.Users.FirstOrDefault();
                         if (existingUser == null)
                         {
@@ -87,11 +93,11 @@ namespace DbOperation.Implementation
                         if (bookings.eventId.HasValue)
                             existing.eventId = bookings.eventId;
                         if (bookings.bookingDate.HasValue)
-                            existing.bookingDate = bookings.bookingDate;
+                            existing.bookingDate = DateTime.SpecifyKind(bookings.bookingDate.Value, DateTimeKind.Utc);
                         if (bookings.fromDate.HasValue)
-                            existing.fromDate = bookings.fromDate;
+                            existing.fromDate = DateTime.SpecifyKind(bookings.fromDate.Value, DateTimeKind.Utc);
                         if (bookings.toDate.HasValue)
-                            existing.toDate = bookings.toDate;
+                            existing.toDate = DateTime.SpecifyKind(bookings.toDate.Value, DateTimeKind.Utc);
                         if (!string.IsNullOrEmpty(bookings.shiftType))
                             existing.shiftType = bookings.shiftType;
                         if (!string.IsNullOrEmpty(bookings.bookingStatus))
@@ -199,11 +205,11 @@ namespace DbOperation.Implementation
                 if (bookings.eventId.HasValue)
                     existing.eventId = bookings.eventId;
                 if (bookings.bookingDate.HasValue)
-                    existing.bookingDate = bookings.bookingDate;
+                    existing.bookingDate = DateTime.SpecifyKind(bookings.bookingDate.Value, DateTimeKind.Utc);
                 if (bookings.fromDate.HasValue)
-                    existing.fromDate = bookings.fromDate;
+                    existing.fromDate = DateTime.SpecifyKind(bookings.fromDate.Value, DateTimeKind.Utc);
                 if (bookings.toDate.HasValue)
-                    existing.toDate = bookings.toDate;
+                    existing.toDate = DateTime.SpecifyKind(bookings.toDate.Value, DateTimeKind.Utc);
                 if (!string.IsNullOrEmpty(bookings.shiftType))
                     existing.shiftType = bookings.shiftType;
                 if (!string.IsNullOrEmpty(bookings.bookingStatus))
@@ -259,8 +265,12 @@ namespace DbOperation.Implementation
                 {
                     eventBooking.eventId = 3;
                     eventBooking.userId = 3;
-                    eventBooking.bookingDate = DateTime.Now;
-                    eventBooking.createdDate = DateTime.Now;
+                    eventBooking.bookingDate = DateTime.UtcNow;
+                    eventBooking.createdDate = DateTime.UtcNow;
+                    if (eventBooking.fromDate.HasValue)
+                        eventBooking.fromDate = DateTime.SpecifyKind(eventBooking.fromDate.Value, DateTimeKind.Utc);
+                    if (eventBooking.toDate.HasValue)
+                        eventBooking.toDate = DateTime.SpecifyKind(eventBooking.toDate.Value, DateTimeKind.Utc);
                     db.Bookings.Add(eventBooking);
                     db.SaveChanges();
                     return true;
@@ -294,11 +304,11 @@ namespace DbOperation.Implementation
                 if (eventBooking.eventId.HasValue)
                     existing.eventId = eventBooking.eventId;
                 if (eventBooking.bookingDate.HasValue)
-                    existing.bookingDate = eventBooking.bookingDate;
+                    existing.bookingDate = DateTime.SpecifyKind(eventBooking.bookingDate.Value, DateTimeKind.Utc);
                 if (eventBooking.fromDate.HasValue)
-                    existing.fromDate = eventBooking.fromDate;
+                    existing.fromDate = DateTime.SpecifyKind(eventBooking.fromDate.Value, DateTimeKind.Utc);
                 if (eventBooking.toDate.HasValue)
-                    existing.toDate = eventBooking.toDate;
+                    existing.toDate = DateTime.SpecifyKind(eventBooking.toDate.Value, DateTimeKind.Utc);
                 if (!string.IsNullOrEmpty(eventBooking.shiftType))
                     existing.shiftType = eventBooking.shiftType;
                 if (!string.IsNullOrEmpty(eventBooking.bookingStatus))
