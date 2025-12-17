@@ -1,4 +1,4 @@
-const CACHE_NAME = 'event-mgmt-v1';
+const CACHE_NAME = 'event-mgmt-v2';
 const urlsToCache = [
   '/',
   '/css/site.css',
