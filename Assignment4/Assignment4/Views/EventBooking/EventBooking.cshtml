@@ -98,6 +98,13 @@
             cursor: pointer;
         }
 
+        /* Adjust FAB position on mobile for bottom nav */
+        @@media (max-width: 768px) {
+            .fab {
+                bottom: 90px;
+            }
+        }
+
             .fab:hover, .fab:active {
                 transform: scale(1.1) rotate(90deg);
                 box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -628,10 +635,17 @@
            RESPONSIVE DESIGN - Mobile First Approach
            ============================================ */
 
+        /* Hide app-bar on mobile - use bottom nav instead */
+        @@media (max-width: 768px) {
+            .app-bar {
+                display: none !important;
+            }
+        }
+
         /* Extra small devices (phones, less than 576px) */
         @@media (max-width: 575.98px) {
             .app-bar {
-                padding: 1rem 0.75rem;
+                display: none !important;
             }
 
             .app-title {
