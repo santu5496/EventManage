@@ -301,10 +301,11 @@
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0,0,0,0.5);
             z-index: 1050;
+            cursor: pointer;
         }
 
         .sidebar-overlay.active {
@@ -467,27 +468,33 @@
 
             // Close on overlay click
             if (overlay) {
-                overlay.addEventListener('click', function() {
-                    sidebar.classList.remove('mobile-open');
-                    overlay.classList.remove('active');
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) {
+                        sidebar.classList.remove('mobile-open');
+                        overlay.classList.remove('active');
+                    }
                 });
             }
 
-            // Sidebar hover detection
+            // Close menu on menu item click (all screen sizes)
+            menuItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    // Check if it's mobile view
+                    if (window.innerWidth <= 991) {
+                        // Close the mobile menu
+                        sidebar.classList.remove('mobile-open');
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+
+            // Sidebar hover detection (desktop only)
             sidebar.addEventListener('mouseenter', function() {
                 isSidebarHovered = true;
             });
 
             sidebar.addEventListener('mouseleave', function() {
                 isSidebarHovered = false;
-                // Collapse sidebar when mouse leaves on desktop
-                const isDesktop = window.innerWidth > 991;
-                if (isDesktop && !sidebar.classList.contains('collapsed')) {
-                    // Optional: auto-collapse when focus is lost
-                    // Uncomment the line below to enable auto-collapse
-                    // sidebar.classList.add('collapsed');
-                    // mainWrapper.classList.add('expanded');
-                }
             });
 
             // Highlight active menu item
@@ -497,15 +504,6 @@
                 if (href && currentPath.includes(href.toLowerCase().replace(/\//g, ''))) {
                     item.classList.add('active');
                 }
-
-                // Close mobile menu when menu item is clicked
-                item.addEventListener('click', function() {
-                    const isDesktop = window.innerWidth > 991;
-                    if (!isDesktop) {
-                        sidebar.classList.remove('mobile-open');
-                        overlay.classList.remove('active');
-                    }
-                });
             });
 
             // Close sidebar when clicking outside (on desktop)
