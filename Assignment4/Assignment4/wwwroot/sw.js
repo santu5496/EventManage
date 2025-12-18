@@ -27,7 +27,18 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') {
     return;
   }
-  
+
+  // Don't intercept external CDN requests
+  if (event.request.url.includes('cdn.') || 
+      event.request.url.includes('cdnjs.') ||
+      event.request.url.includes('googleapis.') ||
+      event.request.url.includes('cdn.jsdelivr.net') ||
+      event.request.url.includes('api.') ||
+      event.request.url.startsWith('https://')) {
+    // Let external resources load without caching
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -47,12 +58,23 @@ self.addEventListener('fetch', event => {
           caches.open(CACHE_NAME)
             .then(cache => {
               cache.put(event.request, responseToCache);
+            })
+            .catch(err => {
+              console.log('Failed to cache:', err);
             });
           return response;
+        }).catch(err => {
+          console.log('Fetch failed:', err);
+          return caches.match('/').catch(() => {
+            return new Response('Offline');
+          });
         });
       })
-      .catch(() => {
-        return caches.match('/');
+      .catch(err => {
+        console.log('Cache match failed:', err);
+        return fetch(event.request).catch(() => {
+          return new Response('Offline');
+        });
       })
   );
 });
