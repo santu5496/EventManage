@@ -20,7 +20,17 @@ namespace Assignment4.Controllers
 
         public IActionResult login()
         {
+            if (HttpContext.Session.GetInt32("UserId") != null)
+            {
+                return RedirectToAction("DashBoard", "DashBoard");
+            }
             return View();
+        }
+        
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("login");
         }
 
         public IActionResult Privacy()
@@ -51,6 +61,9 @@ namespace Assignment4.Controllers
                     userRole = "Admin",
                     username = "Admin"
                 };
+                HttpContext.Session.SetInt32("UserId", adminUser.userId);
+                HttpContext.Session.SetString("Username", adminUser.username);
+                HttpContext.Session.SetString("UserRole", adminUser.userRole);
                 return Json(new { success = true, message = "User found. Login successful.", user = adminUser });
             }
             
@@ -63,6 +76,9 @@ namespace Assignment4.Controllers
                 }
                 else
                 {
+                    HttpContext.Session.SetInt32("UserId", result.userId);
+                    HttpContext.Session.SetString("Username", result.username);
+                    HttpContext.Session.SetString("UserRole", result.userRole);
                     return Json(new { success = true, message = "User found. Login successful.", user = result });
                 }
             }

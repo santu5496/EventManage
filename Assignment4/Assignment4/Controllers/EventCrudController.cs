@@ -15,6 +15,10 @@ namespace EventManagement.Controllers
 
         public IActionResult EventBooking()
         {
+            if (HttpContext.Session.GetInt32("UserId") == null)
+            {
+                return RedirectToAction("login", "Home");
+            }
             return View();
         }
 

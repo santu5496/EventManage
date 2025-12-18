@@ -16,6 +16,10 @@ namespace EventManagement.Controllers
 
         public new IActionResult User()
         {
+            if (HttpContext.Session.GetInt32("UserId") == null)
+            {
+                return RedirectToAction("login", "Home");
+            }
             return View();
         }
 

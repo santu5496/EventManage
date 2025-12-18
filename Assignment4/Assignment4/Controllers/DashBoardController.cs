@@ -14,6 +14,10 @@ namespace Assignment4.Controllers
         }
         public IActionResult DashBoard()
         {
+            if (HttpContext.Session.GetInt32("UserId") == null)
+            {
+                return RedirectToAction("login", "Home");
+            }
             return View();
         }
 

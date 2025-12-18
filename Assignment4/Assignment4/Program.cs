@@ -10,6 +10,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
 // Add services to the container.
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 builder.Services.AddControllersWithViews();
 // Get connection string from configuration (SQL Server)
 var connectionString = builder.Configuration.GetConnectionString("Assignment4") 
@@ -156,6 +162,8 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 app.UseStaticFiles();
+
+app.UseSession();
 
 app.UseRouting();
 
