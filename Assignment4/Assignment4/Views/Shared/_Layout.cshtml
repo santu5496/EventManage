@@ -446,6 +446,8 @@
             const sidebarToggle = document.getElementById('sidebarToggle');
             const mobileToggle = document.getElementById('mobileToggle');
             const overlay = document.getElementById('sidebarOverlay');
+            const menuItems = document.querySelectorAll('.menu-item');
+            let isSidebarHovered = false;
 
             // Desktop toggle
             if (sidebarToggle) {
@@ -471,13 +473,48 @@
                 });
             }
 
+            // Sidebar hover detection
+            sidebar.addEventListener('mouseenter', function() {
+                isSidebarHovered = true;
+            });
+
+            sidebar.addEventListener('mouseleave', function() {
+                isSidebarHovered = false;
+                // Collapse sidebar when mouse leaves on desktop
+                const isDesktop = window.innerWidth > 991;
+                if (isDesktop && !sidebar.classList.contains('collapsed')) {
+                    // Optional: auto-collapse when focus is lost
+                    // Uncomment the line below to enable auto-collapse
+                    // sidebar.classList.add('collapsed');
+                    // mainWrapper.classList.add('expanded');
+                }
+            });
+
             // Highlight active menu item
             const currentPath = window.location.pathname.toLowerCase();
-            const menuItems = document.querySelectorAll('.menu-item');
             menuItems.forEach(item => {
                 const href = item.getAttribute('href');
                 if (href && currentPath.includes(href.toLowerCase().replace(/\//g, ''))) {
                     item.classList.add('active');
+                }
+
+                // Close mobile menu when menu item is clicked
+                item.addEventListener('click', function() {
+                    const isDesktop = window.innerWidth > 991;
+                    if (!isDesktop) {
+                        sidebar.classList.remove('mobile-open');
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+
+            // Close sidebar when clicking outside (on desktop)
+            document.addEventListener('click', function(event) {
+                const isDesktop = window.innerWidth > 991;
+                const isClickInsideSidebar = sidebar.contains(event.target);
+                
+                if (isDesktop && !isClickInsideSidebar && !isSidebarHovered) {
+                    // Optional: handle click outside logic here
                 }
             });
         });
